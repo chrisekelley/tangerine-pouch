@@ -10,9 +10,9 @@ def push
 # Do this twice so you don't have to wait for uglify when in dev mode
 #  `couchapp push`
 
-#  Dir.chdir( File.join Dir.pwd, "www", "js" ) {
-#    `./uglify.rb app`
-#  }
+  Dir.chdir( File.join Dir.pwd, "www", "js" ) {
+    `./uglify.rb app`
+  }
 #  `couchapp push`
 end
 

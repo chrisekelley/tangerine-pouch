@@ -135,13 +135,12 @@
     },
 
     userDb : function(callback) {
-      callback(new PouchDB("_users"));
-//      return $.couch.session({
-//        success : function(resp) {
-//          var userDb = $.couch.db(resp.info.authentication_db);
-//          callback(userDb);
-//        }
-//      });
+      return $.couch.session({
+        success : function(resp) {
+          var userDb = $.couch.db(resp.info.authentication_db);
+          callback(userDb);
+        }
+      });
     },
 
     // Create a new user on the CouchDB server, <code>user_doc</code> is an
@@ -181,25 +180,23 @@
      // expected to have <code>name</code> and <code>password</code> fields.
     login: function(options) {
       options = options || {};
-      if (options.success) options.success();
-      return true;
-//      return $.ajax({
-//        type: "POST", url: this.urlPrefix + "/_session", dataType: "json",
-//        data: {name: options.name, password: options.password},
-//        beforeSend: function(xhr) {
-//            xhr.setRequestHeader('Accept', 'application/json');
-//        },
-//        complete: function(req) {
-//          var resp = $.parseJSON(req.responseText);
-//          if (req.status == 200) {
-//            if (options.success) options.success(resp);
-//          } else if (options.error) {
-//            options.error(req.status, resp.error, resp.reason);
-//          } else {
-//            alert("An error occurred logging in: " + resp.reason);
-//          }
-//        }
-//      });
+      return $.ajax({
+        type: "POST", url: this.urlPrefix + "/_session", dataType: "json",
+        data: {name: options.name, password: options.password},
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('Accept', 'application/json');
+        },
+        complete: function(req) {
+          var resp = $.parseJSON(req.responseText);
+          if (req.status == 200) {
+            if (options.success) options.success(resp);
+          } else if (options.error) {
+            options.error(req.status, resp.error, resp.reason);
+          } else {
+            alert("An error occurred logging in: " + resp.reason);
+          }
+        }
+      });
     },
 
 

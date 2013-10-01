@@ -7,8 +7,10 @@
 # Utils.disableConsoleLog()
 # Utils.disableConsoleAssert()
 
+$.couch.urlPrefix = "http://localhost:5984";
+
 Tangerine =
-  "db_name"    : window.location.pathname.split("/")[1]
+  "db_name"    : "localhost:5984",
   "design_doc" : _.last(String(window.location).split("_design/")).split("/")[0]
 
 # Local tangerine database handle
@@ -120,12 +122,12 @@ Tangerine.onSettingsLoad = ->
 
 # make sure all users in the _users database have a local user model for future use
 Tangerine.transitionUsers = (callback) ->
-
+  # return true;
   return callback() if Tangerine.settings.get("context") is "server" or Tangerine.settings.has("usersTransitioned")
 
   $.couch.login
     name     : "admin"
-    password : "password"
+    password : "luvcouch"
     success: ->
       $.couch.userDb (uDB) => 
         uDB.allDocs
