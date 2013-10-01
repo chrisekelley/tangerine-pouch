@@ -15,9 +15,14 @@ Tangerine =
 Tangerine.$db = $.couch.db(Tangerine.db_name)
 
 # Backbone configuration
-Backbone.couch_connector.config.db_name   = Tangerine.db_name
-Backbone.couch_connector.config.ddoc_name = Tangerine.design_doc
-Backbone.couch_connector.config.global_changes = false
+#Backbone.couch_connector.config.db_name   = Tangerine.db_name
+#Backbone.couch_connector.config.ddoc_name = Tangerine.design_doc
+#Backbone.couch_connector.config.global_changes = false
+Backbone.sync = BackbonePouch.sync({
+  db: PouchDB('tangerine')
+});
+
+Backbone.Model.prototype.idAttribute = '_id';
 
 # set underscore's template engine to accept handlebar-style variables
 _.templateSettings = interpolate : /\{\{(.+?)\}\}/g

@@ -167,7 +167,7 @@ jsFiles = [
 ]
 
 libFiles = [
-  'lib/phonegap.js',
+# 'lib/phonegap.js',
   'lib/jquery.js',
   'lib/underscore.js',
   'lib/sha1.js',
@@ -190,7 +190,7 @@ libFiles = [
   'lib/inflection.js',
   'lib/backbone.js',
   'lib/moment.js',
-  'lib/backbone-couchdb.js',
+  'lib/backbone-pouch.js',
   'lib/transcriptionCheckdigit.js',
   'lib/table2CSV.js',
   'lib/base64.js',
@@ -198,6 +198,7 @@ libFiles = [
   'lib/ckeditor.js',
   '../_docs/configuration.js',
   '../_docs/templates.js',
+  'lib/pouchdb-nightly.js',
   'lib/coffee-script.js' # This file tends to like to be last
 ]
 
