@@ -1,0 +1,11 @@
+{
+  "name": "tangerine-pouch",
+  "version": "1.0.0",
+  "type": "app",
+  "dependencies": {
+     "simple-http-server":"0.1.8"
+  },
+  "scripts": {
+    "start": "nserver -d www"
+  }
+}
