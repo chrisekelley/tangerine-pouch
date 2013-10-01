@@ -57,8 +57,9 @@ class Settings extends Backbone.Model
 
 
     if Tangerine.settings.get("context") != "server"
-      splitGroup = groupHost.split("://")
-      groupHost = "#{splitGroup[0]}://#{@upUser}:#{@upPass}@#{splitGroup[1]}"
+      if groupHost?
+        splitGroup = groupHost.split("://")
+        groupHost = "#{splitGroup[0]}://#{@upUser}:#{@upPass}@#{splitGroup[1]}"
 
     @location =
       local:

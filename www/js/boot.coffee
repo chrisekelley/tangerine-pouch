@@ -66,59 +66,58 @@ Tangerine.settings.fetch
 Tangerine.onSettingsLoad = ->
 
   # Template files for ease of use in grids
-  Tangerine.templates = new Template "_id" : "templates"
-  Tangerine.templates.fetch
-    success: ->
-      Tangerine.ensureAdmin ->
-        Tangerine.transitionUsers ->
-          $ ->
-            # Start the application
+  # Tangerine.templates = new Template "_id" : "templates"
+  Tangerine.templates = new Template(templates);
+  Tangerine.ensureAdmin ->
+    Tangerine.transitionUsers ->
+      $ ->
+        # Start the application
 
-            window.vm = new ViewManager()
+        window.vm = new ViewManager()
 
-            #$("<button id='reload'>reload me</button>").appendTo("#footer").click -> document.location.reload()
+        #$("<button id='reload'>reload me</button>").appendTo("#footer").click -> document.location.reload()
 
-            $.i18n.init 
-              "fallbackLng" : "en"
-              "lng"         : Tangerine.settings.get "language"
-              "resGetPath"  : "locales/__lng__/translation.json"
-            , (t) ->
-              window.t = t
-
-
-              if Tangerine.settings.get("context") != "server"
-                document.addEventListener "deviceready"
-                , ->
-                  document.addEventListener "online", -> Tangerine.online = true
-                  document.addEventListener "offline", -> Tangerine.online = false
-
-                  ### Note, turns on menu button
-                  document.addEventListener "menubutton", (event) ->
-                    console.log "menu button"
-                  , false
-                  ###
-
-                  # prevents default
-                  document.addEventListener "backbutton", Tangerine.onBackButton, false
-                , false
+        $.i18n.init
+          "fallbackLng" : "en"
+          "lng"         : Tangerine.settings.get "language"
+          "resGetPath"  : "locales/__lng__/translation.json"
+        , (t) ->
+          window.t = t
 
 
-              # Singletons
-              Tangerine.router = new Router()
-              Tangerine.user   = if Tangerine.settings.get("context") is "server"
-                  new User()
-                else
-                  new TabletUser()
-              Tangerine.nav    = new NavigationView
-                user   : Tangerine.user
-                router : Tangerine.router
-              Tangerine.log    = new Log()
+          if Tangerine.settings.get("context") != "server"
+            document.addEventListener "deviceready"
+            , ->
+              document.addEventListener "online", -> Tangerine.online = true
+              document.addEventListener "offline", -> Tangerine.online = false
 
-              Tangerine.user.sessionRefresh 
-                success: -> 
-                  $("body").addClass(Tangerine.settings.get("context"))
+              ### Note, turns on menu button
+              document.addEventListener "menubutton", (event) ->
+                console.log "menu button"
+              , false
+              ###
 
-                  Backbone.history.start()
+              # prevents default
+              document.addEventListener "backbutton", Tangerine.onBackButton, false
+            , false
+
+
+          # Singletons
+          Tangerine.router = new Router()
+          Tangerine.user   = if Tangerine.settings.get("context") is "server"
+              new User()
+            else
+              new TabletUser()
+          Tangerine.nav    = new NavigationView
+            user   : Tangerine.user
+            router : Tangerine.router
+          Tangerine.log    = new Log()
+
+          Tangerine.user.sessionRefresh
+            success: ->
+              $("body").addClass(Tangerine.settings.get("context"))
+
+              Backbone.history.start()
 
 # make sure all users in the _users database have a local user model for future use
 Tangerine.transitionUsers = (callback) ->
