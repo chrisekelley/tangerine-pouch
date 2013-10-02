@@ -89,7 +89,13 @@
     // Returns the session information for the currently logged in user.
     session: function(options) {
 
-      if (options.success) options.success();
+        // In our AuthSession, we are cheating and only have names
+        var authSession = $.cookie("AuthSession");
+        var resp = [
+            {"ok": true},
+            {"userCtx": {"name": authSession, "roles": []}}
+        ];
+        if (options.success) options.success(resp);
 
       return;
 
@@ -185,8 +191,14 @@
       options = options || {};
 
       // Set the cookie
-      $.cookie( "AuthSession", "admin", { expires: 600 });
-      if (options.success) options.success();
+      $.cookie( "AuthSession", options.name, { expires: 600 });
+        // In our AuthSession, we are cheating and only have names
+        var authSession = $.cookie("AuthSession");
+        var resp = [
+            {"ok": true},
+            {"userCtx": {"name": authSession, "roles": []}}
+        ];
+        if (options.success) options.success(resp);
       return;
 
       return $.ajax({
