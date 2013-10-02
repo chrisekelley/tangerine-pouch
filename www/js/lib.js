@@ -1,4 +1,4 @@
-if(typeof PhoneGap==="undefined"){var PhoneGap={documentEventHandler:{},windowEventHandler:{}};PhoneGap.resources={base:true};PhoneGap.hasResource=function(a){return PhoneGap.resources[a]};PhoneGap.addResource=function(a){PhoneGap.resources[a]=true};PhoneGap.Channel=function(a){this.type=a;this.handlers={};this.guid=0;this.fired=false;this.enabled=true};PhoneGap.Channel.prototype.subscribe=function(d,e,b){if(d===null){return}var a=d;if(typeof e==="object"&&typeof d==="function"){a=PhoneGap.close(e,d)}b=b||a.observer_guid||d.observer_guid||this.guid++;a.observer_guid=b;d.observer_guid=b;this.handlers[b]=a;return b};PhoneGap.Channel.prototype.subscribeOnce=function(d,h){var b=null;var e=this;var a=function(){d.apply(h||null,arguments);e.unsubscribe(b)};if(this.fired){if(typeof h==="object"&&typeof d==="function"){d=PhoneGap.close(h,d)}d.apply(this,this.fireArgs)}else{b=this.subscribe(a)}return b};PhoneGap.Channel.prototype.unsubscribe=function(a){if(typeof a==="function"){a=a.observer_guid}this.handlers[a]=null;delete this.handlers[a]};PhoneGap.Channel.prototype.fire=function(d){if(this.enabled){var a=false;var c,b,f;for(c in this.handlers){if(this.handlers.hasOwnProperty(c)){b=this.handlers[c];if(typeof b==="function"){f=(b.apply(this,arguments)===false);a=a||f}}}this.fired=true;this.fireArgs=arguments;return !a}return true};PhoneGap.Channel.join=function(e,k){var d=k.length;var g=function(){if(!(--d)){e()}};var a=d;var b;for(b=0;b<a;b++){if(!k[b].fired){k[b].subscribeOnce(g)}else{d--}}if(!d){e()}};PhoneGap.addConstructor=function(a){PhoneGap.onPhoneGapInit.subscribeOnce(function(){try{a()}catch(b){console.log("Failed to run constructor: "+b)}})};if(!window.plugins){window.plugins={}}PhoneGap.addPlugin=function(a,b){if(!window.plugins[a]){window.plugins[a]=b}else{console.log("Error: Plugin "+a+" already exists.")}};PhoneGap.onDOMContentLoaded=new PhoneGap.Channel("onDOMContentLoaded");PhoneGap.onNativeReady=new PhoneGap.Channel("onNativeReady");PhoneGap.onPhoneGapInit=new PhoneGap.Channel("onPhoneGapInit");PhoneGap.onPhoneGapReady=new PhoneGap.Channel("onPhoneGapReady");PhoneGap.onPhoneGapInfoReady=new PhoneGap.Channel("onPhoneGapInfoReady");PhoneGap.onPhoneGapConnectionReady=new PhoneGap.Channel("onPhoneGapConnectionReady");PhoneGap.onDestroy=new PhoneGap.Channel("onDestroy");PhoneGap.onDestroy.subscribeOnce(function(){PhoneGap.shuttingDown=true});PhoneGap.shuttingDown=false;if(typeof _nativeReady!=="undefined"){PhoneGap.onNativeReady.fire()}PhoneGap.onDeviceReady=new PhoneGap.Channel("onDeviceReady");PhoneGap.deviceReadyChannelsArray=[PhoneGap.onPhoneGapReady,PhoneGap.onPhoneGapInfoReady,PhoneGap.onPhoneGapConnectionReady];PhoneGap.deviceReadyChannelsMap={};PhoneGap.waitForInitialization=function(a){if(a){var b=new PhoneGap.Channel(a);PhoneGap.deviceReadyChannelsMap[a]=b;PhoneGap.deviceReadyChannelsArray.push(b)}};PhoneGap.initializationComplete=function(a){var b=PhoneGap.deviceReadyChannelsMap[a];if(b){b.fire()}};PhoneGap.Channel.join(function(){setTimeout(function(){if(PhoneGap.UsePolling){PhoneGap.JSCallbackPolling()}else{var a=prompt("usePolling","gap_callbackServer:");PhoneGap.UsePolling=a;if(a=="true"){PhoneGap.UsePolling=true;PhoneGap.JSCallbackPolling()}else{PhoneGap.UsePolling=false;PhoneGap.JSCallback()}}},1);PhoneGap.onPhoneGapInit.fire();PhoneGap.onPhoneGapReady.fire();PhoneGap.Channel.join(function(){prompt("","gap_init:");PhoneGap.onDeviceReady.fire()},PhoneGap.deviceReadyChannelsArray)},[PhoneGap.onDOMContentLoaded,PhoneGap.onNativeReady]);document.addEventListener("DOMContentLoaded",function(){PhoneGap.onDOMContentLoaded.fire()},false);PhoneGap.m_document_addEventListener=document.addEventListener;PhoneGap.m_window_addEventListener=window.addEventListener;PhoneGap.addWindowEventHandler=function(a,b){PhoneGap.windowEventHandler[a]=b};PhoneGap.addDocumentEventHandler=function(a,b){PhoneGap.documentEventHandler[a]=b};document.addEventListener=function(a,c,b){var d=a.toLowerCase();if(d==="deviceready"){PhoneGap.onDeviceReady.subscribeOnce(c)}else{if(d==="backbutton"){PhoneGap.exec(null,null,"App","overrideBackbutton",[true])}else{if(typeof PhoneGap.documentEventHandler[d]!=="undefined"){if(PhoneGap.documentEventHandler[d](d,c,true)){return}}}PhoneGap.m_document_addEventListener.call(document,a,c,b)}};window.addEventListener=function(a,c,b){var d=a.toLowerCase();if(typeof PhoneGap.windowEventHandler[d]!=="undefined"){if(PhoneGap.windowEventHandler[d](d,c,true)){return}}PhoneGap.m_window_addEventListener.call(window,a,c,b)};PhoneGap.m_document_removeEventListener=document.removeEventListener;PhoneGap.m_window_removeEventListener=window.removeEventListener;document.removeEventListener=function(a,c,b){var d=a.toLowerCase();if(d==="backbutton"){PhoneGap.exec(null,null,"App","overrideBackbutton",[false])}if(typeof PhoneGap.documentEventHandler[d]!=="undefined"){if(PhoneGap.documentEventHandler[d](d,c,false)){return}}PhoneGap.m_document_removeEventListener.call(document,a,c,b)};window.removeEventListener=function(a,c,b){var d=a.toLowerCase();if(typeof PhoneGap.windowEventHandler[d]!=="undefined"){if(PhoneGap.windowEventHandler[d](d,c,false)){return}}PhoneGap.m_window_removeEventListener.call(window,a,c,b)};PhoneGap.fireDocumentEvent=function(b,c){var d=document.createEvent("Events");d.initEvent(b);if(c){for(var a in c){d[a]=c[a]}}document.dispatchEvent(d)};PhoneGap.fireWindowEvent=function(b,c){var d=document.createEvent("Events");d.initEvent(b);if(c){for(var a in c){d[a]=c[a]}}window.dispatchEvent(d)};PhoneGap.clone=function(c){var a,b;if(!c){return c}if(c instanceof Array){b=[];for(a=0;a<c.length;++a){b.push(PhoneGap.clone(c[a]))}return b}if(typeof c==="function"){return c}if(!(c instanceof Object)){return c}if(c instanceof Date){return c}b={};for(a in c){if(!(a in b)||b[a]!==c[a]){b[a]=PhoneGap.clone(c[a])}}return b};PhoneGap.callbackId=0;PhoneGap.callbacks={};PhoneGap.callbackStatus={NO_RESULT:0,OK:1,CLASS_NOT_FOUND_EXCEPTION:2,ILLEGAL_ACCESS_EXCEPTION:3,INSTANTIATION_EXCEPTION:4,MALFORMED_URL_EXCEPTION:5,IO_EXCEPTION:6,INVALID_ACTION:7,JSON_EXCEPTION:8,ERROR:9};PhoneGap.exec=function(success,fail,service,action,args){try{var callbackId=service+PhoneGap.callbackId++;if(success||fail){PhoneGap.callbacks[callbackId]={success:success,fail:fail}}var r=prompt(JSON.stringify(args),"gap:"+JSON.stringify([service,action,callbackId,true]));if(r.length>0){eval("var v="+r+";");if(v.status===PhoneGap.callbackStatus.OK){if(success){try{success(v.message)}catch(e){console.log("Error in success callback: "+callbackId+" = "+e)}if(!v.keepCallback){delete PhoneGap.callbacks[callbackId]}}return v.message}else{if(v.status===PhoneGap.callbackStatus.NO_RESULT){if(!v.keepCallback){delete PhoneGap.callbacks[callbackId]}}else{console.log("Error: Status="+v.status+" Message="+v.message);if(fail){try{fail(v.message)}catch(e1){console.log("Error in error callback: "+callbackId+" = "+e1)}if(!v.keepCallback){delete PhoneGap.callbacks[callbackId]}}return null}}}}catch(e2){console.log("Error: "+e2)}};PhoneGap.callbackSuccess=function(b,a){if(PhoneGap.callbacks[b]){if(a.status===PhoneGap.callbackStatus.OK){try{if(PhoneGap.callbacks[b].success){PhoneGap.callbacks[b].success(a.message)}}catch(c){console.log("Error in success callback: "+b+" = "+c)}}if(!a.keepCallback){delete PhoneGap.callbacks[b]}}};PhoneGap.callbackError=function(b,a){if(PhoneGap.callbacks[b]){try{if(PhoneGap.callbacks[b].fail){PhoneGap.callbacks[b].fail(a.message)}}catch(c){console.log("Error in error callback: "+b+" = "+c)}if(!a.keepCallback){delete PhoneGap.callbacks[b]}}};PhoneGap.JSCallbackPort=null;PhoneGap.JSCallbackToken=null;PhoneGap.JSCallback=function(){if(PhoneGap.shuttingDown){return}if(PhoneGap.UsePolling){PhoneGap.JSCallbackPolling();return}var xmlhttp=new XMLHttpRequest();xmlhttp.onreadystatechange=function(){if(xmlhttp.readyState===4){if(PhoneGap.shuttingDown){return}if(xmlhttp.status===200){var msg=decodeURIComponent(xmlhttp.responseText);setTimeout(function(){try{var t=eval(msg)}catch(e){console.log("JSCallback: Message from Server: "+msg);console.log("JSCallback Error: "+e)}},1);setTimeout(PhoneGap.JSCallback,1)}else{if(xmlhttp.status===404){setTimeout(PhoneGap.JSCallback,10)}else{if(xmlhttp.status===403){console.log("JSCallback Error: Invalid token.  Stopping callbacks.")}else{if(xmlhttp.status===503){console.log("JSCallback Server Closed: Stopping callbacks.")}else{if(xmlhttp.status===400){console.log("JSCallback Error: Bad request.  Stopping callbacks.")}else{console.log("JSCallback Error: Request failed.");PhoneGap.UsePolling=true;PhoneGap.JSCallbackPolling()}}}}}}};if(PhoneGap.JSCallbackPort===null){PhoneGap.JSCallbackPort=prompt("getPort","gap_callbackServer:")}if(PhoneGap.JSCallbackToken===null){PhoneGap.JSCallbackToken=prompt("getToken","gap_callbackServer:")}xmlhttp.open("GET","http://127.0.0.1:"+PhoneGap.JSCallbackPort+"/"+PhoneGap.JSCallbackToken,true);xmlhttp.send()};PhoneGap.JSCallbackPollingPeriod=50;PhoneGap.UsePolling=false;PhoneGap.JSCallbackPolling=function(){if(PhoneGap.shuttingDown){return}if(!PhoneGap.UsePolling){PhoneGap.JSCallback();return}var msg=prompt("","gap_poll:");if(msg){setTimeout(function(){try{var t=eval(""+msg)}catch(e){console.log("JSCallbackPolling: Message from Server: "+msg);console.log("JSCallbackPolling Error: "+e)}},1);setTimeout(PhoneGap.JSCallbackPolling,1)}else{setTimeout(PhoneGap.JSCallbackPolling,PhoneGap.JSCallbackPollingPeriod)}};PhoneGap.createUUID=function(){return PhoneGap.UUIDcreatePart(4)+"-"+PhoneGap.UUIDcreatePart(2)+"-"+PhoneGap.UUIDcreatePart(2)+"-"+PhoneGap.UUIDcreatePart(2)+"-"+PhoneGap.UUIDcreatePart(6)};PhoneGap.UUIDcreatePart=function(d){var b="";var a,c;for(a=0;a<d;a++){c=parseInt((Math.random()*256),0).toString(16);if(c.length===1){c="0"+c}b+=c}return b};PhoneGap.close=function(a,b,c){if(typeof c==="undefined"){return function(){return b.apply(a,arguments)}}else{return function(){return b.apply(a,c)}}};PhoneGap.includeJavascript=function(c,a){var d=document.getElementsByTagName("head")[0];var b=document.createElement("script");b.type="text/javascript";if(typeof a==="function"){b.onload=a}b.src=c;d.appendChild(b)}}if(!PhoneGap.hasResource("device")){PhoneGap.addResource("device");var Device=function(){this.available=PhoneGap.available;this.platform=null;this.version=null;this.name=null;this.uuid=null;this.phonegap=null;var a=this;this.getInfo(function(b){a.available=true;a.platform=b.platform;a.version=b.version;a.name=b.name;a.uuid=b.uuid;a.phonegap=b.phonegap;PhoneGap.onPhoneGapInfoReady.fire()},function(b){a.available=false;console.log("Error initializing PhoneGap: "+b);alert("Error initializing PhoneGap: "+b)})};Device.prototype.getInfo=function(a,b){if(typeof a!=="function"){console.log("Device Error: successCallback is not a function");return}if(b&&(typeof b!=="function")){console.log("Device Error: errorCallback is not a function");return}PhoneGap.exec(a,b,"Device","getDeviceInfo",[])};Device.prototype.overrideBackButton=function(){console.log("Device.overrideBackButton() is deprecated.  Use App.overrideBackbutton(true).");navigator.app.overrideBackbutton(true)};Device.prototype.resetBackButton=function(){console.log("Device.resetBackButton() is deprecated.  Use App.overrideBackbutton(false).");navigator.app.overrideBackbutton(false)};Device.prototype.exitApp=function(){console.log("Device.exitApp() is deprecated.  Use App.exitApp().");navigator.app.exitApp()};PhoneGap.addConstructor(function(){if(typeof navigator.device==="undefined"){navigator.device=window.device=new Device()}})}if(!PhoneGap.hasResource("accelerometer")){PhoneGap.addResource("accelerometer");var Acceleration=function(a,c,b){this.x=a;this.y=c;this.z=b;this.timestamp=new Date().getTime()};var Accelerometer=function(){this.lastAcceleration=null;this.timers={}};Accelerometer.ERROR_MSG=["Not running","Starting","","Failed to start"];Accelerometer.prototype.getCurrentAcceleration=function(a,b,c){if(typeof a!=="function"){console.log("Accelerometer Error: successCallback is not a function");return}if(b&&(typeof b!=="function")){console.log("Accelerometer Error: errorCallback is not a function");return}PhoneGap.exec(a,b,"Accelerometer","getAcceleration",[])};Accelerometer.prototype.watchAcceleration=function(a,b,c){var d=(c!==undefined)?c.frequency:10000;if(typeof a!=="function"){console.log("Accelerometer Error: successCallback is not a function");return}if(b&&(typeof b!=="function")){console.log("Accelerometer Error: errorCallback is not a function");return}PhoneGap.exec(function(f){if(f<(d+10000)){PhoneGap.exec(null,null,"Accelerometer","setTimeout",[d+10000])}},function(f){},"Accelerometer","getTimeout",[]);var e=PhoneGap.createUUID();navigator.accelerometer.timers[e]=setInterval(function(){PhoneGap.exec(a,b,"Accelerometer","getAcceleration",[])},(d?d:1));return e};Accelerometer.prototype.clearWatch=function(a){if(a&&navigator.accelerometer.timers[a]!==undefined){clearInterval(navigator.accelerometer.timers[a]);delete navigator.accelerometer.timers[a]}};PhoneGap.addConstructor(function(){if(typeof navigator.accelerometer==="undefined"){navigator.accelerometer=new Accelerometer()}})}if(!PhoneGap.hasResource("app")){PhoneGap.addResource("app");(function(){var a=function(){};a.prototype.clearCache=function(){PhoneGap.exec(null,null,"App","clearCache",[])};a.prototype.loadUrl=function(b,c){PhoneGap.exec(null,null,"App","loadUrl",[b,c])};a.prototype.cancelLoadUrl=function(){PhoneGap.exec(null,null,"App","cancelLoadUrl",[])};a.prototype.clearHistory=function(){PhoneGap.exec(null,null,"App","clearHistory",[])};a.prototype.backHistory=function(){PhoneGap.exec(null,null,"App","backHistory",[])};a.prototype.overrideBackbutton=function(b){PhoneGap.exec(null,null,"App","overrideBackbutton",[b])};a.prototype.exitApp=function(){return PhoneGap.exec(null,null,"App","exitApp",[])};PhoneGap.addConstructor(function(){navigator.app=new a()})}())}if(!PhoneGap.hasResource("battery")){PhoneGap.addResource("battery");var Battery=function(){this._level=null;this._isPlugged=null;this._batteryListener=[];this._lowListener=[];this._criticalListener=[]};Battery.prototype.eventHandler=function(a,b,d){var c=navigator.battery;if(d){if(c._batteryListener.length===0&&c._lowListener.length===0&&c._criticalListener.length===0){PhoneGap.exec(c._status,c._error,"Battery","start",[])}if(a==="batterystatus"){if(c._batteryListener.indexOf(b)===-1){c._batteryListener.push(b)}}else{if(a==="batterylow"){if(c._lowListener.indexOf(b)===-1){c._lowListener.push(b)}}else{if(a==="batterycritical"){if(c._criticalListener.indexOf(b)===-1){c._criticalListener.push(b)}}}}}else{var e=-1;if(a==="batterystatus"){e=c._batteryListener.indexOf(b);if(e>-1){c._batteryListener.splice(e,1)}}else{if(a==="batterylow"){e=c._lowListener.indexOf(b);if(e>-1){c._lowListener.splice(e,1)}}else{if(a==="batterycritical"){e=c._criticalListener.indexOf(b);if(e>-1){c._criticalListener.splice(e,1)}}}}if(c._batteryListener.length===0&&c._lowListener.length===0&&c._criticalListener.length===0){PhoneGap.exec(null,null,"Battery","stop",[])}}};Battery.prototype._status=function(b){if(b){var a=this;var c=b.level;if(a._level!==c||a._isPlugged!==b.isPlugged){PhoneGap.fireWindowEvent("batterystatus",b);if(c===20||c===5){if(c===20){PhoneGap.fireWindowEvent("batterylow",b)}else{PhoneGap.fireWindowEvent("batterycritical",b)}}}a._level=c;a._isPlugged=b.isPlugged}};Battery.prototype._error=function(a){console.log("Error initializing Battery: "+a)};PhoneGap.addConstructor(function(){if(typeof navigator.battery==="undefined"){navigator.battery=new Battery();PhoneGap.addWindowEventHandler("batterystatus",navigator.battery.eventHandler);PhoneGap.addWindowEventHandler("batterylow",navigator.battery.eventHandler);PhoneGap.addWindowEventHandler("batterycritical",navigator.battery.eventHandler)}})}if(!PhoneGap.hasResource("camera")){PhoneGap.addResource("camera");var Camera=function(){this.successCallback=null;this.errorCallback=null;this.options=null};Camera.DestinationType={DATA_URL:0,FILE_URI:1};Camera.prototype.DestinationType=Camera.DestinationType;Camera.EncodingType={JPEG:0,PNG:1};Camera.prototype.EncodingType=Camera.EncodingType;Camera.MediaType={PICTURE:0,VIDEO:1,ALLMEDIA:2};Camera.prototype.MediaType=Camera.MediaType;Camera.PictureSourceType={PHOTOLIBRARY:0,CAMERA:1,SAVEDPHOTOALBUM:2};Camera.prototype.PictureSourceType=Camera.PictureSourceType;Camera.prototype.getPicture=function(b,c,d){if(typeof b!=="function"){console.log("Camera Error: successCallback is not a function");return}if(c&&(typeof c!=="function")){console.log("Camera Error: errorCallback is not a function");return}if(d===null||typeof d==="undefined"){d={}}if(d.quality===null||typeof d.quality==="undefined"){d.quality=80}if(d.maxResolution===null||typeof d.maxResolution==="undefined"){d.maxResolution=0}if(d.destinationType===null||typeof d.destinationType==="undefined"){d.destinationType=Camera.DestinationType.DATA_URL}if(d.sourceType===null||typeof d.sourceType==="undefined"){d.sourceType=Camera.PictureSourceType.CAMERA}if(d.encodingType===null||typeof d.encodingType==="undefined"){d.encodingType=Camera.EncodingType.JPEG}if(d.mediaType===null||typeof d.mediaType==="undefined"){d.mediaType=Camera.MediaType.PICTURE}if(d.targetWidth===null||typeof d.targetWidth==="undefined"){d.targetWidth=-1}else{if(typeof d.targetWidth==="string"){var e=new Number(d.targetWidth);if(isNaN(e)===false){d.targetWidth=e.valueOf()}}}if(d.targetHeight===null||typeof d.targetHeight==="undefined"){d.targetHeight=-1}else{if(typeof d.targetHeight==="string"){var a=new Number(d.targetHeight);if(isNaN(a)===false){d.targetHeight=a.valueOf()}}}PhoneGap.exec(b,c,"Camera","takePicture",[d])};PhoneGap.addConstructor(function(){if(typeof navigator.camera==="undefined"){navigator.camera=new Camera()}})}if(!PhoneGap.hasResource("capture")){PhoneGap.addResource("capture");var MediaFile=function(c,b,e,a,d){this.name=c||null;this.fullPath=b||null;this.type=e||null;this.lastModifiedDate=a||null;this.size=d||0};MediaFile.prototype.getFormatData=function(a,b){PhoneGap.exec(a,b,"Capture","getFormatData",[this.fullPath,this.type])};var MediaFileData=function(b,d,a,c,e){this.codecs=b||null;this.bitrate=d||0;this.height=a||0;this.width=c||0;this.duration=e||0};var CaptureError=function(){this.code=null};CaptureError.CAPTURE_INTERNAL_ERR=0;CaptureError.CAPTURE_APPLICATION_BUSY=1;CaptureError.CAPTURE_INVALID_ARGUMENT=2;CaptureError.CAPTURE_NO_MEDIA_FILES=3;CaptureError.CAPTURE_NOT_SUPPORTED=20;var Capture=function(){this.supportedAudioModes=[];this.supportedImageModes=[];this.supportedVideoModes=[]};Capture.prototype.captureAudio=function(a,b,c){PhoneGap.exec(a,b,"Capture","captureAudio",[c])};Capture.prototype.captureImage=function(a,b,c){PhoneGap.exec(a,b,"Capture","captureImage",[c])};Capture.prototype._castMediaFile=function(c){var d=[];var b;for(b=0;b<c.message.length;b++){var a=new MediaFile();a.name=c.message[b].name;a.fullPath=c.message[b].fullPath;a.type=c.message[b].type;a.lastModifiedDate=c.message[b].lastModifiedDate;a.size=c.message[b].size;d.push(a)}c.message=d;return c};Capture.prototype.captureVideo=function(a,b,c){PhoneGap.exec(a,b,"Capture","captureVideo",[c])};var ConfigurationData=function(){this.type=null;this.height=0;this.width=0};var CaptureImageOptions=function(){this.limit=1;this.mode=null};var CaptureVideoOptions=function(){this.limit=1;this.duration=0;this.mode=null};var CaptureAudioOptions=function(){this.limit=1;this.duration=0;this.mode=null};PhoneGap.addConstructor(function(){if(typeof navigator.device.capture==="undefined"){navigator.device.capture=window.device.capture=new Capture()}})}if(!PhoneGap.hasResource("compass")){PhoneGap.addResource("compass");var CompassError=function(){this.code=null};CompassError.COMPASS_INTERNAL_ERR=0;CompassError.COMPASS_NOT_SUPPORTED=20;var CompassHeading=function(){this.magneticHeading=null;this.trueHeading=null;this.headingAccuracy=null;this.timestamp=null};var Compass=function(){this.lastHeading=null;this.timers={}};Compass.ERROR_MSG=["Not running","Starting","","Failed to start"];Compass.prototype.getCurrentHeading=function(a,b,c){if(typeof a!=="function"){console.log("Compass Error: successCallback is not a function");return}if(b&&(typeof b!=="function")){console.log("Compass Error: errorCallback is not a function");return}PhoneGap.exec(a,b,"Compass","getHeading",[])};Compass.prototype.watchHeading=function(a,b,c){var d=(c!==undefined)?c.frequency:100;if(typeof a!=="function"){console.log("Compass Error: successCallback is not a function");return}if(b&&(typeof b!=="function")){console.log("Compass Error: errorCallback is not a function");return}PhoneGap.exec(function(f){if(f<(d+10000)){PhoneGap.exec(null,null,"Compass","setTimeout",[d+10000])}},function(f){},"Compass","getTimeout",[]);var e=PhoneGap.createUUID();navigator.compass.timers[e]=setInterval(function(){PhoneGap.exec(a,b,"Compass","getHeading",[])},(d?d:1));return e};Compass.prototype.clearWatch=function(a){if(a&&navigator.compass.timers[a]){clearInterval(navigator.compass.timers[a]);delete navigator.compass.timers[a]}};Compass.prototype._castDate=function(a){if(a.message.timestamp){var b=new Date(a.message.timestamp);a.message.timestamp=b}return a};PhoneGap.addConstructor(function(){if(typeof navigator.compass==="undefined"){navigator.compass=new Compass()}})}if(!PhoneGap.hasResource("contact")){PhoneGap.addResource("contact");var Contact=function(c,k,a,h,e,g,d,m,b,l,j,n,f,i){this.id=c||null;this.rawId=null;this.displayName=k||null;this.name=a||null;this.nickname=h||null;this.phoneNumbers=e||null;this.emails=g||null;this.addresses=d||null;this.ims=m||null;this.organizations=b||null;this.birthday=l||null;this.note=j||null;this.photos=n||null;this.categories=f||null;this.urls=i||null};var ContactError=function(){this.code=null};ContactError.UNKNOWN_ERROR=0;ContactError.INVALID_ARGUMENT_ERROR=1;ContactError.TIMEOUT_ERROR=2;ContactError.PENDING_OPERATION_ERROR=3;ContactError.IO_ERROR=4;ContactError.NOT_SUPPORTED_ERROR=5;ContactError.PERMISSION_DENIED_ERROR=20;Contact.prototype.remove=function(c,a){if(this.id===null){var b=new ContactError();b.code=ContactError.UNKNOWN_ERROR;a(b)}else{PhoneGap.exec(c,a,"Contacts","remove",[this.id])}};Contact.prototype.clone=function(){var b=PhoneGap.clone(this);var a;b.id=null;b.rawId=null;if(b.phoneNumbers){for(a=0;a<b.phoneNumbers.length;a++){b.phoneNumbers[a].id=null}}if(b.emails){for(a=0;a<b.emails.length;a++){b.emails[a].id=null}}if(b.addresses){for(a=0;a<b.addresses.length;a++){b.addresses[a].id=null}}if(b.ims){for(a=0;a<b.ims.length;a++){b.ims[a].id=null}}if(b.organizations){for(a=0;a<b.organizations.length;a++){b.organizations[a].id=null}}if(b.tags){for(a=0;a<b.tags.length;a++){b.tags[a].id=null}}if(b.photos){for(a=0;a<b.photos.length;a++){b.photos[a].id=null}}if(b.urls){for(a=0;a<b.urls.length;a++){b.urls[a].id=null}}return b};Contact.prototype.save=function(b,a){PhoneGap.exec(b,a,"Contacts","save",[this])};var ContactName=function(e,a,c,b,d,f){this.formatted=e||null;this.familyName=a||null;this.givenName=c||null;this.middleName=b||null;this.honorificPrefix=d||null;this.honorificSuffix=f||null};var ContactField=function(b,c,a){this.id=null;this.type=b||null;this.value=c||null;this.pref=a||null};var ContactAddress=function(a,d,e,c,b,g,f,h){this.id=null;this.pref=a||null;this.type=d||null;this.formatted=e||null;this.streetAddress=c||null;this.locality=b||null;this.region=g||null;this.postalCode=f||null;this.country=h||null};var ContactOrganization=function(a,c,b,d,e){this.id=null;this.pref=a||null;this.type=c||null;this.name=b||null;this.department=d||null;this.title=e||null};var Contacts=function(){this.inProgress=false;this.records=[]};Contacts.prototype.find=function(a,d,c,b){if(d===null){throw new TypeError("You must specify a success callback for the find command.")}if(a===null||a==="undefined"||a.length==="undefined"||a.length<=0){if(typeof c==="function"){c({code:ContactError.INVALID_ARGUMENT_ERROR})}}else{PhoneGap.exec(d,c,"Contacts","search",[a,b])}};Contacts.prototype.create=function(c){var b;var a=new Contact();for(b in c){if(a[b]!=="undefined"){a[b]=c[b]}}return a};Contacts.prototype.cast=function(b){var c=[];var a;for(a=0;a<b.message.length;a++){c.push(navigator.contacts.create(b.message[a]))}b.message=c;return b};var ContactFindOptions=function(b,a){this.filter=b||"";this.multiple=a||false};PhoneGap.addConstructor(function(){if(typeof navigator.contacts==="undefined"){navigator.contacts=new Contacts()}})}if(!PhoneGap.hasResource("crypto")){PhoneGap.addResource("crypto");var Crypto=function(){};Crypto.prototype.encrypt=function(a,b,c){this.encryptWin=c;PhoneGap.exec(null,null,"Crypto","encrypt",[a,b])};Crypto.prototype.decrypt=function(a,b,c){this.decryptWin=c;PhoneGap.exec(null,null,"Crypto","decrypt",[a,b])};Crypto.prototype.gotCryptedString=function(a){this.encryptWin(a)};Crypto.prototype.getPlainString=function(a){this.decryptWin(a)};PhoneGap.addConstructor(function(){if(typeof navigator.Crypto==="undefined"){navigator.Crypto=new Crypto()}})}if(!PhoneGap.hasResource("file")){PhoneGap.addResource("file");var FileProperties=function(a){this.filePath=a;this.size=0;this.lastModifiedDate=null};var File=function(c,b,e,a,d){this.name=c||null;this.fullPath=b||null;this.type=e||null;this.lastModifiedDate=a||null;this.size=d||0};var FileError=function(){this.code=null};FileError.NOT_FOUND_ERR=1;FileError.SECURITY_ERR=2;FileError.ABORT_ERR=3;FileError.NOT_READABLE_ERR=4;FileError.ENCODING_ERR=5;FileError.NO_MODIFICATION_ALLOWED_ERR=6;FileError.INVALID_STATE_ERR=7;FileError.SYNTAX_ERR=8;FileError.INVALID_MODIFICATION_ERR=9;FileError.QUOTA_EXCEEDED_ERR=10;FileError.TYPE_MISMATCH_ERR=11;FileError.PATH_EXISTS_ERR=12;var FileReader=function(){this.fileName="";this.readyState=0;this.result=null;this.error=null;this.onloadstart=null;this.onprogress=null;this.onload=null;this.onerror=null;this.onloadend=null;this.onabort=null};FileReader.EMPTY=0;FileReader.LOADING=1;FileReader.DONE=2;FileReader.prototype.abort=function(){var a;this.readyState=FileReader.DONE;this.result=null;var b=new FileError();b.code=b.ABORT_ERR;this.error=b;if(typeof this.onerror==="function"){this.onerror({type:"error",target:this})}if(typeof this.onabort==="function"){this.onabort({type:"abort",target:this})}if(typeof this.onloadend==="function"){this.onloadend({type:"loadend",target:this})}};FileReader.prototype.readAsText=function(b,d){this.fileName="";if(typeof b.fullPath==="undefined"){this.fileName=b}else{this.fileName=b.fullPath}this.readyState=FileReader.LOADING;if(typeof this.onloadstart==="function"){this.onloadstart({type:"loadstart",target:this})}var a=d?d:"UTF-8";var c=this;PhoneGap.exec(function(f){var e;if(c.readyState===FileReader.DONE){return}c.result=f;if(typeof c.onload==="function"){c.onload({type:"load",target:c})}c.readyState=FileReader.DONE;if(typeof c.onloadend==="function"){c.onloadend({type:"loadend",target:c})}},function(g){var f;if(c.readyState===FileReader.DONE){return}c.error=g;if(typeof c.onerror==="function"){c.onerror({type:"error",target:c})}c.readyState=FileReader.DONE;if(typeof c.onloadend==="function"){c.onloadend({type:"loadend",target:c})}},"File","readAsText",[this.fileName,a])};FileReader.prototype.readAsDataURL=function(a){this.fileName="";if(typeof a.fullPath==="undefined"){this.fileName=a}else{this.fileName=a.fullPath}this.readyState=FileReader.LOADING;if(typeof this.onloadstart==="function"){this.onloadstart({type:"loadstart",target:this})}var b=this;PhoneGap.exec(function(d){var c;if(b.readyState===FileReader.DONE){return}b.result=d;if(typeof b.onload==="function"){b.onload({type:"load",target:b})}b.readyState=FileReader.DONE;if(typeof b.onloadend==="function"){b.onloadend({type:"loadend",target:b})}},function(d){var c;if(b.readyState===FileReader.DONE){return}b.error=d;if(typeof b.onerror==="function"){b.onerror({type:"error",target:b})}b.readyState=FileReader.DONE;if(typeof b.onloadend==="function"){b.onloadend({type:"loadend",target:b})}},"File","readAsDataURL",[this.fileName])};FileReader.prototype.readAsBinaryString=function(a){this.fileName=a};FileReader.prototype.readAsArrayBuffer=function(a){this.fileName=a};var FileWriter=function(a){this.fileName="";this.length=0;if(a){this.fileName=a.fullPath||a;this.length=a.size||0}this.position=0;this.readyState=0;this.result=null;this.error=null;this.onwritestart=null;this.onprogress=null;this.onwrite=null;this.onwriteend=null;this.onabort=null;this.onerror=null};FileWriter.INIT=0;FileWriter.WRITING=1;FileWriter.DONE=2;FileWriter.prototype.abort=function(){if(this.readyState===FileWriter.DONE||this.readyState===FileWriter.INIT){throw FileError.INVALID_STATE_ERR}var b=new FileError(),a;b.code=b.ABORT_ERR;this.error=b;if(typeof this.onerror==="function"){this.onerror({type:"error",target:this})}if(typeof this.onabort==="function"){this.onabort({type:"abort",target:this})}this.readyState=FileWriter.DONE;if(typeof this.onwriteend==="function"){this.onwriteend({type:"writeend",target:this})}};FileWriter.prototype.write=function(b){if(this.readyState===FileWriter.WRITING){throw FileError.INVALID_STATE_ERR}this.readyState=FileWriter.WRITING;var a=this;if(typeof a.onwritestart==="function"){a.onwritestart({type:"writestart",target:a})}PhoneGap.exec(function(d){var c;if(a.readyState===FileWriter.DONE){return}a.position+=d;a.length=a.position;if(typeof a.onwrite==="function"){a.onwrite({type:"write",target:a})}a.readyState=FileWriter.DONE;if(typeof a.onwriteend==="function"){a.onwriteend({type:"writeend",target:a})}},function(d){var c;if(a.readyState===FileWriter.DONE){return}a.error=d;if(typeof a.onerror==="function"){a.onerror({type:"error",target:a})}a.readyState=FileWriter.DONE;if(typeof a.onwriteend==="function"){a.onwriteend({type:"writeend",target:a})}},"File","write",[this.fileName,b,this.position])};FileWriter.prototype.seek=function(a){if(this.readyState===FileWriter.WRITING){throw FileError.INVALID_STATE_ERR}if(!a){return}if(a<0){this.position=Math.max(a+this.length,0)}else{if(a>this.length){this.position=this.length}else{this.position=a}}};FileWriter.prototype.truncate=function(a){if(this.readyState===FileWriter.WRITING){throw FileError.INVALID_STATE_ERR}this.readyState=FileWriter.WRITING;var b=this;if(typeof b.onwritestart==="function"){b.onwritestart({type:"writestart",target:this})}PhoneGap.exec(function(d){var c;if(b.readyState===FileWriter.DONE){return}b.length=d;b.position=Math.min(b.position,d);if(typeof b.onwrite==="function"){b.onwrite({type:"write",target:b})}b.readyState=FileWriter.DONE;if(typeof b.onwriteend==="function"){b.onwriteend({type:"writeend",target:b})}},function(d){var c;if(b.readyState===FileWriter.DONE){return}b.error=d;if(typeof b.onerror==="function"){b.onerror({type:"error",target:b})}b.readyState=FileWriter.DONE;if(typeof b.onwriteend==="function"){b.onwriteend({type:"writeend",target:b})}},"File","truncate",[this.fileName,a])};var Metadata=function(){this.modificationTime=null};var Flags=function(a,b){this.create=a||false;this.exclusive=b||false};var FileSystem=function(){this.name=null;this.root=null};var DirectoryReader=function(a){this.fullPath=a||null};DirectoryReader.prototype.readEntries=function(a,b){PhoneGap.exec(a,b,"File","readEntries",[this.fullPath])};var DirectoryEntry=function(){this.isFile=false;this.isDirectory=true;this.name=null;this.fullPath=null;this.filesystem=null};DirectoryEntry.prototype.copyTo=function(d,b,a,c){PhoneGap.exec(a,c,"File","copyTo",[this.fullPath,d,b])};DirectoryEntry.prototype.getMetadata=function(a,b){PhoneGap.exec(a,b,"File","getMetadata",[this.fullPath])};DirectoryEntry.prototype.getParent=function(a,b){PhoneGap.exec(a,b,"File","getParent",[this.fullPath])};DirectoryEntry.prototype.moveTo=function(d,b,a,c){PhoneGap.exec(a,c,"File","moveTo",[this.fullPath,d,b])};DirectoryEntry.prototype.remove=function(a,b){PhoneGap.exec(a,b,"File","remove",[this.fullPath])};DirectoryEntry.prototype.toURI=function(a){return"file://"+this.fullPath};DirectoryEntry.prototype.createReader=function(a,b){return new DirectoryReader(this.fullPath)};DirectoryEntry.prototype.getDirectory=function(d,c,a,b){PhoneGap.exec(a,b,"File","getDirectory",[this.fullPath,d,c])};DirectoryEntry.prototype.getFile=function(d,c,a,b){PhoneGap.exec(a,b,"File","getFile",[this.fullPath,d,c])};DirectoryEntry.prototype.removeRecursively=function(a,b){PhoneGap.exec(a,b,"File","removeRecursively",[this.fullPath])};var FileEntry=function(){this.isFile=true;this.isDirectory=false;this.name=null;this.fullPath=null;this.filesystem=null};FileEntry.prototype.copyTo=function(d,b,a,c){PhoneGap.exec(a,c,"File","copyTo",[this.fullPath,d,b])};FileEntry.prototype.getMetadata=function(a,b){PhoneGap.exec(a,b,"File","getMetadata",[this.fullPath])};FileEntry.prototype.getParent=function(a,b){PhoneGap.exec(a,b,"File","getParent",[this.fullPath])};FileEntry.prototype.moveTo=function(d,b,a,c){PhoneGap.exec(a,c,"File","moveTo",[this.fullPath,d,b])};FileEntry.prototype.remove=function(a,b){PhoneGap.exec(a,b,"File","remove",[this.fullPath])};FileEntry.prototype.toURI=function(a){return"file://"+this.fullPath};FileEntry.prototype.createWriter=function(a,b){this.file(function(c){var d=new FileWriter(c);if(d.fileName===null||d.fileName===""){if(typeof b==="function"){b({code:FileError.INVALID_STATE_ERR})}}if(typeof a==="function"){a(d)}},b)};FileEntry.prototype.file=function(a,b){PhoneGap.exec(a,b,"File","getFileMetadata",[this.fullPath])};var LocalFileSystem=function(){};LocalFileSystem.TEMPORARY=0;LocalFileSystem.PERSISTENT=1;LocalFileSystem.RESOURCE=2;LocalFileSystem.APPLICATION=3;LocalFileSystem.prototype.requestFileSystem=function(d,c,a,b){if(d<0||d>3){if(typeof b==="function"){b({code:FileError.SYNTAX_ERR})}}else{PhoneGap.exec(a,b,"File","requestFileSystem",[d,c])}};LocalFileSystem.prototype.resolveLocalFileSystemURI=function(c,a,b){PhoneGap.exec(a,b,"File","resolveLocalFileSystemURI",[c])};LocalFileSystem.prototype._castFS=function(a){var b=null;b=new DirectoryEntry();b.isDirectory=a.message.root.isDirectory;b.isFile=a.message.root.isFile;b.name=a.message.root.name;b.fullPath=a.message.root.fullPath;a.message.root=b;return a};LocalFileSystem.prototype._castEntry=function(a){var b=null;if(a.message.isDirectory){console.log("This is a dir");b=new DirectoryEntry()}else{if(a.message.isFile){console.log("This is a file");b=new FileEntry()}}b.isDirectory=a.message.isDirectory;b.isFile=a.message.isFile;b.name=a.message.name;b.fullPath=a.message.fullPath;a.message=b;return a};LocalFileSystem.prototype._castEntries=function(c){var a=c.message;var d=[];for(var b=0;b<a.length;b++){d.push(window.localFileSystem._createEntry(a[b]))}c.message=d;return c};LocalFileSystem.prototype._createEntry=function(a){var b=null;if(a.isDirectory){console.log("This is a dir");b=new DirectoryEntry()}else{if(a.isFile){console.log("This is a file");b=new FileEntry()}}b.isDirectory=a.isDirectory;b.isFile=a.isFile;b.name=a.name;b.fullPath=a.fullPath;return b};LocalFileSystem.prototype._castDate=function(c){if(c.message.modificationTime){var a=new Date(c.message.modificationTime);c.message.modificationTime=a}else{if(c.message.lastModifiedDate){var b=new File();b.size=c.message.size;b.type=c.message.type;b.name=c.message.name;b.fullPath=c.message.fullPath;b.lastModifiedDate=new Date(c.message.lastModifiedDate);c.message=b}}return c};PhoneGap.addConstructor(function(){var a=new LocalFileSystem();if(typeof window.localFileSystem==="undefined"){window.localFileSystem=a}if(typeof window.requestFileSystem==="undefined"){window.requestFileSystem=a.requestFileSystem}if(typeof window.resolveLocalFileSystemURI==="undefined"){window.resolveLocalFileSystemURI=a.resolveLocalFileSystemURI}})}if(!PhoneGap.hasResource("filetransfer")){PhoneGap.addResource("filetransfer");var FileTransfer=function(){};var FileUploadResult=function(){this.bytesSent=0;this.responseCode=null;this.response=null};var FileTransferError=function(){this.code=null};FileTransferError.FILE_NOT_FOUND_ERR=1;FileTransferError.INVALID_URL_ERR=2;FileTransferError.CONNECTION_ERR=3;FileTransfer.prototype.upload=function(e,d,c,h,k,a){var i=null;var g=null;var b=null;var f=null;var j=true;if(k){i=k.fileKey;g=k.fileName;b=k.mimeType;if(k.chunkedMode!==null||typeof k.chunkedMode!=="undefined"){j=k.chunkedMode}if(k.params){f=k.params}else{f={}}}PhoneGap.exec(c,h,"FileTransfer","upload",[e,d,i,g,b,f,a,j])};FileTransfer.prototype.download=function(c,d,a,b){PhoneGap.exec(a,b,"FileTransfer","download",[c,d])};var FileUploadOptions=function(a,d,c,b){this.fileKey=a||null;this.fileName=d||null;this.mimeType=c||null;this.params=b||null}}if(!PhoneGap.hasResource("geolocation")){PhoneGap.addResource("geolocation");var Geolocation=function(){this.lastPosition=null;this.listeners={}};var PositionError=function(b,a){this.code=b;this.message=a};PositionError.PERMISSION_DENIED=1;PositionError.POSITION_UNAVAILABLE=2;PositionError.TIMEOUT=3;Geolocation.prototype.getCurrentPosition=function(a,d,f){if(navigator._geo.listeners.global){console.log("Geolocation Error: Still waiting for previous getCurrentPosition() request.");try{d(new PositionError(PositionError.TIMEOUT,"Geolocation Error: Still waiting for previous getCurrentPosition() request."))}catch(h){}return}var b=10000;var c=false;var g=10000;if(typeof f!=="undefined"){if(typeof f.maximumAge!=="undefined"){b=f.maximumAge}if(typeof f.enableHighAccuracy!=="undefined"){c=f.enableHighAccuracy}if(typeof f.timeout!=="undefined"){g=f.timeout}}navigator._geo.listeners.global={success:a,fail:d};PhoneGap.exec(null,null,"Geolocation","getCurrentLocation",[c,g,b])};Geolocation.prototype.watchPosition=function(a,d,e){var b=10000;var c=false;var f=10000;if(typeof e!=="undefined"){if(typeof e.frequency!=="undefined"){b=e.frequency}if(typeof e.maximumAge!=="undefined"){b=e.maximumAge}if(typeof e.enableHighAccuracy!=="undefined"){c=e.enableHighAccuracy}if(typeof e.timeout!=="undefined"){f=e.timeout}}var g=PhoneGap.createUUID();navigator._geo.listeners[g]={success:a,fail:d};PhoneGap.exec(null,null,"Geolocation","start",[g,c,f,b]);return g};Geolocation.prototype.success=function(b,h,j,c,d,i,l,a){var k=new Coordinates(h,j,c,d,i,l);var f=new Position(k,a);try{if(h==="undefined"||j==="undefined"){navigator._geo.listeners[b].fail(new PositionError(PositionError.POSITION_UNAVAILABLE,"Lat/Lng are undefined."))}else{navigator._geo.lastPosition=f;navigator._geo.listeners[b].success(f)}}catch(g){console.log("Geolocation Error: Error calling success callback function.")}if(b==="global"){delete navigator._geo.listeners.global}};Geolocation.prototype.fail=function(d,a,c){try{navigator._geo.listeners[d].fail(new PositionError(a,c))}catch(b){console.log("Geolocation Error: Error calling error callback function.")}};Geolocation.prototype.clearWatch=function(a){PhoneGap.exec(null,null,"Geolocation","stop",[a]);delete navigator._geo.listeners[a]};Geolocation.usingPhoneGap=false;Geolocation.usePhoneGap=function(){if(Geolocation.usingPhoneGap){return}Geolocation.usingPhoneGap=true;navigator.geolocation.setLocation=navigator._geo.setLocation;navigator.geolocation.getCurrentPosition=navigator._geo.getCurrentPosition;navigator.geolocation.watchPosition=navigator._geo.watchPosition;navigator.geolocation.clearWatch=navigator._geo.clearWatch;navigator.geolocation.start=navigator._geo.start;navigator.geolocation.stop=navigator._geo.stop};PhoneGap.addConstructor(function(){navigator._geo=new Geolocation();if(typeof navigator.geolocation==="undefined"){navigator.geolocation=navigator._geo;Geolocation.usingPhoneGap=true}})}if(!PhoneGap.hasResource("media")){PhoneGap.addResource("media");var Media=function(e,a,c,b,d){if(a&&(typeof a!=="function")){console.log("Media Error: successCallback is not a function");return}if(c&&(typeof c!=="function")){console.log("Media Error: errorCallback is not a function");return}if(b&&(typeof b!=="function")){console.log("Media Error: statusCallback is not a function");return}if(d&&(typeof d!=="function")){console.log("Media Error: positionCallback is not a function");return}this.id=PhoneGap.createUUID();PhoneGap.mediaObjects[this.id]=this;this.src=e;this.successCallback=a;this.errorCallback=c;this.statusCallback=b;this.positionCallback=d;this._duration=-1;this._position=-1};Media.MEDIA_STATE=1;Media.MEDIA_DURATION=2;Media.MEDIA_POSITION=3;Media.MEDIA_ERROR=9;Media.MEDIA_NONE=0;Media.MEDIA_STARTING=1;Media.MEDIA_RUNNING=2;Media.MEDIA_PAUSED=3;Media.MEDIA_STOPPED=4;Media.MEDIA_MSG=["None","Starting","Running","Paused","Stopped"];var MediaError=function(){this.code=null;this.message=""};MediaError.MEDIA_ERR_NONE_ACTIVE=0;MediaError.MEDIA_ERR_ABORTED=1;MediaError.MEDIA_ERR_NETWORK=2;MediaError.MEDIA_ERR_DECODE=3;MediaError.MEDIA_ERR_NONE_SUPPORTED=4;Media.prototype.play=function(){PhoneGap.exec(null,null,"Media","startPlayingAudio",[this.id,this.src])};Media.prototype.stop=function(){return PhoneGap.exec(null,null,"Media","stopPlayingAudio",[this.id])};Media.prototype.seekTo=function(a){PhoneGap.exec(null,null,"Media","seekToAudio",[this.id,a])};Media.prototype.pause=function(){PhoneGap.exec(null,null,"Media","pausePlayingAudio",[this.id])};Media.prototype.getDuration=function(){return this._duration};Media.prototype.getCurrentPosition=function(b,a){PhoneGap.exec(b,a,"Media","getCurrentPositionAudio",[this.id])};Media.prototype.startRecord=function(){PhoneGap.exec(null,null,"Media","startRecordingAudio",[this.id,this.src])};Media.prototype.stopRecord=function(){PhoneGap.exec(null,null,"Media","stopRecordingAudio",[this.id])};Media.prototype.release=function(){PhoneGap.exec(null,null,"Media","release",[this.id])};Media.prototype.setVolume=function(a){PhoneGap.exec(null,null,"Media","setVolume",[this.id,a])};PhoneGap.mediaObjects={};PhoneGap.Media=function(){};PhoneGap.Media.getMediaObject=function(a){return PhoneGap.mediaObjects[a]};PhoneGap.Media.onStatus=function(d,c,a){var b=PhoneGap.mediaObjects[d];if(c===Media.MEDIA_STATE){if(a===Media.MEDIA_STOPPED){if(b.successCallback){b.successCallback()}}if(b.statusCallback){b.statusCallback(a)}}else{if(c===Media.MEDIA_DURATION){b._duration=a}else{if(c===Media.MEDIA_ERROR){if(b.errorCallback){b.errorCallback({code:a})}}else{if(c===Media.MEDIA_POSITION){b._position=a}}}}}}if(!PhoneGap.hasResource("network")){PhoneGap.addResource("network");var Connection=function(){this.type=null;this._firstRun=true;this._timer=null;this.timeout=500;var a=this;this.getInfo(function(b){if(b==="none"){a._timer=setTimeout(function(){a.type=b;PhoneGap.fireDocumentEvent("offline");a._timer=null},a.timeout)}else{if(a._timer!==null){clearTimeout(a._timer);a._timer=null}a.type=b;PhoneGap.fireDocumentEvent("online")}if(a._firstRun){a._firstRun=false;PhoneGap.onPhoneGapConnectionReady.fire()}},function(b){if(a._firstRun){a._firstRun=false;PhoneGap.onPhoneGapConnectionReady.fire()}console.log("Error initializing Network Connection: "+b)})};Connection.UNKNOWN="unknown";Connection.ETHERNET="ethernet";Connection.WIFI="wifi";Connection.CELL_2G="2g";Connection.CELL_3G="3g";Connection.CELL_4G="4g";Connection.NONE="none";Connection.prototype.getInfo=function(a,b){PhoneGap.exec(a,b,"Network Status","getConnectionInfo",[])};PhoneGap.addConstructor(function(){if(typeof navigator.network==="undefined"){navigator.network={}}if(typeof navigator.network.connection==="undefined"){navigator.network.connection=new Connection()}})}if(!PhoneGap.hasResource("notification")){PhoneGap.addResource("notification");var Notification=function(){};Notification.prototype.alert=function(c,d,f,e){var b=(f||"Alert");var a=(e||"OK");PhoneGap.exec(d,null,"Notification","alert",[c,b,a])};Notification.prototype.confirm=function(c,a,f,d){var b=(f||"Confirm");var e=(d||"OK,Cancel");PhoneGap.exec(a,null,"Notification","confirm",[c,b,e])};Notification.prototype.activityStart=function(){PhoneGap.exec(null,null,"Notification","activityStart",["Busy","Please wait..."])};Notification.prototype.activityStop=function(){PhoneGap.exec(null,null,"Notification","activityStop",[])};Notification.prototype.progressStart=function(b,a){PhoneGap.exec(null,null,"Notification","progressStart",[b,a])};Notification.prototype.progressValue=function(a){PhoneGap.exec(null,null,"Notification","progressValue",[a])};Notification.prototype.progressStop=function(){PhoneGap.exec(null,null,"Notification","progressStop",[])};Notification.prototype.blink=function(a,b){};Notification.prototype.vibrate=function(a){PhoneGap.exec(null,null,"Notification","vibrate",[a])};Notification.prototype.beep=function(a){PhoneGap.exec(null,null,"Notification","beep",[a])};PhoneGap.addConstructor(function(){if(typeof navigator.notification==="undefined"){navigator.notification=new Notification()}})}if(!PhoneGap.hasResource("position")){PhoneGap.addResource("position");var Position=function(b,a){this.coords=b;this.timestamp=(a!=="undefined")?a:new Date().getTime()};var Coordinates=function(g,b,f,e,c,d,a){this.latitude=g;this.longitude=b;this.accuracy=e;this.altitude=f;this.heading=c;this.speed=d;this.altitudeAccuracy=(a!=="undefined")?a:null};var PositionOptions=function(){this.enableHighAccuracy=true;this.timeout=10000};var PositionError=function(){this.code=null;this.message=""};PositionError.UNKNOWN_ERROR=0;PositionError.PERMISSION_DENIED=1;PositionError.POSITION_UNAVAILABLE=2;PositionError.TIMEOUT=3}if(!PhoneGap.hasResource("storage")){PhoneGap.addResource("storage");var DroidDB_Rows=function(){this.resultSet=[];this.length=0};DroidDB_Rows.prototype.item=function(a){return this.resultSet[a]};var DroidDB_Result=function(){this.rows=new DroidDB_Rows()};var DroidDB=function(){this.queryQueue={}};DroidDB.prototype.completeQuery=function(h,f){var d=this.queryQueue[h];if(d){try{delete this.queryQueue[h];var a=d.tx;if(a&&a.queryList[h]){var c=new DroidDB_Result();c.rows.resultSet=f;c.rows.length=f.length;try{if(typeof d.successCallback==="function"){d.successCallback(d.tx,c)}}catch(b){console.log("executeSql error calling user success callback: "+b)}a.queryComplete(h)}}catch(g){console.log("executeSql error: "+g)}}};DroidDB.prototype.fail=function(f,g){var c=this.queryQueue[g];if(c){try{delete this.queryQueue[g];var a=c.tx;if(a&&a.queryList[g]){a.queryList={};try{if(typeof c.errorCallback==="function"){c.errorCallback(c.tx,f)}}catch(b){console.log("executeSql error calling user error callback: "+b)}a.queryFailed(g,f)}}catch(d){console.log("executeSql error: "+d)}}};var DroidDB_Query=function(a){this.id=PhoneGap.createUUID();droiddb.queryQueue[this.id]=this;this.resultSet=[];this.tx=a;this.tx.queryList[this.id]=this;this.successCallback=null;this.errorCallback=null};var DroidDB_Tx=function(){this.id=PhoneGap.createUUID();this.successCallback=null;this.errorCallback=null;this.queryList={}};DroidDB_Tx.prototype.queryComplete=function(d){delete this.queryList[d];if(this.successCallback){var b=0;var a;for(a in this.queryList){if(this.queryList.hasOwnProperty(a)){b++}}if(b===0){try{this.successCallback()}catch(c){console.log("Transaction error calling user success callback: "+c)}}}};DroidDB_Tx.prototype.queryFailed=function(c,b){this.queryList={};if(this.errorCallback){try{this.errorCallback(b)}catch(a){console.log("Transaction error calling user error callback: "+a)}}};DroidDB_Tx.prototype.executeSql=function(e,d,a,b){if(typeof d==="undefined"){d=[]}var c=new DroidDB_Query(this);droiddb.queryQueue[c.id]=c;c.successCallback=a;c.errorCallback=b;PhoneGap.exec(null,null,"Storage","executeSql",[e,d,c.id])};var DatabaseShell=function(){};DatabaseShell.prototype.transaction=function(g,c,a){var b=new DroidDB_Tx();b.successCallback=a;b.errorCallback=c;try{g(b)}catch(f){console.log("Transaction error: "+f);if(b.errorCallback){try{b.errorCallback(f)}catch(d){console.log("Transaction error calling user error callback: "+f)}}}};var DroidDB_openDatabase=function(d,a,c,e){PhoneGap.exec(null,null,"Storage","openDatabase",[d,a,c,e]);var b=new DatabaseShell();return b};var CupcakeLocalStorage=function(){try{this.db=openDatabase("localStorage","1.0","localStorage",2621440);var c={};this.length=0;function a(d){this.length=d;localStorage.length=d}this.db.transaction(function(e){var d;e.executeSql("CREATE TABLE IF NOT EXISTS storage (id NVARCHAR(40) PRIMARY KEY, body NVARCHAR(255))");e.executeSql("SELECT * FROM storage",[],function(g,f){for(var h=0;h<f.rows.length;h++){c[f.rows.item(h)["id"]]=f.rows.item(h)["body"]}a(f.rows.length);PhoneGap.initializationComplete("cupcakeStorage")})},function(d){alert(d.message)});this.setItem=function(d,e){if(typeof(c[d])=="undefined"){this.length++}c[d]=e;this.db.transaction(function(f){f.executeSql("CREATE TABLE IF NOT EXISTS storage (id NVARCHAR(40) PRIMARY KEY, body NVARCHAR(255))");f.executeSql("REPLACE INTO storage (id, body) values(?,?)",[d,e])})};this.getItem=function(d){return c[d]};this.removeItem=function(d){delete c[d];this.length--;this.db.transaction(function(e){e.executeSql("CREATE TABLE IF NOT EXISTS storage (id NVARCHAR(40) PRIMARY KEY, body NVARCHAR(255))");e.executeSql("DELETE FROM storage where id=?",[d])})};this.clear=function(){c={};this.length=0;this.db.transaction(function(d){d.executeSql("CREATE TABLE IF NOT EXISTS storage (id NVARCHAR(40) PRIMARY KEY, body NVARCHAR(255))");d.executeSql("DELETE FROM storage",[])})};this.key=function(e){var f=0;for(var d in c){if(f==e){return d}else{f++}}return null}}catch(b){alert("Database error "+b+".");return}};PhoneGap.addConstructor(function(){var a=function(){navigator.openDatabase=window.openDatabase=DroidDB_openDatabase;window.droiddb=new DroidDB()};if(typeof window.openDatabase==="undefined"){a()}else{window.openDatabase_orig=window.openDatabase;window.openDatabase=function(d,b,g,f){var c=null;try{c=window.openDatabase_orig(d,b,g,f)}catch(e){c=null}if(c==null){a();return DroidDB_openDatabase(d,b,g,f)}else{return c}}}if((typeof window.localStorage=="undefined")||(window.localStorage==null)){navigator.localStorage=window.localStorage=new CupcakeLocalStorage();PhoneGap.waitForInitialization("cupcakeStorage")}})};/*! jQuery v1.9.1 | (c) 2005, 2012 jQuery Foundation, Inc. | jquery.org/license
+/*! jQuery v1.9.1 | (c) 2005, 2012 jQuery Foundation, Inc. | jquery.org/license
 //@ sourceMappingURL=jquery.min.map
 */(function(e,t){var n,r,i=typeof t,o=e.document,a=e.location,s=e.jQuery,u=e.$,l={},c=[],p="1.9.1",f=c.concat,d=c.push,h=c.slice,g=c.indexOf,m=l.toString,y=l.hasOwnProperty,v=p.trim,b=function(e,t){return new b.fn.init(e,t,r)},x=/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,w=/\S+/g,T=/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,N=/^(?:(<[\w\W]+>)[^>]*|#([\w-]*))$/,C=/^<(\w+)\s*\/?>(?:<\/\1>|)$/,k=/^[\],:{}\s]*$/,E=/(?:^|:|,)(?:\s*\[)+/g,S=/\\(?:["\\\/bfnrt]|u[\da-fA-F]{4})/g,A=/"[^"\\\r\n]*"|true|false|null|-?(?:\d+\.|)\d+(?:[eE][+-]?\d+|)/g,j=/^-ms-/,D=/-([\da-z])/gi,L=function(e,t){return t.toUpperCase()},H=function(e){(o.addEventListener||"load"===e.type||"complete"===o.readyState)&&(q(),b.ready())},q=function(){o.addEventListener?(o.removeEventListener("DOMContentLoaded",H,!1),e.removeEventListener("load",H,!1)):(o.detachEvent("onreadystatechange",H),e.detachEvent("onload",H))};b.fn=b.prototype={jquery:p,constructor:b,init:function(e,n,r){var i,a;if(!e)return this;if("string"==typeof e){if(i="<"===e.charAt(0)&&">"===e.charAt(e.length-1)&&e.length>=3?[null,e,null]:N.exec(e),!i||!i[1]&&n)return!n||n.jquery?(n||r).find(e):this.constructor(n).find(e);if(i[1]){if(n=n instanceof b?n[0]:n,b.merge(this,b.parseHTML(i[1],n&&n.nodeType?n.ownerDocument||n:o,!0)),C.test(i[1])&&b.isPlainObject(n))for(i in n)b.isFunction(this[i])?this[i](n[i]):this.attr(i,n[i]);return this}if(a=o.getElementById(i[2]),a&&a.parentNode){if(a.id!==i[2])return r.find(e);this.length=1,this[0]=a}return this.context=o,this.selector=e,this}return e.nodeType?(this.context=this[0]=e,this.length=1,this):b.isFunction(e)?r.ready(e):(e.selector!==t&&(this.selector=e.selector,this.context=e.context),b.makeArray(e,this))},selector:"",length:0,size:function(){return this.length},toArray:function(){return h.call(this)},get:function(e){return null==e?this.toArray():0>e?this[this.length+e]:this[e]},pushStack:function(e){var t=b.merge(this.constructor(),e);return t.prevObject=this,t.context=this.context,t},each:function(e,t){return b.each(this,e,t)},ready:function(e){return b.ready.promise().done(e),this},slice:function(){return this.pushStack(h.apply(this,arguments))},first:function(){return this.eq(0)},last:function(){return this.eq(-1)},eq:function(e){var t=this.length,n=+e+(0>e?t:0);return this.pushStack(n>=0&&t>n?[this[n]]:[])},map:function(e){return this.pushStack(b.map(this,function(t,n){return e.call(t,n,t)}))},end:function(){return this.prevObject||this.constructor(null)},push:d,sort:[].sort,splice:[].splice},b.fn.init.prototype=b.fn,b.extend=b.fn.extend=function(){var e,n,r,i,o,a,s=arguments[0]||{},u=1,l=arguments.length,c=!1;for("boolean"==typeof s&&(c=s,s=arguments[1]||{},u=2),"object"==typeof s||b.isFunction(s)||(s={}),l===u&&(s=this,--u);l>u;u++)if(null!=(o=arguments[u]))for(i in o)e=s[i],r=o[i],s!==r&&(c&&r&&(b.isPlainObject(r)||(n=b.isArray(r)))?(n?(n=!1,a=e&&b.isArray(e)?e:[]):a=e&&b.isPlainObject(e)?e:{},s[i]=b.extend(c,a,r)):r!==t&&(s[i]=r));return s},b.extend({noConflict:function(t){return e.$===b&&(e.$=u),t&&e.jQuery===b&&(e.jQuery=s),b},isReady:!1,readyWait:1,holdReady:function(e){e?b.readyWait++:b.ready(!0)},ready:function(e){if(e===!0?!--b.readyWait:!b.isReady){if(!o.body)return setTimeout(b.ready);b.isReady=!0,e!==!0&&--b.readyWait>0||(n.resolveWith(o,[b]),b.fn.trigger&&b(o).trigger("ready").off("ready"))}},isFunction:function(e){return"function"===b.type(e)},isArray:Array.isArray||function(e){return"array"===b.type(e)},isWindow:function(e){return null!=e&&e==e.window},isNumeric:function(e){return!isNaN(parseFloat(e))&&isFinite(e)},type:function(e){return null==e?e+"":"object"==typeof e||"function"==typeof e?l[m.call(e)]||"object":typeof e},isPlainObject:function(e){if(!e||"object"!==b.type(e)||e.nodeType||b.isWindow(e))return!1;try{if(e.constructor&&!y.call(e,"constructor")&&!y.call(e.constructor.prototype,"isPrototypeOf"))return!1}catch(n){return!1}var r;for(r in e);return r===t||y.call(e,r)},isEmptyObject:function(e){var t;for(t in e)return!1;return!0},error:function(e){throw Error(e)},parseHTML:function(e,t,n){if(!e||"string"!=typeof e)return null;"boolean"==typeof t&&(n=t,t=!1),t=t||o;var r=C.exec(e),i=!n&&[];return r?[t.createElement(r[1])]:(r=b.buildFragment([e],t,i),i&&b(i).remove(),b.merge([],r.childNodes))},parseJSON:function(n){return e.JSON&&e.JSON.parse?e.JSON.parse(n):null===n?n:"string"==typeof n&&(n=b.trim(n),n&&k.test(n.replace(S,"@").replace(A,"]").replace(E,"")))?Function("return "+n)():(b.error("Invalid JSON: "+n),t)},parseXML:function(n){var r,i;if(!n||"string"!=typeof n)return null;try{e.DOMParser?(i=new DOMParser,r=i.parseFromString(n,"text/xml")):(r=new ActiveXObject("Microsoft.XMLDOM"),r.async="false",r.loadXML(n))}catch(o){r=t}return r&&r.documentElement&&!r.getElementsByTagName("parsererror").length||b.error("Invalid XML: "+n),r},noop:function(){},globalEval:function(t){t&&b.trim(t)&&(e.execScript||function(t){e.eval.call(e,t)})(t)},camelCase:function(e){return e.replace(j,"ms-").replace(D,L)},nodeName:function(e,t){return e.nodeName&&e.nodeName.toLowerCase()===t.toLowerCase()},each:function(e,t,n){var r,i=0,o=e.length,a=M(e);if(n){if(a){for(;o>i;i++)if(r=t.apply(e[i],n),r===!1)break}else for(i in e)if(r=t.apply(e[i],n),r===!1)break}else if(a){for(;o>i;i++)if(r=t.call(e[i],i,e[i]),r===!1)break}else for(i in e)if(r=t.call(e[i],i,e[i]),r===!1)break;return e},trim:v&&!v.call("\ufeff\u00a0")?function(e){return null==e?"":v.call(e)}:function(e){return null==e?"":(e+"").replace(T,"")},makeArray:function(e,t){var n=t||[];return null!=e&&(M(Object(e))?b.merge(n,"string"==typeof e?[e]:e):d.call(n,e)),n},inArray:function(e,t,n){var r;if(t){if(g)return g.call(t,e,n);for(r=t.length,n=n?0>n?Math.max(0,r+n):n:0;r>n;n++)if(n in t&&t[n]===e)return n}return-1},merge:function(e,n){var r=n.length,i=e.length,o=0;if("number"==typeof r)for(;r>o;o++)e[i++]=n[o];else while(n[o]!==t)e[i++]=n[o++];return e.length=i,e},grep:function(e,t,n){var r,i=[],o=0,a=e.length;for(n=!!n;a>o;o++)r=!!t(e[o],o),n!==r&&i.push(e[o]);return i},map:function(e,t,n){var r,i=0,o=e.length,a=M(e),s=[];if(a)for(;o>i;i++)r=t(e[i],i,n),null!=r&&(s[s.length]=r);else for(i in e)r=t(e[i],i,n),null!=r&&(s[s.length]=r);return f.apply([],s)},guid:1,proxy:function(e,n){var r,i,o;return"string"==typeof n&&(o=e[n],n=e,e=o),b.isFunction(e)?(r=h.call(arguments,2),i=function(){return e.apply(n||this,r.concat(h.call(arguments)))},i.guid=e.guid=e.guid||b.guid++,i):t},access:function(e,n,r,i,o,a,s){var u=0,l=e.length,c=null==r;if("object"===b.type(r)){o=!0;for(u in r)b.access(e,n,u,r[u],!0,a,s)}else if(i!==t&&(o=!0,b.isFunction(i)||(s=!0),c&&(s?(n.call(e,i),n=null):(c=n,n=function(e,t,n){return c.call(b(e),n)})),n))for(;l>u;u++)n(e[u],r,s?i:i.call(e[u],u,n(e[u],r)));return o?e:c?n.call(e):l?n(e[0],r):a},now:function(){return(new Date).getTime()}}),b.ready.promise=function(t){if(!n)if(n=b.Deferred(),"complete"===o.readyState)setTimeout(b.ready);else if(o.addEventListener)o.addEventListener("DOMContentLoaded",H,!1),e.addEventListener("load",H,!1);else{o.attachEvent("onreadystatechange",H),e.attachEvent("onload",H);var r=!1;try{r=null==e.frameElement&&o.documentElement}catch(i){}r&&r.doScroll&&function a(){if(!b.isReady){try{r.doScroll("left")}catch(e){return setTimeout(a,50)}q(),b.ready()}}()}return n.promise(t)},b.each("Boolean Number String Function Array Date RegExp Object Error".split(" "),function(e,t){l["[object "+t+"]"]=t.toLowerCase()});function M(e){var t=e.length,n=b.type(e);return b.isWindow(e)?!1:1===e.nodeType&&t?!0:"array"===n||"function"!==n&&(0===t||"number"==typeof t&&t>0&&t-1 in e)}r=b(o);var _={};function F(e){var t=_[e]={};return b.each(e.match(w)||[],function(e,n){t[n]=!0}),t}b.Callbacks=function(e){e="string"==typeof e?_[e]||F(e):b.extend({},e);var n,r,i,o,a,s,u=[],l=!e.once&&[],c=function(t){for(r=e.memory&&t,i=!0,a=s||0,s=0,o=u.length,n=!0;u&&o>a;a++)if(u[a].apply(t[0],t[1])===!1&&e.stopOnFalse){r=!1;break}n=!1,u&&(l?l.length&&c(l.shift()):r?u=[]:p.disable())},p={add:function(){if(u){var t=u.length;(function i(t){b.each(t,function(t,n){var r=b.type(n);"function"===r?e.unique&&p.has(n)||u.push(n):n&&n.length&&"string"!==r&&i(n)})})(arguments),n?o=u.length:r&&(s=t,c(r))}return this},remove:function(){return u&&b.each(arguments,function(e,t){var r;while((r=b.inArray(t,u,r))>-1)u.splice(r,1),n&&(o>=r&&o--,a>=r&&a--)}),this},has:function(e){return e?b.inArray(e,u)>-1:!(!u||!u.length)},empty:function(){return u=[],this},disable:function(){return u=l=r=t,this},disabled:function(){return!u},lock:function(){return l=t,r||p.disable(),this},locked:function(){return!l},fireWith:function(e,t){return t=t||[],t=[e,t.slice?t.slice():t],!u||i&&!l||(n?l.push(t):c(t)),this},fire:function(){return p.fireWith(this,arguments),this},fired:function(){return!!i}};return p},b.extend({Deferred:function(e){var t=[["resolve","done",b.Callbacks("once memory"),"resolved"],["reject","fail",b.Callbacks("once memory"),"rejected"],["notify","progress",b.Callbacks("memory")]],n="pending",r={state:function(){return n},always:function(){return i.done(arguments).fail(arguments),this},then:function(){var e=arguments;return b.Deferred(function(n){b.each(t,function(t,o){var a=o[0],s=b.isFunction(e[t])&&e[t];i[o[1]](function(){var e=s&&s.apply(this,arguments);e&&b.isFunction(e.promise)?e.promise().done(n.resolve).fail(n.reject).progress(n.notify):n[a+"With"](this===r?n.promise():this,s?[e]:arguments)})}),e=null}).promise()},promise:function(e){return null!=e?b.extend(e,r):r}},i={};return r.pipe=r.then,b.each(t,function(e,o){var a=o[2],s=o[3];r[o[1]]=a.add,s&&a.add(function(){n=s},t[1^e][2].disable,t[2][2].lock),i[o[0]]=function(){return i[o[0]+"With"](this===i?r:this,arguments),this},i[o[0]+"With"]=a.fireWith}),r.promise(i),e&&e.call(i,i),i},when:function(e){var t=0,n=h.call(arguments),r=n.length,i=1!==r||e&&b.isFunction(e.promise)?r:0,o=1===i?e:b.Deferred(),a=function(e,t,n){return function(r){t[e]=this,n[e]=arguments.length>1?h.call(arguments):r,n===s?o.notifyWith(t,n):--i||o.resolveWith(t,n)}},s,u,l;if(r>1)for(s=Array(r),u=Array(r),l=Array(r);r>t;t++)n[t]&&b.isFunction(n[t].promise)?n[t].promise().done(a(t,l,n)).fail(o.reject).progress(a(t,u,s)):--i;return i||o.resolveWith(l,n),o.promise()}}),b.support=function(){var t,n,r,a,s,u,l,c,p,f,d=o.createElement("div");if(d.setAttribute("className","t"),d.innerHTML="  <link/><table></table><a href='/a'>a</a><input type='checkbox'/>",n=d.getElementsByTagName("*"),r=d.getElementsByTagName("a")[0],!n||!r||!n.length)return{};s=o.createElement("select"),l=s.appendChild(o.createElement("option")),a=d.getElementsByTagName("input")[0],r.style.cssText="top:1px;float:left;opacity:.5",t={getSetAttribute:"t"!==d.className,leadingWhitespace:3===d.firstChild.nodeType,tbody:!d.getElementsByTagName("tbody").length,htmlSerialize:!!d.getElementsByTagName("link").length,style:/top/.test(r.getAttribute("style")),hrefNormalized:"/a"===r.getAttribute("href"),opacity:/^0.5/.test(r.style.opacity),cssFloat:!!r.style.cssFloat,checkOn:!!a.value,optSelected:l.selected,enctype:!!o.createElement("form").enctype,html5Clone:"<:nav></:nav>"!==o.createElement("nav").cloneNode(!0).outerHTML,boxModel:"CSS1Compat"===o.compatMode,deleteExpando:!0,noCloneEvent:!0,inlineBlockNeedsLayout:!1,shrinkWrapBlocks:!1,reliableMarginRight:!0,boxSizingReliable:!0,pixelPosition:!1},a.checked=!0,t.noCloneChecked=a.cloneNode(!0).checked,s.disabled=!0,t.optDisabled=!l.disabled;try{delete d.test}catch(h){t.deleteExpando=!1}a=o.createElement("input"),a.setAttribute("value",""),t.input=""===a.getAttribute("value"),a.value="t",a.setAttribute("type","radio"),t.radioValue="t"===a.value,a.setAttribute("checked","t"),a.setAttribute("name","t"),u=o.createDocumentFragment(),u.appendChild(a),t.appendChecked=a.checked,t.checkClone=u.cloneNode(!0).cloneNode(!0).lastChild.checked,d.attachEvent&&(d.attachEvent("onclick",function(){t.noCloneEvent=!1}),d.cloneNode(!0).click());for(f in{submit:!0,change:!0,focusin:!0})d.setAttribute(c="on"+f,"t"),t[f+"Bubbles"]=c in e||d.attributes[c].expando===!1;return d.style.backgroundClip="content-box",d.cloneNode(!0).style.backgroundClip="",t.clearCloneStyle="content-box"===d.style.backgroundClip,b(function(){var n,r,a,s="padding:0;margin:0;border:0;display:block;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;",u=o.getElementsByTagName("body")[0];u&&(n=o.createElement("div"),n.style.cssText="border:0;width:0;height:0;position:absolute;top:0;left:-9999px;margin-top:1px",u.appendChild(n).appendChild(d),d.innerHTML="<table><tr><td></td><td>t</td></tr></table>",a=d.getElementsByTagName("td"),a[0].style.cssText="padding:0;margin:0;border:0;display:none",p=0===a[0].offsetHeight,a[0].style.display="",a[1].style.display="none",t.reliableHiddenOffsets=p&&0===a[0].offsetHeight,d.innerHTML="",d.style.cssText="box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;padding:1px;border:1px;display:block;width:4px;margin-top:1%;position:absolute;top:1%;",t.boxSizing=4===d.offsetWidth,t.doesNotIncludeMarginInBodyOffset=1!==u.offsetTop,e.getComputedStyle&&(t.pixelPosition="1%"!==(e.getComputedStyle(d,null)||{}).top,t.boxSizingReliable="4px"===(e.getComputedStyle(d,null)||{width:"4px"}).width,r=d.appendChild(o.createElement("div")),r.style.cssText=d.style.cssText=s,r.style.marginRight=r.style.width="0",d.style.width="1px",t.reliableMarginRight=!parseFloat((e.getComputedStyle(r,null)||{}).marginRight)),typeof d.style.zoom!==i&&(d.innerHTML="",d.style.cssText=s+"width:1px;padding:1px;display:inline;zoom:1",t.inlineBlockNeedsLayout=3===d.offsetWidth,d.style.display="block",d.innerHTML="<div></div>",d.firstChild.style.width="5px",t.shrinkWrapBlocks=3!==d.offsetWidth,t.inlineBlockNeedsLayout&&(u.style.zoom=1)),u.removeChild(n),n=d=a=r=null)}),n=s=u=l=r=a=null,t}();var O=/(?:\{[\s\S]*\}|\[[\s\S]*\])$/,B=/([A-Z])/g;function P(e,n,r,i){if(b.acceptData(e)){var o,a,s=b.expando,u="string"==typeof n,l=e.nodeType,p=l?b.cache:e,f=l?e[s]:e[s]&&s;if(f&&p[f]&&(i||p[f].data)||!u||r!==t)return f||(l?e[s]=f=c.pop()||b.guid++:f=s),p[f]||(p[f]={},l||(p[f].toJSON=b.noop)),("object"==typeof n||"function"==typeof n)&&(i?p[f]=b.extend(p[f],n):p[f].data=b.extend(p[f].data,n)),o=p[f],i||(o.data||(o.data={}),o=o.data),r!==t&&(o[b.camelCase(n)]=r),u?(a=o[n],null==a&&(a=o[b.camelCase(n)])):a=o,a}}function R(e,t,n){if(b.acceptData(e)){var r,i,o,a=e.nodeType,s=a?b.cache:e,u=a?e[b.expando]:b.expando;if(s[u]){if(t&&(o=n?s[u]:s[u].data)){b.isArray(t)?t=t.concat(b.map(t,b.camelCase)):t in o?t=[t]:(t=b.camelCase(t),t=t in o?[t]:t.split(" "));for(r=0,i=t.length;i>r;r++)delete o[t[r]];if(!(n?$:b.isEmptyObject)(o))return}(n||(delete s[u].data,$(s[u])))&&(a?b.cleanData([e],!0):b.support.deleteExpando||s!=s.window?delete s[u]:s[u]=null)}}}b.extend({cache:{},expando:"jQuery"+(p+Math.random()).replace(/\D/g,""),noData:{embed:!0,object:"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000",applet:!0},hasData:function(e){return e=e.nodeType?b.cache[e[b.expando]]:e[b.expando],!!e&&!$(e)},data:function(e,t,n){return P(e,t,n)},removeData:function(e,t){return R(e,t)},_data:function(e,t,n){return P(e,t,n,!0)},_removeData:function(e,t){return R(e,t,!0)},acceptData:function(e){if(e.nodeType&&1!==e.nodeType&&9!==e.nodeType)return!1;var t=e.nodeName&&b.noData[e.nodeName.toLowerCase()];return!t||t!==!0&&e.getAttribute("classid")===t}}),b.fn.extend({data:function(e,n){var r,i,o=this[0],a=0,s=null;if(e===t){if(this.length&&(s=b.data(o),1===o.nodeType&&!b._data(o,"parsedAttrs"))){for(r=o.attributes;r.length>a;a++)i=r[a].name,i.indexOf("data-")||(i=b.camelCase(i.slice(5)),W(o,i,s[i]));b._data(o,"parsedAttrs",!0)}return s}return"object"==typeof e?this.each(function(){b.data(this,e)}):b.access(this,function(n){return n===t?o?W(o,e,b.data(o,e)):null:(this.each(function(){b.data(this,e,n)}),t)},null,n,arguments.length>1,null,!0)},removeData:function(e){return this.each(function(){b.removeData(this,e)})}});function W(e,n,r){if(r===t&&1===e.nodeType){var i="data-"+n.replace(B,"-$1").toLowerCase();if(r=e.getAttribute(i),"string"==typeof r){try{r="true"===r?!0:"false"===r?!1:"null"===r?null:+r+""===r?+r:O.test(r)?b.parseJSON(r):r}catch(o){}b.data(e,n,r)}else r=t}return r}function $(e){var t;for(t in e)if(("data"!==t||!b.isEmptyObject(e[t]))&&"toJSON"!==t)return!1;return!0}b.extend({queue:function(e,n,r){var i;return e?(n=(n||"fx")+"queue",i=b._data(e,n),r&&(!i||b.isArray(r)?i=b._data(e,n,b.makeArray(r)):i.push(r)),i||[]):t},dequeue:function(e,t){t=t||"fx";var n=b.queue(e,t),r=n.length,i=n.shift(),o=b._queueHooks(e,t),a=function(){b.dequeue(e,t)};"inprogress"===i&&(i=n.shift(),r--),o.cur=i,i&&("fx"===t&&n.unshift("inprogress"),delete o.stop,i.call(e,a,o)),!r&&o&&o.empty.fire()},_queueHooks:function(e,t){var n=t+"queueHooks";return b._data(e,n)||b._data(e,n,{empty:b.Callbacks("once memory").add(function(){b._removeData(e,t+"queue"),b._removeData(e,n)})})}}),b.fn.extend({queue:function(e,n){var r=2;return"string"!=typeof e&&(n=e,e="fx",r--),r>arguments.length?b.queue(this[0],e):n===t?this:this.each(function(){var t=b.queue(this,e,n);b._queueHooks(this,e),"fx"===e&&"inprogress"!==t[0]&&b.dequeue(this,e)})},dequeue:function(e){return this.each(function(){b.dequeue(this,e)})},delay:function(e,t){return e=b.fx?b.fx.speeds[e]||e:e,t=t||"fx",this.queue(t,function(t,n){var r=setTimeout(t,e);n.stop=function(){clearTimeout(r)}})},clearQueue:function(e){return this.queue(e||"fx",[])},promise:function(e,n){var r,i=1,o=b.Deferred(),a=this,s=this.length,u=function(){--i||o.resolveWith(a,[a])};"string"!=typeof e&&(n=e,e=t),e=e||"fx";while(s--)r=b._data(a[s],e+"queueHooks"),r&&r.empty&&(i++,r.empty.add(u));return u(),o.promise(n)}});var I,z,X=/[\t\r\n]/g,U=/\r/g,V=/^(?:input|select|textarea|button|object)$/i,Y=/^(?:a|area)$/i,J=/^(?:checked|selected|autofocus|autoplay|async|controls|defer|disabled|hidden|loop|multiple|open|readonly|required|scoped)$/i,G=/^(?:checked|selected)$/i,Q=b.support.getSetAttribute,K=b.support.input;b.fn.extend({attr:function(e,t){return b.access(this,b.attr,e,t,arguments.length>1)},removeAttr:function(e){return this.each(function(){b.removeAttr(this,e)})},prop:function(e,t){return b.access(this,b.prop,e,t,arguments.length>1)},removeProp:function(e){return e=b.propFix[e]||e,this.each(function(){try{this[e]=t,delete this[e]}catch(n){}})},addClass:function(e){var t,n,r,i,o,a=0,s=this.length,u="string"==typeof e&&e;if(b.isFunction(e))return this.each(function(t){b(this).addClass(e.call(this,t,this.className))});if(u)for(t=(e||"").match(w)||[];s>a;a++)if(n=this[a],r=1===n.nodeType&&(n.className?(" "+n.className+" ").replace(X," "):" ")){o=0;while(i=t[o++])0>r.indexOf(" "+i+" ")&&(r+=i+" ");n.className=b.trim(r)}return this},removeClass:function(e){var t,n,r,i,o,a=0,s=this.length,u=0===arguments.length||"string"==typeof e&&e;if(b.isFunction(e))return this.each(function(t){b(this).removeClass(e.call(this,t,this.className))});if(u)for(t=(e||"").match(w)||[];s>a;a++)if(n=this[a],r=1===n.nodeType&&(n.className?(" "+n.className+" ").replace(X," "):"")){o=0;while(i=t[o++])while(r.indexOf(" "+i+" ")>=0)r=r.replace(" "+i+" "," ");n.className=e?b.trim(r):""}return this},toggleClass:function(e,t){var n=typeof e,r="boolean"==typeof t;return b.isFunction(e)?this.each(function(n){b(this).toggleClass(e.call(this,n,this.className,t),t)}):this.each(function(){if("string"===n){var o,a=0,s=b(this),u=t,l=e.match(w)||[];while(o=l[a++])u=r?u:!s.hasClass(o),s[u?"addClass":"removeClass"](o)}else(n===i||"boolean"===n)&&(this.className&&b._data(this,"__className__",this.className),this.className=this.className||e===!1?"":b._data(this,"__className__")||"")})},hasClass:function(e){var t=" "+e+" ",n=0,r=this.length;for(;r>n;n++)if(1===this[n].nodeType&&(" "+this[n].className+" ").replace(X," ").indexOf(t)>=0)return!0;return!1},val:function(e){var n,r,i,o=this[0];{if(arguments.length)return i=b.isFunction(e),this.each(function(n){var o,a=b(this);1===this.nodeType&&(o=i?e.call(this,n,a.val()):e,null==o?o="":"number"==typeof o?o+="":b.isArray(o)&&(o=b.map(o,function(e){return null==e?"":e+""})),r=b.valHooks[this.type]||b.valHooks[this.nodeName.toLowerCase()],r&&"set"in r&&r.set(this,o,"value")!==t||(this.value=o))});if(o)return r=b.valHooks[o.type]||b.valHooks[o.nodeName.toLowerCase()],r&&"get"in r&&(n=r.get(o,"value"))!==t?n:(n=o.value,"string"==typeof n?n.replace(U,""):null==n?"":n)}}}),b.extend({valHooks:{option:{get:function(e){var t=e.attributes.value;return!t||t.specified?e.value:e.text}},select:{get:function(e){var t,n,r=e.options,i=e.selectedIndex,o="select-one"===e.type||0>i,a=o?null:[],s=o?i+1:r.length,u=0>i?s:o?i:0;for(;s>u;u++)if(n=r[u],!(!n.selected&&u!==i||(b.support.optDisabled?n.disabled:null!==n.getAttribute("disabled"))||n.parentNode.disabled&&b.nodeName(n.parentNode,"optgroup"))){if(t=b(n).val(),o)return t;a.push(t)}return a},set:function(e,t){var n=b.makeArray(t);return b(e).find("option").each(function(){this.selected=b.inArray(b(this).val(),n)>=0}),n.length||(e.selectedIndex=-1),n}}},attr:function(e,n,r){var o,a,s,u=e.nodeType;if(e&&3!==u&&8!==u&&2!==u)return typeof e.getAttribute===i?b.prop(e,n,r):(a=1!==u||!b.isXMLDoc(e),a&&(n=n.toLowerCase(),o=b.attrHooks[n]||(J.test(n)?z:I)),r===t?o&&a&&"get"in o&&null!==(s=o.get(e,n))?s:(typeof e.getAttribute!==i&&(s=e.getAttribute(n)),null==s?t:s):null!==r?o&&a&&"set"in o&&(s=o.set(e,r,n))!==t?s:(e.setAttribute(n,r+""),r):(b.removeAttr(e,n),t))},removeAttr:function(e,t){var n,r,i=0,o=t&&t.match(w);if(o&&1===e.nodeType)while(n=o[i++])r=b.propFix[n]||n,J.test(n)?!Q&&G.test(n)?e[b.camelCase("default-"+n)]=e[r]=!1:e[r]=!1:b.attr(e,n,""),e.removeAttribute(Q?n:r)},attrHooks:{type:{set:function(e,t){if(!b.support.radioValue&&"radio"===t&&b.nodeName(e,"input")){var n=e.value;return e.setAttribute("type",t),n&&(e.value=n),t}}}},propFix:{tabindex:"tabIndex",readonly:"readOnly","for":"htmlFor","class":"className",maxlength:"maxLength",cellspacing:"cellSpacing",cellpadding:"cellPadding",rowspan:"rowSpan",colspan:"colSpan",usemap:"useMap",frameborder:"frameBorder",contenteditable:"contentEditable"},prop:function(e,n,r){var i,o,a,s=e.nodeType;if(e&&3!==s&&8!==s&&2!==s)return a=1!==s||!b.isXMLDoc(e),a&&(n=b.propFix[n]||n,o=b.propHooks[n]),r!==t?o&&"set"in o&&(i=o.set(e,r,n))!==t?i:e[n]=r:o&&"get"in o&&null!==(i=o.get(e,n))?i:e[n]},propHooks:{tabIndex:{get:function(e){var n=e.getAttributeNode("tabindex");return n&&n.specified?parseInt(n.value,10):V.test(e.nodeName)||Y.test(e.nodeName)&&e.href?0:t}}}}),z={get:function(e,n){var r=b.prop(e,n),i="boolean"==typeof r&&e.getAttribute(n),o="boolean"==typeof r?K&&Q?null!=i:G.test(n)?e[b.camelCase("default-"+n)]:!!i:e.getAttributeNode(n);return o&&o.value!==!1?n.toLowerCase():t},set:function(e,t,n){return t===!1?b.removeAttr(e,n):K&&Q||!G.test(n)?e.setAttribute(!Q&&b.propFix[n]||n,n):e[b.camelCase("default-"+n)]=e[n]=!0,n}},K&&Q||(b.attrHooks.value={get:function(e,n){var r=e.getAttributeNode(n);return b.nodeName(e,"input")?e.defaultValue:r&&r.specified?r.value:t},set:function(e,n,r){return b.nodeName(e,"input")?(e.defaultValue=n,t):I&&I.set(e,n,r)}}),Q||(I=b.valHooks.button={get:function(e,n){var r=e.getAttributeNode(n);return r&&("id"===n||"name"===n||"coords"===n?""!==r.value:r.specified)?r.value:t},set:function(e,n,r){var i=e.getAttributeNode(r);return i||e.setAttributeNode(i=e.ownerDocument.createAttribute(r)),i.value=n+="","value"===r||n===e.getAttribute(r)?n:t}},b.attrHooks.contenteditable={get:I.get,set:function(e,t,n){I.set(e,""===t?!1:t,n)}},b.each(["width","height"],function(e,n){b.attrHooks[n]=b.extend(b.attrHooks[n],{set:function(e,r){return""===r?(e.setAttribute(n,"auto"),r):t}})})),b.support.hrefNormalized||(b.each(["href","src","width","height"],function(e,n){b.attrHooks[n]=b.extend(b.attrHooks[n],{get:function(e){var r=e.getAttribute(n,2);return null==r?t:r}})}),b.each(["href","src"],function(e,t){b.propHooks[t]={get:function(e){return e.getAttribute(t,4)}}})),b.support.style||(b.attrHooks.style={get:function(e){return e.style.cssText||t},set:function(e,t){return e.style.cssText=t+""}}),b.support.optSelected||(b.propHooks.selected=b.extend(b.propHooks.selected,{get:function(e){var t=e.parentNode;return t&&(t.selectedIndex,t.parentNode&&t.parentNode.selectedIndex),null}})),b.support.enctype||(b.propFix.enctype="encoding"),b.support.checkOn||b.each(["radio","checkbox"],function(){b.valHooks[this]={get:function(e){return null===e.getAttribute("value")?"on":e.value}}}),b.each(["radio","checkbox"],function(){b.valHooks[this]=b.extend(b.valHooks[this],{set:function(e,n){return b.isArray(n)?e.checked=b.inArray(b(e).val(),n)>=0:t}})});var Z=/^(?:input|select|textarea)$/i,et=/^key/,tt=/^(?:mouse|contextmenu)|click/,nt=/^(?:focusinfocus|focusoutblur)$/,rt=/^([^.]*)(?:\.(.+)|)$/;function it(){return!0}function ot(){return!1}b.event={global:{},add:function(e,n,r,o,a){var s,u,l,c,p,f,d,h,g,m,y,v=b._data(e);if(v){r.handler&&(c=r,r=c.handler,a=c.selector),r.guid||(r.guid=b.guid++),(u=v.events)||(u=v.events={}),(f=v.handle)||(f=v.handle=function(e){return typeof b===i||e&&b.event.triggered===e.type?t:b.event.dispatch.apply(f.elem,arguments)},f.elem=e),n=(n||"").match(w)||[""],l=n.length;while(l--)s=rt.exec(n[l])||[],g=y=s[1],m=(s[2]||"").split(".").sort(),p=b.event.special[g]||{},g=(a?p.delegateType:p.bindType)||g,p=b.event.special[g]||{},d=b.extend({type:g,origType:y,data:o,handler:r,guid:r.guid,selector:a,needsContext:a&&b.expr.match.needsContext.test(a),namespace:m.join(".")},c),(h=u[g])||(h=u[g]=[],h.delegateCount=0,p.setup&&p.setup.call(e,o,m,f)!==!1||(e.addEventListener?e.addEventListener(g,f,!1):e.attachEvent&&e.attachEvent("on"+g,f))),p.add&&(p.add.call(e,d),d.handler.guid||(d.handler.guid=r.guid)),a?h.splice(h.delegateCount++,0,d):h.push(d),b.event.global[g]=!0;e=null}},remove:function(e,t,n,r,i){var o,a,s,u,l,c,p,f,d,h,g,m=b.hasData(e)&&b._data(e);if(m&&(c=m.events)){t=(t||"").match(w)||[""],l=t.length;while(l--)if(s=rt.exec(t[l])||[],d=g=s[1],h=(s[2]||"").split(".").sort(),d){p=b.event.special[d]||{},d=(r?p.delegateType:p.bindType)||d,f=c[d]||[],s=s[2]&&RegExp("(^|\\.)"+h.join("\\.(?:.*\\.|)")+"(\\.|$)"),u=o=f.length;while(o--)a=f[o],!i&&g!==a.origType||n&&n.guid!==a.guid||s&&!s.test(a.namespace)||r&&r!==a.selector&&("**"!==r||!a.selector)||(f.splice(o,1),a.selector&&f.delegateCount--,p.remove&&p.remove.call(e,a));u&&!f.length&&(p.teardown&&p.teardown.call(e,h,m.handle)!==!1||b.removeEvent(e,d,m.handle),delete c[d])}else for(d in c)b.event.remove(e,d+t[l],n,r,!0);b.isEmptyObject(c)&&(delete m.handle,b._removeData(e,"events"))}},trigger:function(n,r,i,a){var s,u,l,c,p,f,d,h=[i||o],g=y.call(n,"type")?n.type:n,m=y.call(n,"namespace")?n.namespace.split("."):[];if(l=f=i=i||o,3!==i.nodeType&&8!==i.nodeType&&!nt.test(g+b.event.triggered)&&(g.indexOf(".")>=0&&(m=g.split("."),g=m.shift(),m.sort()),u=0>g.indexOf(":")&&"on"+g,n=n[b.expando]?n:new b.Event(g,"object"==typeof n&&n),n.isTrigger=!0,n.namespace=m.join("."),n.namespace_re=n.namespace?RegExp("(^|\\.)"+m.join("\\.(?:.*\\.|)")+"(\\.|$)"):null,n.result=t,n.target||(n.target=i),r=null==r?[n]:b.makeArray(r,[n]),p=b.event.special[g]||{},a||!p.trigger||p.trigger.apply(i,r)!==!1)){if(!a&&!p.noBubble&&!b.isWindow(i)){for(c=p.delegateType||g,nt.test(c+g)||(l=l.parentNode);l;l=l.parentNode)h.push(l),f=l;f===(i.ownerDocument||o)&&h.push(f.defaultView||f.parentWindow||e)}d=0;while((l=h[d++])&&!n.isPropagationStopped())n.type=d>1?c:p.bindType||g,s=(b._data(l,"events")||{})[n.type]&&b._data(l,"handle"),s&&s.apply(l,r),s=u&&l[u],s&&b.acceptData(l)&&s.apply&&s.apply(l,r)===!1&&n.preventDefault();if(n.type=g,!(a||n.isDefaultPrevented()||p._default&&p._default.apply(i.ownerDocument,r)!==!1||"click"===g&&b.nodeName(i,"a")||!b.acceptData(i)||!u||!i[g]||b.isWindow(i))){f=i[u],f&&(i[u]=null),b.event.triggered=g;try{i[g]()}catch(v){}b.event.triggered=t,f&&(i[u]=f)}return n.result}},dispatch:function(e){e=b.event.fix(e);var n,r,i,o,a,s=[],u=h.call(arguments),l=(b._data(this,"events")||{})[e.type]||[],c=b.event.special[e.type]||{};if(u[0]=e,e.delegateTarget=this,!c.preDispatch||c.preDispatch.call(this,e)!==!1){s=b.event.handlers.call(this,e,l),n=0;while((o=s[n++])&&!e.isPropagationStopped()){e.currentTarget=o.elem,a=0;while((i=o.handlers[a++])&&!e.isImmediatePropagationStopped())(!e.namespace_re||e.namespace_re.test(i.namespace))&&(e.handleObj=i,e.data=i.data,r=((b.event.special[i.origType]||{}).handle||i.handler).apply(o.elem,u),r!==t&&(e.result=r)===!1&&(e.preventDefault(),e.stopPropagation()))}return c.postDispatch&&c.postDispatch.call(this,e),e.result}},handlers:function(e,n){var r,i,o,a,s=[],u=n.delegateCount,l=e.target;if(u&&l.nodeType&&(!e.button||"click"!==e.type))for(;l!=this;l=l.parentNode||this)if(1===l.nodeType&&(l.disabled!==!0||"click"!==e.type)){for(o=[],a=0;u>a;a++)i=n[a],r=i.selector+" ",o[r]===t&&(o[r]=i.needsContext?b(r,this).index(l)>=0:b.find(r,this,null,[l]).length),o[r]&&o.push(i);o.length&&s.push({elem:l,handlers:o})}return n.length>u&&s.push({elem:this,handlers:n.slice(u)}),s},fix:function(e){if(e[b.expando])return e;var t,n,r,i=e.type,a=e,s=this.fixHooks[i];s||(this.fixHooks[i]=s=tt.test(i)?this.mouseHooks:et.test(i)?this.keyHooks:{}),r=s.props?this.props.concat(s.props):this.props,e=new b.Event(a),t=r.length;while(t--)n=r[t],e[n]=a[n];return e.target||(e.target=a.srcElement||o),3===e.target.nodeType&&(e.target=e.target.parentNode),e.metaKey=!!e.metaKey,s.filter?s.filter(e,a):e},props:"altKey bubbles cancelable ctrlKey currentTarget eventPhase metaKey relatedTarget shiftKey target timeStamp view which".split(" "),fixHooks:{},keyHooks:{props:"char charCode key keyCode".split(" "),filter:function(e,t){return null==e.which&&(e.which=null!=t.charCode?t.charCode:t.keyCode),e}},mouseHooks:{props:"button buttons clientX clientY fromElement offsetX offsetY pageX pageY screenX screenY toElement".split(" "),filter:function(e,n){var r,i,a,s=n.button,u=n.fromElement;return null==e.pageX&&null!=n.clientX&&(i=e.target.ownerDocument||o,a=i.documentElement,r=i.body,e.pageX=n.clientX+(a&&a.scrollLeft||r&&r.scrollLeft||0)-(a&&a.clientLeft||r&&r.clientLeft||0),e.pageY=n.clientY+(a&&a.scrollTop||r&&r.scrollTop||0)-(a&&a.clientTop||r&&r.clientTop||0)),!e.relatedTarget&&u&&(e.relatedTarget=u===e.target?n.toElement:u),e.which||s===t||(e.which=1&s?1:2&s?3:4&s?2:0),e}},special:{load:{noBubble:!0},click:{trigger:function(){return b.nodeName(this,"input")&&"checkbox"===this.type&&this.click?(this.click(),!1):t}},focus:{trigger:function(){if(this!==o.activeElement&&this.focus)try{return this.focus(),!1}catch(e){}},delegateType:"focusin"},blur:{trigger:function(){return this===o.activeElement&&this.blur?(this.blur(),!1):t},delegateType:"focusout"},beforeunload:{postDispatch:function(e){e.result!==t&&(e.originalEvent.returnValue=e.result)}}},simulate:function(e,t,n,r){var i=b.extend(new b.Event,n,{type:e,isSimulated:!0,originalEvent:{}});r?b.event.trigger(i,null,t):b.event.dispatch.call(t,i),i.isDefaultPrevented()&&n.preventDefault()}},b.removeEvent=o.removeEventListener?function(e,t,n){e.removeEventListener&&e.removeEventListener(t,n,!1)}:function(e,t,n){var r="on"+t;e.detachEvent&&(typeof e[r]===i&&(e[r]=null),e.detachEvent(r,n))},b.Event=function(e,n){return this instanceof b.Event?(e&&e.type?(this.originalEvent=e,this.type=e.type,this.isDefaultPrevented=e.defaultPrevented||e.returnValue===!1||e.getPreventDefault&&e.getPreventDefault()?it:ot):this.type=e,n&&b.extend(this,n),this.timeStamp=e&&e.timeStamp||b.now(),this[b.expando]=!0,t):new b.Event(e,n)},b.Event.prototype={isDefaultPrevented:ot,isPropagationStopped:ot,isImmediatePropagationStopped:ot,preventDefault:function(){var e=this.originalEvent;this.isDefaultPrevented=it,e&&(e.preventDefault?e.preventDefault():e.returnValue=!1)},stopPropagation:function(){var e=this.originalEvent;this.isPropagationStopped=it,e&&(e.stopPropagation&&e.stopPropagation(),e.cancelBubble=!0)},stopImmediatePropagation:function(){this.isImmediatePropagationStopped=it,this.stopPropagation()}},b.each({mouseenter:"mouseover",mouseleave:"mouseout"},function(e,t){b.event.special[e]={delegateType:t,bindType:t,handle:function(e){var n,r=this,i=e.relatedTarget,o=e.handleObj;
 return(!i||i!==r&&!b.contains(r,i))&&(e.type=o.origType,n=o.handler.apply(this,arguments),e.type=t),n}}}),b.support.submitBubbles||(b.event.special.submit={setup:function(){return b.nodeName(this,"form")?!1:(b.event.add(this,"click._submit keypress._submit",function(e){var n=e.target,r=b.nodeName(n,"input")||b.nodeName(n,"button")?n.form:t;r&&!b._data(r,"submitBubbles")&&(b.event.add(r,"submit._submit",function(e){e._submit_bubble=!0}),b._data(r,"submitBubbles",!0))}),t)},postDispatch:function(e){e._submit_bubble&&(delete e._submit_bubble,this.parentNode&&!e.isTrigger&&b.event.simulate("submit",this.parentNode,e,!0))},teardown:function(){return b.nodeName(this,"form")?!1:(b.event.remove(this,"._submit"),t)}}),b.support.changeBubbles||(b.event.special.change={setup:function(){return Z.test(this.nodeName)?(("checkbox"===this.type||"radio"===this.type)&&(b.event.add(this,"propertychange._change",function(e){"checked"===e.originalEvent.propertyName&&(this._just_changed=!0)}),b.event.add(this,"click._change",function(e){this._just_changed&&!e.isTrigger&&(this._just_changed=!1),b.event.simulate("change",this,e,!0)})),!1):(b.event.add(this,"beforeactivate._change",function(e){var t=e.target;Z.test(t.nodeName)&&!b._data(t,"changeBubbles")&&(b.event.add(t,"change._change",function(e){!this.parentNode||e.isSimulated||e.isTrigger||b.event.simulate("change",this.parentNode,e,!0)}),b._data(t,"changeBubbles",!0))}),t)},handle:function(e){var n=e.target;return this!==n||e.isSimulated||e.isTrigger||"radio"!==n.type&&"checkbox"!==n.type?e.handleObj.handler.apply(this,arguments):t},teardown:function(){return b.event.remove(this,"._change"),!Z.test(this.nodeName)}}),b.support.focusinBubbles||b.each({focus:"focusin",blur:"focusout"},function(e,t){var n=0,r=function(e){b.event.simulate(t,e.target,b.event.fix(e),!0)};b.event.special[t]={setup:function(){0===n++&&o.addEventListener(e,r,!0)},teardown:function(){0===--n&&o.removeEventListener(e,r,!0)}}}),b.fn.extend({on:function(e,n,r,i,o){var a,s;if("object"==typeof e){"string"!=typeof n&&(r=r||n,n=t);for(a in e)this.on(a,n,r,e[a],o);return this}if(null==r&&null==i?(i=n,r=n=t):null==i&&("string"==typeof n?(i=r,r=t):(i=r,r=n,n=t)),i===!1)i=ot;else if(!i)return this;return 1===o&&(s=i,i=function(e){return b().off(e),s.apply(this,arguments)},i.guid=s.guid||(s.guid=b.guid++)),this.each(function(){b.event.add(this,e,i,r,n)})},one:function(e,t,n,r){return this.on(e,t,n,r,1)},off:function(e,n,r){var i,o;if(e&&e.preventDefault&&e.handleObj)return i=e.handleObj,b(e.delegateTarget).off(i.namespace?i.origType+"."+i.namespace:i.origType,i.selector,i.handler),this;if("object"==typeof e){for(o in e)this.off(o,n,e[o]);return this}return(n===!1||"function"==typeof n)&&(r=n,n=t),r===!1&&(r=ot),this.each(function(){b.event.remove(this,e,r,n)})},bind:function(e,t,n){return this.on(e,null,t,n)},unbind:function(e,t){return this.off(e,null,t)},delegate:function(e,t,n,r){return this.on(t,e,n,r)},undelegate:function(e,t,n){return 1===arguments.length?this.off(e,"**"):this.off(t,e||"**",n)},trigger:function(e,t){return this.each(function(){b.event.trigger(e,t,this)})},triggerHandler:function(e,n){var r=this[0];return r?b.event.trigger(e,n,r,!0):t}}),function(e,t){var n,r,i,o,a,s,u,l,c,p,f,d,h,g,m,y,v,x="sizzle"+-new Date,w=e.document,T={},N=0,C=0,k=it(),E=it(),S=it(),A=typeof t,j=1<<31,D=[],L=D.pop,H=D.push,q=D.slice,M=D.indexOf||function(e){var t=0,n=this.length;for(;n>t;t++)if(this[t]===e)return t;return-1},_="[\\x20\\t\\r\\n\\f]",F="(?:\\\\.|[\\w-]|[^\\x00-\\xa0])+",O=F.replace("w","w#"),B="([*^$|!~]?=)",P="\\["+_+"*("+F+")"+_+"*(?:"+B+_+"*(?:(['\"])((?:\\\\.|[^\\\\])*?)\\3|("+O+")|)|)"+_+"*\\]",R=":("+F+")(?:\\(((['\"])((?:\\\\.|[^\\\\])*?)\\3|((?:\\\\.|[^\\\\()[\\]]|"+P.replace(3,8)+")*)|.*)\\)|)",W=RegExp("^"+_+"+|((?:^|[^\\\\])(?:\\\\.)*)"+_+"+$","g"),$=RegExp("^"+_+"*,"+_+"*"),I=RegExp("^"+_+"*([\\x20\\t\\r\\n\\f>+~])"+_+"*"),z=RegExp(R),X=RegExp("^"+O+"$"),U={ID:RegExp("^#("+F+")"),CLASS:RegExp("^\\.("+F+")"),NAME:RegExp("^\\[name=['\"]?("+F+")['\"]?\\]"),TAG:RegExp("^("+F.replace("w","w*")+")"),ATTR:RegExp("^"+P),PSEUDO:RegExp("^"+R),CHILD:RegExp("^:(only|first|last|nth|nth-last)-(child|of-type)(?:\\("+_+"*(even|odd|(([+-]|)(\\d*)n|)"+_+"*(?:([+-]|)"+_+"*(\\d+)|))"+_+"*\\)|)","i"),needsContext:RegExp("^"+_+"*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\("+_+"*((?:-\\d)?\\d*)"+_+"*\\)|)(?=[^-]|$)","i")},V=/[\x20\t\r\n\f]*[+~]/,Y=/^[^{]+\{\s*\[native code/,J=/^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,G=/^(?:input|select|textarea|button)$/i,Q=/^h\d$/i,K=/'|\\/g,Z=/\=[\x20\t\r\n\f]*([^'"\]]*)[\x20\t\r\n\f]*\]/g,et=/\\([\da-fA-F]{1,6}[\x20\t\r\n\f]?|.)/g,tt=function(e,t){var n="0x"+t-65536;return n!==n?t:0>n?String.fromCharCode(n+65536):String.fromCharCode(55296|n>>10,56320|1023&n)};try{q.call(w.documentElement.childNodes,0)[0].nodeType}catch(nt){q=function(e){var t,n=[];while(t=this[e++])n.push(t);return n}}function rt(e){return Y.test(e+"")}function it(){var e,t=[];return e=function(n,r){return t.push(n+=" ")>i.cacheLength&&delete e[t.shift()],e[n]=r}}function ot(e){return e[x]=!0,e}function at(e){var t=p.createElement("div");try{return e(t)}catch(n){return!1}finally{t=null}}function st(e,t,n,r){var i,o,a,s,u,l,f,g,m,v;if((t?t.ownerDocument||t:w)!==p&&c(t),t=t||p,n=n||[],!e||"string"!=typeof e)return n;if(1!==(s=t.nodeType)&&9!==s)return[];if(!d&&!r){if(i=J.exec(e))if(a=i[1]){if(9===s){if(o=t.getElementById(a),!o||!o.parentNode)return n;if(o.id===a)return n.push(o),n}else if(t.ownerDocument&&(o=t.ownerDocument.getElementById(a))&&y(t,o)&&o.id===a)return n.push(o),n}else{if(i[2])return H.apply(n,q.call(t.getElementsByTagName(e),0)),n;if((a=i[3])&&T.getByClassName&&t.getElementsByClassName)return H.apply(n,q.call(t.getElementsByClassName(a),0)),n}if(T.qsa&&!h.test(e)){if(f=!0,g=x,m=t,v=9===s&&e,1===s&&"object"!==t.nodeName.toLowerCase()){l=ft(e),(f=t.getAttribute("id"))?g=f.replace(K,"\\$&"):t.setAttribute("id",g),g="[id='"+g+"'] ",u=l.length;while(u--)l[u]=g+dt(l[u]);m=V.test(e)&&t.parentNode||t,v=l.join(",")}if(v)try{return H.apply(n,q.call(m.querySelectorAll(v),0)),n}catch(b){}finally{f||t.removeAttribute("id")}}}return wt(e.replace(W,"$1"),t,n,r)}a=st.isXML=function(e){var t=e&&(e.ownerDocument||e).documentElement;return t?"HTML"!==t.nodeName:!1},c=st.setDocument=function(e){var n=e?e.ownerDocument||e:w;return n!==p&&9===n.nodeType&&n.documentElement?(p=n,f=n.documentElement,d=a(n),T.tagNameNoComments=at(function(e){return e.appendChild(n.createComment("")),!e.getElementsByTagName("*").length}),T.attributes=at(function(e){e.innerHTML="<select></select>";var t=typeof e.lastChild.getAttribute("multiple");return"boolean"!==t&&"string"!==t}),T.getByClassName=at(function(e){return e.innerHTML="<div class='hidden e'></div><div class='hidden'></div>",e.getElementsByClassName&&e.getElementsByClassName("e").length?(e.lastChild.className="e",2===e.getElementsByClassName("e").length):!1}),T.getByName=at(function(e){e.id=x+0,e.innerHTML="<a name='"+x+"'></a><div name='"+x+"'></div>",f.insertBefore(e,f.firstChild);var t=n.getElementsByName&&n.getElementsByName(x).length===2+n.getElementsByName(x+0).length;return T.getIdNotName=!n.getElementById(x),f.removeChild(e),t}),i.attrHandle=at(function(e){return e.innerHTML="<a href='#'></a>",e.firstChild&&typeof e.firstChild.getAttribute!==A&&"#"===e.firstChild.getAttribute("href")})?{}:{href:function(e){return e.getAttribute("href",2)},type:function(e){return e.getAttribute("type")}},T.getIdNotName?(i.find.ID=function(e,t){if(typeof t.getElementById!==A&&!d){var n=t.getElementById(e);return n&&n.parentNode?[n]:[]}},i.filter.ID=function(e){var t=e.replace(et,tt);return function(e){return e.getAttribute("id")===t}}):(i.find.ID=function(e,n){if(typeof n.getElementById!==A&&!d){var r=n.getElementById(e);return r?r.id===e||typeof r.getAttributeNode!==A&&r.getAttributeNode("id").value===e?[r]:t:[]}},i.filter.ID=function(e){var t=e.replace(et,tt);return function(e){var n=typeof e.getAttributeNode!==A&&e.getAttributeNode("id");return n&&n.value===t}}),i.find.TAG=T.tagNameNoComments?function(e,n){return typeof n.getElementsByTagName!==A?n.getElementsByTagName(e):t}:function(e,t){var n,r=[],i=0,o=t.getElementsByTagName(e);if("*"===e){while(n=o[i++])1===n.nodeType&&r.push(n);return r}return o},i.find.NAME=T.getByName&&function(e,n){return typeof n.getElementsByName!==A?n.getElementsByName(name):t},i.find.CLASS=T.getByClassName&&function(e,n){return typeof n.getElementsByClassName===A||d?t:n.getElementsByClassName(e)},g=[],h=[":focus"],(T.qsa=rt(n.querySelectorAll))&&(at(function(e){e.innerHTML="<select><option selected=''></option></select>",e.querySelectorAll("[selected]").length||h.push("\\["+_+"*(?:checked|disabled|ismap|multiple|readonly|selected|value)"),e.querySelectorAll(":checked").length||h.push(":checked")}),at(function(e){e.innerHTML="<input type='hidden' i=''/>",e.querySelectorAll("[i^='']").length&&h.push("[*^$]="+_+"*(?:\"\"|'')"),e.querySelectorAll(":enabled").length||h.push(":enabled",":disabled"),e.querySelectorAll("*,:x"),h.push(",.*:")})),(T.matchesSelector=rt(m=f.matchesSelector||f.mozMatchesSelector||f.webkitMatchesSelector||f.oMatchesSelector||f.msMatchesSelector))&&at(function(e){T.disconnectedMatch=m.call(e,"div"),m.call(e,"[s!='']:x"),g.push("!=",R)}),h=RegExp(h.join("|")),g=RegExp(g.join("|")),y=rt(f.contains)||f.compareDocumentPosition?function(e,t){var n=9===e.nodeType?e.documentElement:e,r=t&&t.parentNode;return e===r||!(!r||1!==r.nodeType||!(n.contains?n.contains(r):e.compareDocumentPosition&&16&e.compareDocumentPosition(r)))}:function(e,t){if(t)while(t=t.parentNode)if(t===e)return!0;return!1},v=f.compareDocumentPosition?function(e,t){var r;return e===t?(u=!0,0):(r=t.compareDocumentPosition&&e.compareDocumentPosition&&e.compareDocumentPosition(t))?1&r||e.parentNode&&11===e.parentNode.nodeType?e===n||y(w,e)?-1:t===n||y(w,t)?1:0:4&r?-1:1:e.compareDocumentPosition?-1:1}:function(e,t){var r,i=0,o=e.parentNode,a=t.parentNode,s=[e],l=[t];if(e===t)return u=!0,0;if(!o||!a)return e===n?-1:t===n?1:o?-1:a?1:0;if(o===a)return ut(e,t);r=e;while(r=r.parentNode)s.unshift(r);r=t;while(r=r.parentNode)l.unshift(r);while(s[i]===l[i])i++;return i?ut(s[i],l[i]):s[i]===w?-1:l[i]===w?1:0},u=!1,[0,0].sort(v),T.detectDuplicates=u,p):p},st.matches=function(e,t){return st(e,null,null,t)},st.matchesSelector=function(e,t){if((e.ownerDocument||e)!==p&&c(e),t=t.replace(Z,"='$1']"),!(!T.matchesSelector||d||g&&g.test(t)||h.test(t)))try{var n=m.call(e,t);if(n||T.disconnectedMatch||e.document&&11!==e.document.nodeType)return n}catch(r){}return st(t,p,null,[e]).length>0},st.contains=function(e,t){return(e.ownerDocument||e)!==p&&c(e),y(e,t)},st.attr=function(e,t){var n;return(e.ownerDocument||e)!==p&&c(e),d||(t=t.toLowerCase()),(n=i.attrHandle[t])?n(e):d||T.attributes?e.getAttribute(t):((n=e.getAttributeNode(t))||e.getAttribute(t))&&e[t]===!0?t:n&&n.specified?n.value:null},st.error=function(e){throw Error("Syntax error, unrecognized expression: "+e)},st.uniqueSort=function(e){var t,n=[],r=1,i=0;if(u=!T.detectDuplicates,e.sort(v),u){for(;t=e[r];r++)t===e[r-1]&&(i=n.push(r));while(i--)e.splice(n[i],1)}return e};function ut(e,t){var n=t&&e,r=n&&(~t.sourceIndex||j)-(~e.sourceIndex||j);if(r)return r;if(n)while(n=n.nextSibling)if(n===t)return-1;return e?1:-1}function lt(e){return function(t){var n=t.nodeName.toLowerCase();return"input"===n&&t.type===e}}function ct(e){return function(t){var n=t.nodeName.toLowerCase();return("input"===n||"button"===n)&&t.type===e}}function pt(e){return ot(function(t){return t=+t,ot(function(n,r){var i,o=e([],n.length,t),a=o.length;while(a--)n[i=o[a]]&&(n[i]=!(r[i]=n[i]))})})}o=st.getText=function(e){var t,n="",r=0,i=e.nodeType;if(i){if(1===i||9===i||11===i){if("string"==typeof e.textContent)return e.textContent;for(e=e.firstChild;e;e=e.nextSibling)n+=o(e)}else if(3===i||4===i)return e.nodeValue}else for(;t=e[r];r++)n+=o(t);return n},i=st.selectors={cacheLength:50,createPseudo:ot,match:U,find:{},relative:{">":{dir:"parentNode",first:!0}," ":{dir:"parentNode"},"+":{dir:"previousSibling",first:!0},"~":{dir:"previousSibling"}},preFilter:{ATTR:function(e){return e[1]=e[1].replace(et,tt),e[3]=(e[4]||e[5]||"").replace(et,tt),"~="===e[2]&&(e[3]=" "+e[3]+" "),e.slice(0,4)},CHILD:function(e){return e[1]=e[1].toLowerCase(),"nth"===e[1].slice(0,3)?(e[3]||st.error(e[0]),e[4]=+(e[4]?e[5]+(e[6]||1):2*("even"===e[3]||"odd"===e[3])),e[5]=+(e[7]+e[8]||"odd"===e[3])):e[3]&&st.error(e[0]),e},PSEUDO:function(e){var t,n=!e[5]&&e[2];return U.CHILD.test(e[0])?null:(e[4]?e[2]=e[4]:n&&z.test(n)&&(t=ft(n,!0))&&(t=n.indexOf(")",n.length-t)-n.length)&&(e[0]=e[0].slice(0,t),e[2]=n.slice(0,t)),e.slice(0,3))}},filter:{TAG:function(e){return"*"===e?function(){return!0}:(e=e.replace(et,tt).toLowerCase(),function(t){return t.nodeName&&t.nodeName.toLowerCase()===e})},CLASS:function(e){var t=k[e+" "];return t||(t=RegExp("(^|"+_+")"+e+"("+_+"|$)"))&&k(e,function(e){return t.test(e.className||typeof e.getAttribute!==A&&e.getAttribute("class")||"")})},ATTR:function(e,t,n){return function(r){var i=st.attr(r,e);return null==i?"!="===t:t?(i+="","="===t?i===n:"!="===t?i!==n:"^="===t?n&&0===i.indexOf(n):"*="===t?n&&i.indexOf(n)>-1:"$="===t?n&&i.slice(-n.length)===n:"~="===t?(" "+i+" ").indexOf(n)>-1:"|="===t?i===n||i.slice(0,n.length+1)===n+"-":!1):!0}},CHILD:function(e,t,n,r,i){var o="nth"!==e.slice(0,3),a="last"!==e.slice(-4),s="of-type"===t;return 1===r&&0===i?function(e){return!!e.parentNode}:function(t,n,u){var l,c,p,f,d,h,g=o!==a?"nextSibling":"previousSibling",m=t.parentNode,y=s&&t.nodeName.toLowerCase(),v=!u&&!s;if(m){if(o){while(g){p=t;while(p=p[g])if(s?p.nodeName.toLowerCase()===y:1===p.nodeType)return!1;h=g="only"===e&&!h&&"nextSibling"}return!0}if(h=[a?m.firstChild:m.lastChild],a&&v){c=m[x]||(m[x]={}),l=c[e]||[],d=l[0]===N&&l[1],f=l[0]===N&&l[2],p=d&&m.childNodes[d];while(p=++d&&p&&p[g]||(f=d=0)||h.pop())if(1===p.nodeType&&++f&&p===t){c[e]=[N,d,f];break}}else if(v&&(l=(t[x]||(t[x]={}))[e])&&l[0]===N)f=l[1];else while(p=++d&&p&&p[g]||(f=d=0)||h.pop())if((s?p.nodeName.toLowerCase()===y:1===p.nodeType)&&++f&&(v&&((p[x]||(p[x]={}))[e]=[N,f]),p===t))break;return f-=i,f===r||0===f%r&&f/r>=0}}},PSEUDO:function(e,t){var n,r=i.pseudos[e]||i.setFilters[e.toLowerCase()]||st.error("unsupported pseudo: "+e);return r[x]?r(t):r.length>1?(n=[e,e,"",t],i.setFilters.hasOwnProperty(e.toLowerCase())?ot(function(e,n){var i,o=r(e,t),a=o.length;while(a--)i=M.call(e,o[a]),e[i]=!(n[i]=o[a])}):function(e){return r(e,0,n)}):r}},pseudos:{not:ot(function(e){var t=[],n=[],r=s(e.replace(W,"$1"));return r[x]?ot(function(e,t,n,i){var o,a=r(e,null,i,[]),s=e.length;while(s--)(o=a[s])&&(e[s]=!(t[s]=o))}):function(e,i,o){return t[0]=e,r(t,null,o,n),!n.pop()}}),has:ot(function(e){return function(t){return st(e,t).length>0}}),contains:ot(function(e){return function(t){return(t.textContent||t.innerText||o(t)).indexOf(e)>-1}}),lang:ot(function(e){return X.test(e||"")||st.error("unsupported lang: "+e),e=e.replace(et,tt).toLowerCase(),function(t){var n;do if(n=d?t.getAttribute("xml:lang")||t.getAttribute("lang"):t.lang)return n=n.toLowerCase(),n===e||0===n.indexOf(e+"-");while((t=t.parentNode)&&1===t.nodeType);return!1}}),target:function(t){var n=e.location&&e.location.hash;return n&&n.slice(1)===t.id},root:function(e){return e===f},focus:function(e){return e===p.activeElement&&(!p.hasFocus||p.hasFocus())&&!!(e.type||e.href||~e.tabIndex)},enabled:function(e){return e.disabled===!1},disabled:function(e){return e.disabled===!0},checked:function(e){var t=e.nodeName.toLowerCase();return"input"===t&&!!e.checked||"option"===t&&!!e.selected},selected:function(e){return e.parentNode&&e.parentNode.selectedIndex,e.selected===!0},empty:function(e){for(e=e.firstChild;e;e=e.nextSibling)if(e.nodeName>"@"||3===e.nodeType||4===e.nodeType)return!1;return!0},parent:function(e){return!i.pseudos.empty(e)},header:function(e){return Q.test(e.nodeName)},input:function(e){return G.test(e.nodeName)},button:function(e){var t=e.nodeName.toLowerCase();return"input"===t&&"button"===e.type||"button"===t},text:function(e){var t;return"input"===e.nodeName.toLowerCase()&&"text"===e.type&&(null==(t=e.getAttribute("type"))||t.toLowerCase()===e.type)},first:pt(function(){return[0]}),last:pt(function(e,t){return[t-1]}),eq:pt(function(e,t,n){return[0>n?n+t:n]}),even:pt(function(e,t){var n=0;for(;t>n;n+=2)e.push(n);return e}),odd:pt(function(e,t){var n=1;for(;t>n;n+=2)e.push(n);return e}),lt:pt(function(e,t,n){var r=0>n?n+t:n;for(;--r>=0;)e.push(r);return e}),gt:pt(function(e,t,n){var r=0>n?n+t:n;for(;t>++r;)e.push(r);return e})}};for(n in{radio:!0,checkbox:!0,file:!0,password:!0,image:!0})i.pseudos[n]=lt(n);for(n in{submit:!0,reset:!0})i.pseudos[n]=ct(n);function ft(e,t){var n,r,o,a,s,u,l,c=E[e+" "];if(c)return t?0:c.slice(0);s=e,u=[],l=i.preFilter;while(s){(!n||(r=$.exec(s)))&&(r&&(s=s.slice(r[0].length)||s),u.push(o=[])),n=!1,(r=I.exec(s))&&(n=r.shift(),o.push({value:n,type:r[0].replace(W," ")}),s=s.slice(n.length));for(a in i.filter)!(r=U[a].exec(s))||l[a]&&!(r=l[a](r))||(n=r.shift(),o.push({value:n,type:a,matches:r}),s=s.slice(n.length));if(!n)break}return t?s.length:s?st.error(e):E(e,u).slice(0)}function dt(e){var t=0,n=e.length,r="";for(;n>t;t++)r+=e[t].value;return r}function ht(e,t,n){var i=t.dir,o=n&&"parentNode"===i,a=C++;return t.first?function(t,n,r){while(t=t[i])if(1===t.nodeType||o)return e(t,n,r)}:function(t,n,s){var u,l,c,p=N+" "+a;if(s){while(t=t[i])if((1===t.nodeType||o)&&e(t,n,s))return!0}else while(t=t[i])if(1===t.nodeType||o)if(c=t[x]||(t[x]={}),(l=c[i])&&l[0]===p){if((u=l[1])===!0||u===r)return u===!0}else if(l=c[i]=[p],l[1]=e(t,n,s)||r,l[1]===!0)return!0}}function gt(e){return e.length>1?function(t,n,r){var i=e.length;while(i--)if(!e[i](t,n,r))return!1;return!0}:e[0]}function mt(e,t,n,r,i){var o,a=[],s=0,u=e.length,l=null!=t;for(;u>s;s++)(o=e[s])&&(!n||n(o,r,i))&&(a.push(o),l&&t.push(s));return a}function yt(e,t,n,r,i,o){return r&&!r[x]&&(r=yt(r)),i&&!i[x]&&(i=yt(i,o)),ot(function(o,a,s,u){var l,c,p,f=[],d=[],h=a.length,g=o||xt(t||"*",s.nodeType?[s]:s,[]),m=!e||!o&&t?g:mt(g,f,e,s,u),y=n?i||(o?e:h||r)?[]:a:m;if(n&&n(m,y,s,u),r){l=mt(y,d),r(l,[],s,u),c=l.length;while(c--)(p=l[c])&&(y[d[c]]=!(m[d[c]]=p))}if(o){if(i||e){if(i){l=[],c=y.length;while(c--)(p=y[c])&&l.push(m[c]=p);i(null,y=[],l,u)}c=y.length;while(c--)(p=y[c])&&(l=i?M.call(o,p):f[c])>-1&&(o[l]=!(a[l]=p))}}else y=mt(y===a?y.splice(h,y.length):y),i?i(null,a,y,u):H.apply(a,y)})}function vt(e){var t,n,r,o=e.length,a=i.relative[e[0].type],s=a||i.relative[" "],u=a?1:0,c=ht(function(e){return e===t},s,!0),p=ht(function(e){return M.call(t,e)>-1},s,!0),f=[function(e,n,r){return!a&&(r||n!==l)||((t=n).nodeType?c(e,n,r):p(e,n,r))}];for(;o>u;u++)if(n=i.relative[e[u].type])f=[ht(gt(f),n)];else{if(n=i.filter[e[u].type].apply(null,e[u].matches),n[x]){for(r=++u;o>r;r++)if(i.relative[e[r].type])break;return yt(u>1&&gt(f),u>1&&dt(e.slice(0,u-1)).replace(W,"$1"),n,r>u&&vt(e.slice(u,r)),o>r&&vt(e=e.slice(r)),o>r&&dt(e))}f.push(n)}return gt(f)}function bt(e,t){var n=0,o=t.length>0,a=e.length>0,s=function(s,u,c,f,d){var h,g,m,y=[],v=0,b="0",x=s&&[],w=null!=d,T=l,C=s||a&&i.find.TAG("*",d&&u.parentNode||u),k=N+=null==T?1:Math.random()||.1;for(w&&(l=u!==p&&u,r=n);null!=(h=C[b]);b++){if(a&&h){g=0;while(m=e[g++])if(m(h,u,c)){f.push(h);break}w&&(N=k,r=++n)}o&&((h=!m&&h)&&v--,s&&x.push(h))}if(v+=b,o&&b!==v){g=0;while(m=t[g++])m(x,y,u,c);if(s){if(v>0)while(b--)x[b]||y[b]||(y[b]=L.call(f));y=mt(y)}H.apply(f,y),w&&!s&&y.length>0&&v+t.length>1&&st.uniqueSort(f)}return w&&(N=k,l=T),x};return o?ot(s):s}s=st.compile=function(e,t){var n,r=[],i=[],o=S[e+" "];if(!o){t||(t=ft(e)),n=t.length;while(n--)o=vt(t[n]),o[x]?r.push(o):i.push(o);o=S(e,bt(i,r))}return o};function xt(e,t,n){var r=0,i=t.length;for(;i>r;r++)st(e,t[r],n);return n}function wt(e,t,n,r){var o,a,u,l,c,p=ft(e);if(!r&&1===p.length){if(a=p[0]=p[0].slice(0),a.length>2&&"ID"===(u=a[0]).type&&9===t.nodeType&&!d&&i.relative[a[1].type]){if(t=i.find.ID(u.matches[0].replace(et,tt),t)[0],!t)return n;e=e.slice(a.shift().value.length)}o=U.needsContext.test(e)?0:a.length;while(o--){if(u=a[o],i.relative[l=u.type])break;if((c=i.find[l])&&(r=c(u.matches[0].replace(et,tt),V.test(a[0].type)&&t.parentNode||t))){if(a.splice(o,1),e=r.length&&dt(a),!e)return H.apply(n,q.call(r,0)),n;break}}}return s(e,p)(r,t,d,n,V.test(e)),n}i.pseudos.nth=i.pseudos.eq;function Tt(){}i.filters=Tt.prototype=i.pseudos,i.setFilters=new Tt,c(),st.attr=b.attr,b.find=st,b.expr=st.selectors,b.expr[":"]=b.expr.pseudos,b.unique=st.uniqueSort,b.text=st.getText,b.isXMLDoc=st.isXML,b.contains=st.contains}(e);var at=/Until$/,st=/^(?:parents|prev(?:Until|All))/,ut=/^.[^:#\[\.,]*$/,lt=b.expr.match.needsContext,ct={children:!0,contents:!0,next:!0,prev:!0};b.fn.extend({find:function(e){var t,n,r,i=this.length;if("string"!=typeof e)return r=this,this.pushStack(b(e).filter(function(){for(t=0;i>t;t++)if(b.contains(r[t],this))return!0}));for(n=[],t=0;i>t;t++)b.find(e,this[t],n);return n=this.pushStack(i>1?b.unique(n):n),n.selector=(this.selector?this.selector+" ":"")+e,n},has:function(e){var t,n=b(e,this),r=n.length;return this.filter(function(){for(t=0;r>t;t++)if(b.contains(this,n[t]))return!0})},not:function(e){return this.pushStack(ft(this,e,!1))},filter:function(e){return this.pushStack(ft(this,e,!0))},is:function(e){return!!e&&("string"==typeof e?lt.test(e)?b(e,this.context).index(this[0])>=0:b.filter(e,this).length>0:this.filter(e).length>0)},closest:function(e,t){var n,r=0,i=this.length,o=[],a=lt.test(e)||"string"!=typeof e?b(e,t||this.context):0;for(;i>r;r++){n=this[r];while(n&&n.ownerDocument&&n!==t&&11!==n.nodeType){if(a?a.index(n)>-1:b.find.matchesSelector(n,e)){o.push(n);break}n=n.parentNode}}return this.pushStack(o.length>1?b.unique(o):o)},index:function(e){return e?"string"==typeof e?b.inArray(this[0],b(e)):b.inArray(e.jquery?e[0]:e,this):this[0]&&this[0].parentNode?this.first().prevAll().length:-1},add:function(e,t){var n="string"==typeof e?b(e,t):b.makeArray(e&&e.nodeType?[e]:e),r=b.merge(this.get(),n);return this.pushStack(b.unique(r))},addBack:function(e){return this.add(null==e?this.prevObject:this.prevObject.filter(e))}}),b.fn.andSelf=b.fn.addBack;function pt(e,t){do e=e[t];while(e&&1!==e.nodeType);return e}b.each({parent:function(e){var t=e.parentNode;return t&&11!==t.nodeType?t:null},parents:function(e){return b.dir(e,"parentNode")},parentsUntil:function(e,t,n){return b.dir(e,"parentNode",n)},next:function(e){return pt(e,"nextSibling")},prev:function(e){return pt(e,"previousSibling")},nextAll:function(e){return b.dir(e,"nextSibling")},prevAll:function(e){return b.dir(e,"previousSibling")},nextUntil:function(e,t,n){return b.dir(e,"nextSibling",n)},prevUntil:function(e,t,n){return b.dir(e,"previousSibling",n)},siblings:function(e){return b.sibling((e.parentNode||{}).firstChild,e)},children:function(e){return b.sibling(e.firstChild)},contents:function(e){return b.nodeName(e,"iframe")?e.contentDocument||e.contentWindow.document:b.merge([],e.childNodes)}},function(e,t){b.fn[e]=function(n,r){var i=b.map(this,t,n);return at.test(e)||(r=n),r&&"string"==typeof r&&(i=b.filter(r,i)),i=this.length>1&&!ct[e]?b.unique(i):i,this.length>1&&st.test(e)&&(i=i.reverse()),this.pushStack(i)}}),b.extend({filter:function(e,t,n){return n&&(e=":not("+e+")"),1===t.length?b.find.matchesSelector(t[0],e)?[t[0]]:[]:b.find.matches(e,t)},dir:function(e,n,r){var i=[],o=e[n];while(o&&9!==o.nodeType&&(r===t||1!==o.nodeType||!b(o).is(r)))1===o.nodeType&&i.push(o),o=o[n];return i},sibling:function(e,t){var n=[];for(;e;e=e.nextSibling)1===e.nodeType&&e!==t&&n.push(e);return n}});function ft(e,t,n){if(t=t||0,b.isFunction(t))return b.grep(e,function(e,r){var i=!!t.call(e,r,e);return i===n});if(t.nodeType)return b.grep(e,function(e){return e===t===n});if("string"==typeof t){var r=b.grep(e,function(e){return 1===e.nodeType});if(ut.test(t))return b.filter(t,r,!n);t=b.filter(t,r)}return b.grep(e,function(e){return b.inArray(e,t)>=0===n})}function dt(e){var t=ht.split("|"),n=e.createDocumentFragment();if(n.createElement)while(t.length)n.createElement(t.pop());return n}var ht="abbr|article|aside|audio|bdi|canvas|data|datalist|details|figcaption|figure|footer|header|hgroup|mark|meter|nav|output|progress|section|summary|time|video",gt=/ jQuery\d+="(?:null|\d+)"/g,mt=RegExp("<(?:"+ht+")[\\s/>]","i"),yt=/^\s+/,vt=/<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,bt=/<([\w:]+)/,xt=/<tbody/i,wt=/<|&#?\w+;/,Tt=/<(?:script|style|link)/i,Nt=/^(?:checkbox|radio)$/i,Ct=/checked\s*(?:[^=]|=\s*.checked.)/i,kt=/^$|\/(?:java|ecma)script/i,Et=/^true\/(.*)/,St=/^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g,At={option:[1,"<select multiple='multiple'>","</select>"],legend:[1,"<fieldset>","</fieldset>"],area:[1,"<map>","</map>"],param:[1,"<object>","</object>"],thead:[1,"<table>","</table>"],tr:[2,"<table><tbody>","</tbody></table>"],col:[2,"<table><tbody></tbody><colgroup>","</colgroup></table>"],td:[3,"<table><tbody><tr>","</tr></tbody></table>"],_default:b.support.htmlSerialize?[0,"",""]:[1,"X<div>","</div>"]},jt=dt(o),Dt=jt.appendChild(o.createElement("div"));At.optgroup=At.option,At.tbody=At.tfoot=At.colgroup=At.caption=At.thead,At.th=At.td,b.fn.extend({text:function(e){return b.access(this,function(e){return e===t?b.text(this):this.empty().append((this[0]&&this[0].ownerDocument||o).createTextNode(e))},null,e,arguments.length)},wrapAll:function(e){if(b.isFunction(e))return this.each(function(t){b(this).wrapAll(e.call(this,t))});if(this[0]){var t=b(e,this[0].ownerDocument).eq(0).clone(!0);this[0].parentNode&&t.insertBefore(this[0]),t.map(function(){var e=this;while(e.firstChild&&1===e.firstChild.nodeType)e=e.firstChild;return e}).append(this)}return this},wrapInner:function(e){return b.isFunction(e)?this.each(function(t){b(this).wrapInner(e.call(this,t))}):this.each(function(){var t=b(this),n=t.contents();n.length?n.wrapAll(e):t.append(e)})},wrap:function(e){var t=b.isFunction(e);return this.each(function(n){b(this).wrapAll(t?e.call(this,n):e)})},unwrap:function(){return this.parent().each(function(){b.nodeName(this,"body")||b(this).replaceWith(this.childNodes)}).end()},append:function(){return this.domManip(arguments,!0,function(e){(1===this.nodeType||11===this.nodeType||9===this.nodeType)&&this.appendChild(e)})},prepend:function(){return this.domManip(arguments,!0,function(e){(1===this.nodeType||11===this.nodeType||9===this.nodeType)&&this.insertBefore(e,this.firstChild)})},before:function(){return this.domManip(arguments,!1,function(e){this.parentNode&&this.parentNode.insertBefore(e,this)})},after:function(){return this.domManip(arguments,!1,function(e){this.parentNode&&this.parentNode.insertBefore(e,this.nextSibling)})},remove:function(e,t){var n,r=0;for(;null!=(n=this[r]);r++)(!e||b.filter(e,[n]).length>0)&&(t||1!==n.nodeType||b.cleanData(Ot(n)),n.parentNode&&(t&&b.contains(n.ownerDocument,n)&&Mt(Ot(n,"script")),n.parentNode.removeChild(n)));return this},empty:function(){var e,t=0;for(;null!=(e=this[t]);t++){1===e.nodeType&&b.cleanData(Ot(e,!1));while(e.firstChild)e.removeChild(e.firstChild);e.options&&b.nodeName(e,"select")&&(e.options.length=0)}return this},clone:function(e,t){return e=null==e?!1:e,t=null==t?e:t,this.map(function(){return b.clone(this,e,t)})},html:function(e){return b.access(this,function(e){var n=this[0]||{},r=0,i=this.length;if(e===t)return 1===n.nodeType?n.innerHTML.replace(gt,""):t;if(!("string"!=typeof e||Tt.test(e)||!b.support.htmlSerialize&&mt.test(e)||!b.support.leadingWhitespace&&yt.test(e)||At[(bt.exec(e)||["",""])[1].toLowerCase()])){e=e.replace(vt,"<$1></$2>");try{for(;i>r;r++)n=this[r]||{},1===n.nodeType&&(b.cleanData(Ot(n,!1)),n.innerHTML=e);n=0}catch(o){}}n&&this.empty().append(e)},null,e,arguments.length)},replaceWith:function(e){var t=b.isFunction(e);return t||"string"==typeof e||(e=b(e).not(this).detach()),this.domManip([e],!0,function(e){var t=this.nextSibling,n=this.parentNode;n&&(b(this).remove(),n.insertBefore(e,t))})},detach:function(e){return this.remove(e,!0)},domManip:function(e,n,r){e=f.apply([],e);var i,o,a,s,u,l,c=0,p=this.length,d=this,h=p-1,g=e[0],m=b.isFunction(g);if(m||!(1>=p||"string"!=typeof g||b.support.checkClone)&&Ct.test(g))return this.each(function(i){var o=d.eq(i);m&&(e[0]=g.call(this,i,n?o.html():t)),o.domManip(e,n,r)});if(p&&(l=b.buildFragment(e,this[0].ownerDocument,!1,this),i=l.firstChild,1===l.childNodes.length&&(l=i),i)){for(n=n&&b.nodeName(i,"tr"),s=b.map(Ot(l,"script"),Ht),a=s.length;p>c;c++)o=l,c!==h&&(o=b.clone(o,!0,!0),a&&b.merge(s,Ot(o,"script"))),r.call(n&&b.nodeName(this[c],"table")?Lt(this[c],"tbody"):this[c],o,c);if(a)for(u=s[s.length-1].ownerDocument,b.map(s,qt),c=0;a>c;c++)o=s[c],kt.test(o.type||"")&&!b._data(o,"globalEval")&&b.contains(u,o)&&(o.src?b.ajax({url:o.src,type:"GET",dataType:"script",async:!1,global:!1,"throws":!0}):b.globalEval((o.text||o.textContent||o.innerHTML||"").replace(St,"")));l=i=null}return this}});function Lt(e,t){return e.getElementsByTagName(t)[0]||e.appendChild(e.ownerDocument.createElement(t))}function Ht(e){var t=e.getAttributeNode("type");return e.type=(t&&t.specified)+"/"+e.type,e}function qt(e){var t=Et.exec(e.type);return t?e.type=t[1]:e.removeAttribute("type"),e}function Mt(e,t){var n,r=0;for(;null!=(n=e[r]);r++)b._data(n,"globalEval",!t||b._data(t[r],"globalEval"))}function _t(e,t){if(1===t.nodeType&&b.hasData(e)){var n,r,i,o=b._data(e),a=b._data(t,o),s=o.events;if(s){delete a.handle,a.events={};for(n in s)for(r=0,i=s[n].length;i>r;r++)b.event.add(t,n,s[n][r])}a.data&&(a.data=b.extend({},a.data))}}function Ft(e,t){var n,r,i;if(1===t.nodeType){if(n=t.nodeName.toLowerCase(),!b.support.noCloneEvent&&t[b.expando]){i=b._data(t);for(r in i.events)b.removeEvent(t,r,i.handle);t.removeAttribute(b.expando)}"script"===n&&t.text!==e.text?(Ht(t).text=e.text,qt(t)):"object"===n?(t.parentNode&&(t.outerHTML=e.outerHTML),b.support.html5Clone&&e.innerHTML&&!b.trim(t.innerHTML)&&(t.innerHTML=e.innerHTML)):"input"===n&&Nt.test(e.type)?(t.defaultChecked=t.checked=e.checked,t.value!==e.value&&(t.value=e.value)):"option"===n?t.defaultSelected=t.selected=e.defaultSelected:("input"===n||"textarea"===n)&&(t.defaultValue=e.defaultValue)}}b.each({appendTo:"append",prependTo:"prepend",insertBefore:"before",insertAfter:"after",replaceAll:"replaceWith"},function(e,t){b.fn[e]=function(e){var n,r=0,i=[],o=b(e),a=o.length-1;for(;a>=r;r++)n=r===a?this:this.clone(!0),b(o[r])[t](n),d.apply(i,n.get());return this.pushStack(i)}});function Ot(e,n){var r,o,a=0,s=typeof e.getElementsByTagName!==i?e.getElementsByTagName(n||"*"):typeof e.querySelectorAll!==i?e.querySelectorAll(n||"*"):t;if(!s)for(s=[],r=e.childNodes||e;null!=(o=r[a]);a++)!n||b.nodeName(o,n)?s.push(o):b.merge(s,Ot(o,n));return n===t||n&&b.nodeName(e,n)?b.merge([e],s):s}function Bt(e){Nt.test(e.type)&&(e.defaultChecked=e.checked)}b.extend({clone:function(e,t,n){var r,i,o,a,s,u=b.contains(e.ownerDocument,e);if(b.support.html5Clone||b.isXMLDoc(e)||!mt.test("<"+e.nodeName+">")?o=e.cloneNode(!0):(Dt.innerHTML=e.outerHTML,Dt.removeChild(o=Dt.firstChild)),!(b.support.noCloneEvent&&b.support.noCloneChecked||1!==e.nodeType&&11!==e.nodeType||b.isXMLDoc(e)))for(r=Ot(o),s=Ot(e),a=0;null!=(i=s[a]);++a)r[a]&&Ft(i,r[a]);if(t)if(n)for(s=s||Ot(e),r=r||Ot(o),a=0;null!=(i=s[a]);a++)_t(i,r[a]);else _t(e,o);return r=Ot(o,"script"),r.length>0&&Mt(r,!u&&Ot(e,"script")),r=s=i=null,o},buildFragment:function(e,t,n,r){var i,o,a,s,u,l,c,p=e.length,f=dt(t),d=[],h=0;for(;p>h;h++)if(o=e[h],o||0===o)if("object"===b.type(o))b.merge(d,o.nodeType?[o]:o);else if(wt.test(o)){s=s||f.appendChild(t.createElement("div")),u=(bt.exec(o)||["",""])[1].toLowerCase(),c=At[u]||At._default,s.innerHTML=c[1]+o.replace(vt,"<$1></$2>")+c[2],i=c[0];while(i--)s=s.lastChild;if(!b.support.leadingWhitespace&&yt.test(o)&&d.push(t.createTextNode(yt.exec(o)[0])),!b.support.tbody){o="table"!==u||xt.test(o)?"<table>"!==c[1]||xt.test(o)?0:s:s.firstChild,i=o&&o.childNodes.length;while(i--)b.nodeName(l=o.childNodes[i],"tbody")&&!l.childNodes.length&&o.removeChild(l)
@@ -211,9 +211,5600 @@ function binb2b64(binarray)
   }
   return str;
 }
+// pouchdb.nightly - 2013-08-25T17:29:48
+
+(function() {
+ // BEGIN Math.uuid.js
+
+/*!
+Math.uuid.js (v1.4)
+http://www.broofa.com
+mailto:robert@broofa.com
+
+Copyright (c) 2010 Robert Kieffer
+Dual licensed under the MIT and GPL licenses.
+*/
+
+/*
+ * Generate a random uuid.
+ *
+ * USAGE: Math.uuid(length, radix)
+ *   length - the desired number of characters
+ *   radix  - the number of allowable values for each character.
+ *
+ * EXAMPLES:
+ *   // No arguments  - returns RFC4122, version 4 ID
+ *   >>> Math.uuid()
+ *   "92329D39-6F5C-4520-ABFC-AAB64544E172"
+ *
+ *   // One argument - returns ID of the specified length
+ *   >>> Math.uuid(15)     // 15 character ID (default base=62)
+ *   "VcydxgltxrVZSTV"
+ *
+ *   // Two arguments - returns ID of the specified length, and radix. (Radix must be <= 62)
+ *   >>> Math.uuid(8, 2)  // 8 character ID (base=2)
+ *   "01001010"
+ *   >>> Math.uuid(8, 10) // 8 character ID (base=10)
+ *   "47473046"
+ *   >>> Math.uuid(8, 16) // 8 character ID (base=16)
+ *   "098F4D35"
+ */
+var uuid;
+
+(function() {
+
+  var CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+    'abcdefghijklmnopqrstuvwxyz'.split('');
+
+  uuid = function uuid_inner(len, radix) {
+    var chars = CHARS;
+    var uuidInner = [];
+    var i;
+
+    radix = radix || chars.length;
+
+    if (len) {
+      // Compact form
+      for (i = 0; i < len; i++) uuidInner[i] = chars[0 | Math.random()*radix];
+    } else {
+      // rfc4122, version 4 form
+      var r;
+
+      // rfc4122 requires these characters
+      uuidInner[8] = uuidInner[13] = uuidInner[18] = uuidInner[23] = '-';
+      uuidInner[14] = '4';
+
+      // Fill in random data.  At i==19 set the high bits of clock sequence as
+      // per rfc4122, sec. 4.1.5
+      for (i = 0; i < 36; i++) {
+        if (!uuidInner[i]) {
+          r = 0 | Math.random()*16;
+          uuidInner[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+        }
+      }
+    }
+
+    return uuidInner.join('');
+  };
+
+})();
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = uuid;
+}
+
+/**
+*
+*  MD5 (Message-Digest Algorithm)
+*
+*  For original source see http://www.webtoolkit.info/
+*  Download: 15.02.2009 from http://www.webtoolkit.info/javascript-md5.html
+*
+*  Licensed under CC-BY 2.0 License
+*  (http://creativecommons.org/licenses/by/2.0/uk/)
+*
+**/
+
+var Crypto = {};
+(function() {
+  Crypto.MD5 = function(string) {
+
+    function RotateLeft(lValue, iShiftBits) {
+      return (lValue<<iShiftBits) | (lValue>>>(32-iShiftBits));
+    }
+
+    function AddUnsigned(lX,lY) {
+      var lX4,lY4,lX8,lY8,lResult;
+      lX8 = (lX & 0x80000000);
+      lY8 = (lY & 0x80000000);
+      lX4 = (lX & 0x40000000);
+      lY4 = (lY & 0x40000000);
+      lResult = (lX & 0x3FFFFFFF)+(lY & 0x3FFFFFFF);
+      if (lX4 & lY4) {
+        return (lResult ^ 0x80000000 ^ lX8 ^ lY8);
+      }
+      if (lX4 | lY4) {
+        if (lResult & 0x40000000) {
+          return (lResult ^ 0xC0000000 ^ lX8 ^ lY8);
+        } else {
+          return (lResult ^ 0x40000000 ^ lX8 ^ lY8);
+        }
+      } else {
+        return (lResult ^ lX8 ^ lY8);
+      }
+    }
+
+    function F(x,y,z) { return (x & y) | ((~x) & z); }
+    function G(x,y,z) { return (x & z) | (y & (~z)); }
+    function H(x,y,z) { return (x ^ y ^ z); }
+    function I(x,y,z) { return (y ^ (x | (~z))); }
+
+    function FF(a,b,c,d,x,s,ac) {
+      a = AddUnsigned(a, AddUnsigned(AddUnsigned(F(b, c, d), x), ac));
+      return AddUnsigned(RotateLeft(a, s), b);
+    };
+
+    function GG(a,b,c,d,x,s,ac) {
+      a = AddUnsigned(a, AddUnsigned(AddUnsigned(G(b, c, d), x), ac));
+      return AddUnsigned(RotateLeft(a, s), b);
+    };
+
+    function HH(a,b,c,d,x,s,ac) {
+      a = AddUnsigned(a, AddUnsigned(AddUnsigned(H(b, c, d), x), ac));
+      return AddUnsigned(RotateLeft(a, s), b);
+    };
+
+    function II(a,b,c,d,x,s,ac) {
+      a = AddUnsigned(a, AddUnsigned(AddUnsigned(I(b, c, d), x), ac));
+      return AddUnsigned(RotateLeft(a, s), b);
+    };
+
+    function ConvertToWordArray(string) {
+      var lWordCount;
+      var lMessageLength = string.length;
+      var lNumberOfWords_temp1=lMessageLength + 8;
+      var lNumberOfWords_temp2=(lNumberOfWords_temp1-(lNumberOfWords_temp1 % 64))/64;
+      var lNumberOfWords = (lNumberOfWords_temp2+1)*16;
+      var lWordArray=Array(lNumberOfWords-1);
+      var lBytePosition = 0;
+      var lByteCount = 0;
+      while ( lByteCount < lMessageLength ) {
+        lWordCount = (lByteCount-(lByteCount % 4))/4;
+        lBytePosition = (lByteCount % 4)*8;
+        lWordArray[lWordCount] = (lWordArray[lWordCount] | (string.charCodeAt(lByteCount)<<lBytePosition));
+        lByteCount++;
+      }
+      lWordCount = (lByteCount-(lByteCount % 4))/4;
+      lBytePosition = (lByteCount % 4)*8;
+      lWordArray[lWordCount] = lWordArray[lWordCount] | (0x80<<lBytePosition);
+      lWordArray[lNumberOfWords-2] = lMessageLength<<3;
+      lWordArray[lNumberOfWords-1] = lMessageLength>>>29;
+      return lWordArray;
+    };
+
+    function WordToHex(lValue) {
+      var WordToHexValue="",WordToHexValue_temp="",lByte,lCount;
+      for (lCount = 0;lCount<=3;lCount++) {
+        lByte = (lValue>>>(lCount*8)) & 255;
+        WordToHexValue_temp = "0" + lByte.toString(16);
+        WordToHexValue = WordToHexValue + WordToHexValue_temp.substr(WordToHexValue_temp.length-2,2);
+      }
+      return WordToHexValue;
+    };
+
+    //**	function Utf8Encode(string) removed. Aready defined in pidcrypt_utils.js
+
+    var x=Array();
+    var k,AA,BB,CC,DD,a,b,c,d;
+    var S11=7, S12=12, S13=17, S14=22;
+    var S21=5, S22=9 , S23=14, S24=20;
+    var S31=4, S32=11, S33=16, S34=23;
+    var S41=6, S42=10, S43=15, S44=21;
+
+    //	string = Utf8Encode(string); #function call removed
+
+    x = ConvertToWordArray(string);
+
+    a = 0x67452301; b = 0xEFCDAB89; c = 0x98BADCFE; d = 0x10325476;
+
+    for (k=0;k<x.length;k+=16) {
+      AA=a; BB=b; CC=c; DD=d;
+      a=FF(a,b,c,d,x[k+0], S11,0xD76AA478);
+      d=FF(d,a,b,c,x[k+1], S12,0xE8C7B756);
+      c=FF(c,d,a,b,x[k+2], S13,0x242070DB);
+      b=FF(b,c,d,a,x[k+3], S14,0xC1BDCEEE);
+      a=FF(a,b,c,d,x[k+4], S11,0xF57C0FAF);
+      d=FF(d,a,b,c,x[k+5], S12,0x4787C62A);
+      c=FF(c,d,a,b,x[k+6], S13,0xA8304613);
+      b=FF(b,c,d,a,x[k+7], S14,0xFD469501);
+      a=FF(a,b,c,d,x[k+8], S11,0x698098D8);
+      d=FF(d,a,b,c,x[k+9], S12,0x8B44F7AF);
+      c=FF(c,d,a,b,x[k+10],S13,0xFFFF5BB1);
+      b=FF(b,c,d,a,x[k+11],S14,0x895CD7BE);
+      a=FF(a,b,c,d,x[k+12],S11,0x6B901122);
+      d=FF(d,a,b,c,x[k+13],S12,0xFD987193);
+      c=FF(c,d,a,b,x[k+14],S13,0xA679438E);
+      b=FF(b,c,d,a,x[k+15],S14,0x49B40821);
+      a=GG(a,b,c,d,x[k+1], S21,0xF61E2562);
+      d=GG(d,a,b,c,x[k+6], S22,0xC040B340);
+      c=GG(c,d,a,b,x[k+11],S23,0x265E5A51);
+      b=GG(b,c,d,a,x[k+0], S24,0xE9B6C7AA);
+      a=GG(a,b,c,d,x[k+5], S21,0xD62F105D);
+      d=GG(d,a,b,c,x[k+10],S22,0x2441453);
+      c=GG(c,d,a,b,x[k+15],S23,0xD8A1E681);
+      b=GG(b,c,d,a,x[k+4], S24,0xE7D3FBC8);
+      a=GG(a,b,c,d,x[k+9], S21,0x21E1CDE6);
+      d=GG(d,a,b,c,x[k+14],S22,0xC33707D6);
+      c=GG(c,d,a,b,x[k+3], S23,0xF4D50D87);
+      b=GG(b,c,d,a,x[k+8], S24,0x455A14ED);
+      a=GG(a,b,c,d,x[k+13],S21,0xA9E3E905);
+      d=GG(d,a,b,c,x[k+2], S22,0xFCEFA3F8);
+      c=GG(c,d,a,b,x[k+7], S23,0x676F02D9);
+      b=GG(b,c,d,a,x[k+12],S24,0x8D2A4C8A);
+      a=HH(a,b,c,d,x[k+5], S31,0xFFFA3942);
+      d=HH(d,a,b,c,x[k+8], S32,0x8771F681);
+      c=HH(c,d,a,b,x[k+11],S33,0x6D9D6122);
+      b=HH(b,c,d,a,x[k+14],S34,0xFDE5380C);
+      a=HH(a,b,c,d,x[k+1], S31,0xA4BEEA44);
+      d=HH(d,a,b,c,x[k+4], S32,0x4BDECFA9);
+      c=HH(c,d,a,b,x[k+7], S33,0xF6BB4B60);
+      b=HH(b,c,d,a,x[k+10],S34,0xBEBFBC70);
+      a=HH(a,b,c,d,x[k+13],S31,0x289B7EC6);
+      d=HH(d,a,b,c,x[k+0], S32,0xEAA127FA);
+      c=HH(c,d,a,b,x[k+3], S33,0xD4EF3085);
+      b=HH(b,c,d,a,x[k+6], S34,0x4881D05);
+      a=HH(a,b,c,d,x[k+9], S31,0xD9D4D039);
+      d=HH(d,a,b,c,x[k+12],S32,0xE6DB99E5);
+      c=HH(c,d,a,b,x[k+15],S33,0x1FA27CF8);
+      b=HH(b,c,d,a,x[k+2], S34,0xC4AC5665);
+      a=II(a,b,c,d,x[k+0], S41,0xF4292244);
+      d=II(d,a,b,c,x[k+7], S42,0x432AFF97);
+      c=II(c,d,a,b,x[k+14],S43,0xAB9423A7);
+      b=II(b,c,d,a,x[k+5], S44,0xFC93A039);
+      a=II(a,b,c,d,x[k+12],S41,0x655B59C3);
+      d=II(d,a,b,c,x[k+3], S42,0x8F0CCC92);
+      c=II(c,d,a,b,x[k+10],S43,0xFFEFF47D);
+      b=II(b,c,d,a,x[k+1], S44,0x85845DD1);
+      a=II(a,b,c,d,x[k+8], S41,0x6FA87E4F);
+      d=II(d,a,b,c,x[k+15],S42,0xFE2CE6E0);
+      c=II(c,d,a,b,x[k+6], S43,0xA3014314);
+      b=II(b,c,d,a,x[k+13],S44,0x4E0811A1);
+      a=II(a,b,c,d,x[k+4], S41,0xF7537E82);
+      d=II(d,a,b,c,x[k+11],S42,0xBD3AF235);
+      c=II(c,d,a,b,x[k+2], S43,0x2AD7D2BB);
+      b=II(b,c,d,a,x[k+9], S44,0xEB86D391);
+      a=AddUnsigned(a,AA);
+      b=AddUnsigned(b,BB);
+      c=AddUnsigned(c,CC);
+      d=AddUnsigned(d,DD);
+    }
+    var temp = WordToHex(a)+WordToHex(b)+WordToHex(c)+WordToHex(d);
+    return temp.toLowerCase();
+  }
+})();
+//----------------------------------------------------------------------
+//
+// ECMAScript 5 Polyfills
+//  from www.calocomrmen./polyfill/
+//
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// ES5 15.2 Object Objects
+//----------------------------------------------------------------------
 
 
-// $.couch is used to communicate with a CouchDB server, the server methods can
+
+// ES 15.2.3.6 Object.defineProperty ( O, P, Attributes )
+// Partial support for most common case - getters, setters, and values
+(function() {
+  if (!Object.defineProperty ||
+      !(function () { try { Object.defineProperty({}, 'x', {}); return true; } catch (e) { return false; } } ())) {
+    var orig = Object.defineProperty;
+    Object.defineProperty = function (o, prop, desc) {
+      "use strict";
+
+      // In IE8 try built-in implementation for defining properties on DOM prototypes.
+      if (orig) { try { return orig(o, prop, desc); } catch (e) {} }
+
+      if (o !== Object(o)) { throw new TypeError("Object.defineProperty called on non-object"); }
+      if (Object.prototype.__defineGetter__ && ('get' in desc)) {
+        Object.prototype.__defineGetter__.call(o, prop, desc.get);
+      }
+      if (Object.prototype.__defineSetter__ && ('set' in desc)) {
+        Object.prototype.__defineSetter__.call(o, prop, desc.set);
+      }
+      if ('value' in desc) {
+        o[prop] = desc.value;
+      }
+      return o;
+    };
+  }
+}());
+
+
+
+// ES5 15.2.3.14 Object.keys ( O )
+// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/keys
+if (!Object.keys) {
+  Object.keys = function (o) {
+    if (o !== Object(o)) { throw new TypeError('Object.keys called on non-object'); }
+    var ret = [], p;
+    for (p in o) {
+      if (Object.prototype.hasOwnProperty.call(o, p)) {
+        ret.push(p);
+      }
+    }
+    return ret;
+  };
+}
+
+//----------------------------------------------------------------------
+// ES5 15.4 Array Objects
+//----------------------------------------------------------------------
+
+
+
+// ES5 15.4.4.18 Array.prototype.forEach ( callbackfn [ , thisArg ] )
+// From https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/forEach
+if (!Array.prototype.forEach) {
+  Array.prototype.forEach = function (fun /*, thisp */) {
+    "use strict";
+
+    if (this === void 0 || this === null) { throw new TypeError(); }
+
+    var t = Object(this);
+    var len = t.length >>> 0;
+    if (typeof fun !== "function") { throw new TypeError(); }
+
+    var thisp = arguments[1], i;
+    for (i = 0; i < len; i++) {
+      if (i in t) {
+        fun.call(thisp, t[i], i, t);
+      }
+    }
+  };
+}
+
+
+// ES5 15.4.4.19 Array.prototype.map ( callbackfn [ , thisArg ] )
+// From https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/Map
+if (!Array.prototype.map) {
+  Array.prototype.map = function (fun /*, thisp */) {
+    "use strict";
+
+    if (this === void 0 || this === null) { throw new TypeError(); }
+
+    var t = Object(this);
+    var len = t.length >>> 0;
+    if (typeof fun !== "function") { throw new TypeError(); }
+
+    var res = []; res.length = len;
+    var thisp = arguments[1], i;
+    for (i = 0; i < len; i++) {
+      if (i in t) {
+        res[i] = fun.call(thisp, t[i], i, t);
+      }
+    }
+
+    return res;
+  };
+}
+
+
+// Extends method
+// (taken from http://code.jquery.com/jquery-1.9.0.js)
+// Populate the class2type map
+var class2type = {};
+
+var types = ["Boolean", "Number", "String", "Function", "Array", "Date", "RegExp", "Object", "Error"];
+for (var i = 0; i < types.length; i++) {
+  var typename = types[i];
+  class2type[ "[object " + typename + "]" ] = typename.toLowerCase();
+}
+
+var core_toString = class2type.toString;
+var core_hasOwn = class2type.hasOwnProperty;
+
+var type = function(obj) {
+  if (obj === null) {
+    return String( obj );
+  }
+  return typeof obj === "object" || typeof obj === "function" ?
+    class2type[core_toString.call(obj)] || "object" :
+    typeof obj;
+};
+
+var isWindow = function(obj) {
+  return obj !== null && obj === obj.window;
+};
+
+var isPlainObject = function( obj ) {
+  // Must be an Object.
+  // Because of IE, we also have to check the presence of the constructor property.
+  // Make sure that DOM nodes and window objects don't pass through, as well
+  if ( !obj || type(obj) !== "object" || obj.nodeType || isWindow( obj ) ) {
+    return false;
+  }
+
+  try {
+    // Not own constructor property must be Object
+    if ( obj.constructor &&
+      !core_hasOwn.call(obj, "constructor") &&
+      !core_hasOwn.call(obj.constructor.prototype, "isPrototypeOf") ) {
+      return false;
+    }
+  } catch ( e ) {
+    // IE8,9 Will throw exceptions on certain host objects #9897
+    return false;
+  }
+
+  // Own properties are enumerated firstly, so to speed up,
+  // if last one is own, then all properties are own.
+
+  var key;
+  for ( key in obj ) {}
+
+  return key === undefined || core_hasOwn.call( obj, key );
+};
+
+var isFunction = function(obj) {
+  return type(obj) === "function";
+};
+
+var isArray = Array.isArray || function(obj) {
+  return type(obj) === "array";
+};
+
+var extend = function() {
+  var options, name, src, copy, copyIsArray, clone,
+    target = arguments[0] || {},
+    i = 1,
+    length = arguments.length,
+    deep = false;
+
+  // Handle a deep copy situation
+  if ( typeof target === "boolean" ) {
+    deep = target;
+    target = arguments[1] || {};
+    // skip the boolean and the target
+    i = 2;
+  }
+
+  // Handle case when target is a string or something (possible in deep copy)
+  if ( typeof target !== "object" && !isFunction(target) ) {
+    target = {};
+  }
+
+  // extend jQuery itself if only one argument is passed
+  if ( length === i ) {
+    target = this;
+    --i;
+  }
+
+  for ( ; i < length; i++ ) {
+    // Only deal with non-null/undefined values
+    if ((options = arguments[ i ]) != null) {
+      // Extend the base object
+      for ( name in options ) {
+        src = target[ name ];
+        copy = options[ name ];
+
+        // Prevent never-ending loop
+        if ( target === copy ) {
+          continue;
+        }
+
+        // Recurse if we're merging plain objects or arrays
+        if ( deep && copy && ( isPlainObject(copy) || (copyIsArray = isArray(copy)) ) ) {
+          if ( copyIsArray ) {
+            copyIsArray = false;
+            clone = src && isArray(src) ? src : [];
+
+          } else {
+            clone = src && isPlainObject(src) ? src : {};
+          }
+
+          // Never move original objects, clone them
+          target[ name ] = extend( deep, clone, copy );
+
+        // Don't bring in undefined values
+        } else if ( copy !== undefined ) {
+          if (!(isArray(options) && isFunction(copy))) {
+            target[ name ] = copy;
+          }
+        }
+      }
+    }
+  }
+
+  // Return the modified object
+  return target;
+};
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = extend;
+}
+
+var request;
+var extend;
+
+if (typeof module !== 'undefined' && module.exports) {
+  request = require('request');
+  extend = require('./extend.js');
+}
+
+var ajax = function ajax(options, callback) {
+
+  if (typeof options === "function") {
+    callback = options;
+    options = {};
+  }
+
+  var call = function(fun) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    if (typeof fun === typeof Function) {
+      fun.apply(this, args);
+    }
+  };
+
+  var defaultOptions = {
+    method : "GET",
+    headers: {},
+    json: true,
+    processData: true,
+    timeout: 10000
+  };
+
+  options = extend(true, defaultOptions, options);
+
+  var onSuccess = function(obj, resp, cb){
+    if (!options.binary && !options.json && options.processData &&
+        typeof obj !== 'string') {
+      obj = JSON.stringify(obj);
+    } else if (!options.binary && options.json && typeof obj === 'string') {
+      try {
+        obj = JSON.parse(obj);
+      } catch (e) {
+        // Probably a malformed JSON from server
+        call(cb, e);
+        return;
+      }
+    }
+    call(cb, null, obj, resp);
+  };
+
+  var onError = function(err, cb){
+    var errParsed;
+    var errObj = {status: err.status};
+    try {
+      errParsed = JSON.parse(err.responseText);
+      //would prefer not to have a try/catch clause
+      errObj = extend(true, {}, errObj, errParsed);
+    } catch(e) {}
+    call(cb, errObj);
+  };
+
+  if (typeof window !== 'undefined' && window.XMLHttpRequest) {
+    var timer, timedout = false;
+    var xhr = new XMLHttpRequest();
+
+    xhr.open(options.method, options.url);
+    xhr.withCredentials = true;
+
+    if (options.json) {
+      options.headers.Accept = 'application/json';
+      options.headers['Content-Type'] = options.headers['Content-Type'] ||
+        'application/json';
+      if (options.body && options.processData && typeof options.body !== "string") {
+        options.body = JSON.stringify(options.body);
+      }
+    }
+
+    if (options.binary) {
+      xhr.responseType = 'arraybuffer';
+    }
+
+    function createCookie(name,value,days) {
+      if (days) {
+	var date = new Date();
+	date.setTime(date.getTime()+(days*24*60*60*1000));
+	var expires = "; expires="+date.toGMTString();
+      } else {
+        var expires = "";
+      }
+      document.cookie = name+"="+value+expires+"; path=/";
+    }
+
+    for (var key in options.headers) {
+      if (key === 'Cookie') {
+        var cookie = options.headers[key].split('=');
+        createCookie(cookie[0], cookie[1], 10);
+      } else {
+        xhr.setRequestHeader(key, options.headers[key]);
+      }
+    }
+
+    if (!("body" in options)) {
+      options.body = null;
+    }
+
+    var abortReq = function() {
+      timedout=true;
+      xhr.abort();
+      call(onError, xhr, callback);
+    };
+
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState !== 4 || timedout) {
+        return;
+      }
+      clearTimeout(timer);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        var data;
+        if (options.binary) {
+          data = new Blob([xhr.response || ''], {
+            type: xhr.getResponseHeader('Content-Type')
+          });
+        } else {
+          data = xhr.responseText;
+        }
+        call(onSuccess, data, xhr, callback);
+      } else {
+         call(onError, xhr, callback);
+      }
+    };
+
+    if (options.timeout > 0) {
+      timer = setTimeout(abortReq, options.timeout);
+    }
+    xhr.send(options.body);
+    return {abort:abortReq};
+
+  } else {
+
+    if (options.json) {
+      if (!options.binary) {
+        options.headers.Accept = 'application/json';
+      }
+      options.headers['Content-Type'] = options.headers['Content-Type'] ||
+        'application/json';
+    }
+
+    if (options.binary) {
+      options.encoding = null;
+      options.json = false;
+    }
+
+    if (!options.processData) {
+      options.json = false;
+    }
+
+    return request(options, function(err, response, body) {
+      if (err) {
+        err.status = response ? response.statusCode : 400;
+        return call(onError, err, callback);
+      }
+
+      var content_type = response.headers['content-type'];
+      var data = (body || '');
+
+      // CouchDB doesn't always return the right content-type for JSON data, so
+      // we check for ^{ and }$ (ignoring leading/trailing whitespace)
+      if (!options.binary && (options.json || !options.processData) &&
+          typeof data !== 'object' &&
+          (/json/.test(content_type) ||
+           (/^[\s]*\{/.test(data) && /\}[\s]*$/.test(data)))) {
+        data = JSON.parse(data);
+      }
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        call(onSuccess, data, response, callback);
+      }
+      else {
+        if (options.binary) {
+          var data = JSON.parse(data.toString());
+        }
+        data.status = response.statusCode;
+        call(callback, data);
+      }
+    });
+  }
+};
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = ajax;
+}
+
+/*globals PouchAdapter: true, PouchUtils: true */
+
+"use strict";
+
+var PouchUtils;
+
+if (typeof module !== 'undefined' && module.exports) {
+  PouchUtils = require('./pouch.utils.js');
+}
+
+var Pouch = function Pouch(name, opts, callback) {
+
+  if (!(this instanceof Pouch)) {
+    return new Pouch(name, opts, callback);
+  }
+
+  if (typeof opts === 'function' || typeof opts === 'undefined') {
+    callback = opts;
+    opts = {};
+  }
+
+  if (typeof name === 'object') {
+    opts = name;
+    name = undefined;
+  }
+
+  if (typeof callback === 'undefined') {
+    callback = function() {};
+  }
+
+  var backend = Pouch.parseAdapter(opts.name || name);
+  opts.originalName = name;
+  opts.name = opts.name || backend.name;
+  opts.adapter = opts.adapter || backend.adapter;
+
+  console.log("opts.adapter: " + opts.adapter)
+
+  if (!Pouch.adapters[opts.adapter]) {
+    throw 'Adapter is missing';
+  }
+
+  if (!Pouch.adapters[opts.adapter].valid()) {
+    throw 'Invalid Adapter';
+  }
+
+  var adapter = new PouchAdapter(opts, function(err, db) {
+    if (err) {
+      if (callback) {
+        callback(err);
+      }
+      return;
+    }
+
+    for (var plugin in Pouch.plugins) {
+      // In future these will likely need to be async to allow the plugin
+      // to initialise
+      var pluginObj = Pouch.plugins[plugin](db);
+      for (var api in pluginObj) {
+        // We let things like the http adapter use its own implementation
+        // as it shares a lot of code
+        if (!(api in db)) {
+          db[api] = pluginObj[api];
+        }
+      }
+    }
+    db.taskqueue.ready(true);
+    db.taskqueue.execute(db);
+    callback(null, db);
+  });
+  for (var j in adapter) {
+    this[j] = adapter[j];
+  }
+  for (var plugin in Pouch.plugins) {
+    // In future these will likely need to be async to allow the plugin
+    // to initialise
+    var pluginObj = Pouch.plugins[plugin](this);
+    for (var api in pluginObj) {
+      // We let things like the http adapter use its own implementation
+      // as it shares a lot of code
+      if (!(api in this)) {
+        this[api] = pluginObj[api];
+      }
+    }
+  }
+};
+
+Pouch.DEBUG = true;
+Pouch.openReqList = {};
+Pouch.adapters = {};
+Pouch.plugins = {};
+
+Pouch.prefix = '_pouch_';
+
+Pouch.parseAdapter = function(name) {
+  var match = name.match(/([a-z\-]*):\/\/(.*)/);
+  var adapter;
+  if (match) {
+    // the http adapter expects the fully qualified name
+    name = /http(s?)/.test(match[1]) ? match[1] + '://' + match[2] : match[2];
+    adapter = match[1];
+    if (!Pouch.adapters[adapter].valid()) {
+      throw 'Invalid adapter';
+    }
+    return {name: name, adapter: match[1]};
+  }
+
+
+
+  var preferredAdapters = ['idb', 'leveldb', 'websql'];
+  //var preferredAdapters = ['websql'];
+  for (var i = 0; i < preferredAdapters.length; ++i) {
+    if (preferredAdapters[i] in Pouch.adapters) {
+      console.log("preferredAdapter available: " + preferredAdapters[i]);
+      adapter = Pouch.adapters[preferredAdapters[i]];
+      var use_prefix = 'use_prefix' in adapter ? adapter.use_prefix : true;
+
+      return {
+        name: use_prefix ? Pouch.prefix + name : name,
+        adapter: preferredAdapters[i]
+      };
+    }
+  }
+
+  throw 'No valid adapter found';
+};
+
+Pouch.destroy = function(name, callback) {
+  var opts = Pouch.parseAdapter(name);
+  var cb = function(err, response) {
+    if (err) {
+      callback(err);
+      return;
+    }
+
+    for (var plugin in Pouch.plugins) {
+      Pouch.plugins[plugin]._delete(name);
+    }
+    if (Pouch.DEBUG) {
+      console.log(name + ': Delete Database');
+    }
+
+    // call destroy method of the particular adaptor
+    Pouch.adapters[opts.adapter].destroy(opts.name, callback);
+  };
+
+  // remove Pouch from allDBs
+  Pouch.removeFromAllDbs(opts, cb);
+};
+
+Pouch.removeFromAllDbs = function(opts, callback) {
+  // Only execute function if flag is enabled
+  if (!Pouch.enableAllDbs) {
+    callback();
+    return;
+  }
+
+  // skip http and https adaptors for allDbs
+  var adapter = opts.adapter;
+  if (adapter === "http" || adapter === "https") {
+    callback();
+    return;
+  }
+
+  // remove db from Pouch.ALL_DBS
+  new Pouch(Pouch.allDBName(opts.adapter), function(err, db) {
+    if (err) {
+      // don't fail when allDbs fail
+      console.error(err);
+      callback();
+      return;
+    }
+    // check if db has been registered in Pouch.ALL_DBS
+    var dbname = Pouch.dbName(opts.adapter, opts.name);
+    db.get(dbname, function(err, doc) {
+      if (err) {
+        callback();
+      } else {
+        db.remove(doc, function(err, response) {
+          if (err) {
+            console.error(err);
+          }
+          callback();
+        });
+      }
+    });
+  });
+
+};
+
+Pouch.adapter = function (id, obj) {
+  if (obj.valid()) {
+    Pouch.adapters[id] = obj;
+  }
+};
+
+Pouch.plugin = function(id, obj) {
+  Pouch.plugins[id] = obj;
+};
+
+// flag to toggle allDbs (off by default)
+Pouch.enableAllDbs = false;
+
+// name of database used to keep track of databases
+Pouch.ALL_DBS = "_allDbs";
+Pouch.dbName = function(adapter, name) {
+  return [adapter, "-", name].join('');
+};
+Pouch.realDBName = function(adapter, name) {
+  return [adapter, "://", name].join('');
+};
+Pouch.allDBName = function(adapter) {
+  return [adapter, "://", Pouch.prefix + Pouch.ALL_DBS].join('');
+};
+
+Pouch.open = function(opts, callback) {
+  // Only register pouch with allDbs if flag is enabled
+  if (!Pouch.enableAllDbs) {
+    callback();
+    return;
+  }
+
+  var adapter = opts.adapter;
+  // skip http and https adaptors for allDbs
+  if (adapter === "http" || adapter === "https") {
+    callback();
+    return;
+  }
+
+  new Pouch(Pouch.allDBName(adapter), function(err, db) {
+    if (err) {
+      // don't fail when allDb registration fails
+      console.error(err);
+      callback();
+      return;
+    }
+
+    // check if db has been registered in Pouch.ALL_DBS
+    var dbname = Pouch.dbName(adapter, opts.name);
+    db.get(dbname, function(err, response) {
+      if (err && err.status === 404) {
+        db.put({
+          _id: dbname,
+          dbname: opts.originalName
+        }, function(err) {
+            if (err) {
+                console.error(err);
+            }
+
+            callback();
+        });
+      } else {
+        callback();
+      }
+    });
+  });
+};
+
+Pouch.allDbs = function(callback) {
+  var accumulate = function(adapters, all_dbs) {
+    if (adapters.length === 0) {
+      // remove duplicates
+      var result = [];
+      all_dbs.forEach(function(doc) {
+        var exists = result.some(function(db) {
+          return db.id === doc.id;
+        });
+
+        if (!exists) {
+          result.push(doc);
+        }
+      });
+
+      // return an array of dbname
+      callback(null, result.map(function(row) {
+          return row.doc.dbname;
+      }));
+      return;
+    }
+
+    var adapter = adapters.shift();
+
+    // skip http and https adaptors for allDbs
+    if (adapter === "http" || adapter === "https") {
+      accumulate(adapters, all_dbs);
+      return;
+    }
+
+    new Pouch(Pouch.allDBName(adapter), function(err, db) {
+      if (err) {
+        callback(err);
+        return;
+      }
+      db.allDocs({include_docs: true}, function(err, response) {
+        if (err) {
+          callback(err);
+          return;
+        }
+
+        // append from current adapter rows
+        all_dbs.unshift.apply(all_dbs, response.rows);
+
+        // code to clear allDbs.
+        // response.rows.forEach(function(row) {
+        //   db.remove(row.doc, function() {
+        //     console.log(arguments);
+        //   });
+        // });
+
+        // recurse
+        accumulate(adapters, all_dbs);
+      });
+    });
+  };
+  var adapters = Object.keys(Pouch.adapters);
+  accumulate(adapters, []);
+};
+
+/*
+  Examples:
+
+  >>> Pouch.uuids()
+  "92329D39-6F5C-4520-ABFC-AAB64544E172"]
+
+  >>> Pouch.uuids(10, {length: 32, radix: 5})
+  [ '04422200002240221333300140323100',
+    '02304411022101001312440440020110',
+    '41432430322114143303343433433030',
+    '21234330022303431304443100330401',
+    '23044133434242034101422131301213',
+    '43142032223224403322031032232041',
+    '41121132424023141101403324200330',
+    '00341042023103204342124004122342',
+    '01001141433040113422403034004214',
+    '30221232324132303123433131020020' ]
+ */
+Pouch.uuids = function (count, options) {
+
+  if (typeof(options) !== 'object') {
+    options = {};
+  }
+
+  var length = options.length;
+  var radix = options.radix;
+  var uuids = [];
+
+  while (uuids.push(PouchUtils.uuid(length, radix)) < count) { }
+
+  return uuids;
+};
+
+// Give back one UUID
+Pouch.uuid = function (options) {
+  return Pouch.uuids(1, options)[0];
+};
+
+// Enumerate errors, add the status code so we can reflect the HTTP api
+// in future
+Pouch.Errors = {
+  MISSING_BULK_DOCS: {
+    status: 400,
+    error: 'bad_request',
+    reason: "Missing JSON list of 'docs'"
+  },
+  MISSING_DOC: {
+    status: 404,
+    error: 'not_found',
+    reason: 'missing'
+  },
+  REV_CONFLICT: {
+    status: 409,
+    error: 'conflict',
+    reason: 'Document update conflict'
+  },
+  INVALID_ID: {
+    status: 400,
+    error: 'invalid_id',
+    reason: '_id field must contain a string'
+  },
+  MISSING_ID: {
+    status: 412,
+    error: 'missing_id',
+    reason: '_id is required for puts'
+  },
+  RESERVED_ID: {
+    status: 400,
+    error: 'bad_request',
+    reason: 'Only reserved document ids may start with underscore.'
+  },
+  NOT_OPEN: {
+    status: 412,
+    error: 'precondition_failed',
+    reason: 'Database not open so cannot close'
+  },
+  UNKNOWN_ERROR: {
+    status: 500,
+    error: 'unknown_error',
+    reason: 'Database encountered an unknown error'
+  },
+  BAD_ARG: {
+    status: 500,
+    error: 'badarg',
+    reason: 'Some query argument is invalid'
+  },
+  INVALID_REQUEST: {
+    status: 400,
+    error: 'invalid_request',
+    reason: 'Request was invalid'
+  },
+  QUERY_PARSE_ERROR: {
+    status: 400,
+    error: 'query_parse_error',
+    reason: 'Some query parameter is invalid'
+  },
+  DOC_VALIDATION: {
+    status: 500,
+    error: 'doc_validation',
+    reason: 'Bad special document member'
+  },
+  BAD_REQUEST: {
+    status: 400,
+    error: 'bad_request',
+    reason: 'Something wrong with the request'
+  },
+  NOT_AN_OBJECT: {
+    status: 400,
+    error: 'bad_request',
+    reason: 'Document must be a JSON object'
+  }
+};
+
+Pouch.error = function(error, reason) {
+  return PouchUtils.extend({}, error, {reason: reason});
+};
+
+if (typeof module !== 'undefined' && module.exports) {
+  global.Pouch = Pouch;
+  global.PouchDB = Pouch;
+  module.exports = Pouch;
+  Pouch.replicate = require('./pouch.replicate.js').replicate;
+  var PouchAdapter = require('./pouch.adapter.js');
+  //load adapters known to work under node
+  var adapters = ['leveldb', 'http'];
+  adapters.map(function(adapter) {
+    require('./adapters/pouch.' + adapter + '.js');
+  });
+  require('./plugins/pouchdb.mapreduce.js');
+} else {
+  window.Pouch = Pouch;
+  window.PouchDB = Pouch;
+}
+
+'use strict';
+
+var pouchCollate = function(a, b) {
+  var ai = collationIndex(a);
+  var bi = collationIndex(b);
+  if ((ai - bi) !== 0) {
+    return ai - bi;
+  }
+  if (a === null) {
+    return 0;
+  }
+  if (typeof a === 'number') {
+    return a - b;
+  }
+  if (typeof a === 'boolean') {
+    return a < b ? -1 : 1;
+  }
+  if (typeof a === 'string') {
+    return stringCollate(a, b);
+  }
+  if (Array.isArray(a)) {
+    return arrayCollate(a, b);
+  }
+  if (typeof a === 'object') {
+    return objectCollate(a, b);
+  }
+};
+
+var stringCollate = function(a, b) {
+  // See: https://github.com/daleharvey/pouchdb/issues/40
+  // This is incompatible with the CouchDB implementation, but its the
+  // best we can do for now
+  return (a === b) ? 0 : ((a > b) ? 1 : -1);
+};
+
+var objectCollate = function(a, b) {
+  var ak = Object.keys(a), bk = Object.keys(b);
+  var len = Math.min(ak.length, bk.length);
+  for (var i = 0; i < len; i++) {
+    // First sort the keys
+    var sort = pouchCollate(ak[i], bk[i]);
+    if (sort !== 0) {
+      return sort;
+    }
+    // if the keys are equal sort the values
+    sort = pouchCollate(a[ak[i]], b[bk[i]]);
+    if (sort !== 0) {
+      return sort;
+    }
+
+  }
+  return (ak.length === bk.length) ? 0 :
+    (ak.length > bk.length) ? 1 : -1;
+};
+
+var arrayCollate = function(a, b) {
+  var len = Math.min(a.length, b.length);
+  for (var i = 0; i < len; i++) {
+    var sort = pouchCollate(a[i], b[i]);
+    if (sort !== 0) {
+      return sort;
+    }
+  }
+  return (a.length === b.length) ? 0 :
+    (a.length > b.length) ? 1 : -1;
+};
+
+// The collation is defined by erlangs ordered terms
+// the atoms null, true, false come first, then numbers, strings,
+// arrays, then objects
+var collationIndex = function(x) {
+  var id = ['boolean', 'number', 'string', 'object'];
+  if (id.indexOf(typeof x) !== -1) {
+    if (x === null) {
+      return 1;
+    }
+    return id.indexOf(typeof x) + 2;
+  }
+  if (Array.isArray(x)) {
+    return 4.5;
+  }
+};
+
+// a few hacks to get things in the right place for node.js
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = pouchCollate;
+}
+
+
+'use strict';
+
+var extend;
+if (typeof module !== 'undefined' && module.exports) {
+  extend = require('./deps/extend');
+}
+
+
+// for a better overview of what this is doing, read:
+// https://github.com/apache/couchdb/blob/master/src/couchdb/couch_key_tree.erl
+//
+// But for a quick intro, CouchDB uses a revision tree to store a documents
+// history, A -> B -> C, when a document has conflicts, that is a branch in the
+// tree, A -> (B1 | B2 -> C), We store these as a nested array in the format
+//
+// KeyTree = [Path ... ]
+// Path = {pos: position_from_root, ids: Tree}
+// Tree = [Key, Opts, [Tree, ...]], in particular single node: [Key, []]
+
+// Turn a path as a flat array into a tree with a single branch
+function pathToTree(path) {
+  var doc = path.shift();
+  var root = [doc.id, doc.opts, []];
+  var leaf = root;
+  var nleaf;
+
+  while (path.length) {
+    doc = path.shift();
+    nleaf = [doc.id, doc.opts, []];
+    leaf[2].push(nleaf);
+    leaf = nleaf;
+  }
+  return root;
+}
+
+// Merge two trees together
+// The roots of tree1 and tree2 must be the same revision
+function mergeTree(in_tree1, in_tree2) {
+  var queue = [{tree1: in_tree1, tree2: in_tree2}];
+  var conflicts = false;
+  while (queue.length > 0) {
+    var item = queue.pop();
+    var tree1 = item.tree1;
+    var tree2 = item.tree2;
+
+    if (tree1[1].status || tree2[1].status) {
+      tree1[1].status = (tree1[1].status ===  'available' ||
+                         tree2[1].status === 'available') ? 'available' : 'missing';
+    }
+
+    for (var i = 0; i < tree2[2].length; i++) {
+      if (!tree1[2][0]) {
+        conflicts = 'new_leaf';
+        tree1[2][0] = tree2[2][i];
+        continue;
+      }
+
+      var merged = false;
+      for (var j = 0; j < tree1[2].length; j++) {
+        if (tree1[2][j][0] === tree2[2][i][0]) {
+          queue.push({tree1: tree1[2][j], tree2: tree2[2][i]});
+          merged = true;
+        }
+      }
+      if (!merged) {
+        conflicts = 'new_branch';
+        tree1[2].push(tree2[2][i]);
+        tree1[2].sort();
+      }
+    }
+  }
+  return {conflicts: conflicts, tree: in_tree1};
+}
+
+function doMerge(tree, path, dontExpand) {
+  var restree = [];
+  var conflicts = false;
+  var merged = false;
+  var res, branch;
+
+  if (!tree.length) {
+    return {tree: [path], conflicts: 'new_leaf'};
+  }
+
+  tree.forEach(function(branch) {
+    if (branch.pos === path.pos && branch.ids[0] === path.ids[0]) {
+      // Paths start at the same position and have the same root, so they need
+      // merged
+      res = mergeTree(branch.ids, path.ids);
+      restree.push({pos: branch.pos, ids: res.tree});
+      conflicts = conflicts || res.conflicts;
+      merged = true;
+    } else if (dontExpand !== true) {
+      // The paths start at a different position, take the earliest path and
+      // traverse up until it as at the same point from root as the path we want to
+      // merge.  If the keys match we return the longer path with the other merged
+      // After stemming we dont want to expand the trees
+
+      var t1 = branch.pos < path.pos ? branch : path;
+      var t2 = branch.pos < path.pos ? path : branch;
+      var diff = t2.pos - t1.pos;
+
+      var candidateParents = [];
+
+      var trees = [];
+      trees.push({ids: t1.ids, diff: diff, parent: null, parentIdx: null});
+      while (trees.length > 0) {
+        var item = trees.pop();
+        if (item.diff === 0) {
+          if (item.ids[0] === t2.ids[0]) {
+            candidateParents.push(item);
+          }
+          continue;
+        }
+        if (!item.ids) {
+          continue;
+        }
+        /*jshint loopfunc:true */
+        item.ids[2].forEach(function(el, idx) {
+          trees.push({ids: el, diff: item.diff-1, parent: item.ids, parentIdx: idx});
+        });
+      }
+
+      var el = candidateParents[0];
+
+      if (!el) {
+        restree.push(branch);
+      } else {
+        res = mergeTree(el.ids, t2.ids);
+        el.parent[2][el.parentIdx] = res.tree;
+        restree.push({pos: t1.pos, ids: t1.ids});
+        conflicts = conflicts || res.conflicts;
+        merged = true;
+      }
+    } else {
+      restree.push(branch);
+    }
+  });
+
+  // We didnt find
+  if (!merged) {
+    restree.push(path);
+  }
+
+  restree.sort(function(a, b) {
+    return a.pos - b.pos;
+  });
+
+  return {
+    tree: restree,
+    conflicts: conflicts || 'internal_node'
+  };
+}
+
+// To ensure we dont grow the revision tree infinitely, we stem old revisions
+function stem(tree, depth) {
+  // First we break out the tree into a complete list of root to leaf paths,
+  // we cut off the start of the path and generate a new set of flat trees
+  var stemmedPaths = PouchMerge.rootToLeaf(tree).map(function(path) {
+    var stemmed = path.ids.slice(-depth);
+    return {
+      pos: path.pos + (path.ids.length - stemmed.length),
+      ids: pathToTree(stemmed)
+    };
+  });
+  // Then we remerge all those flat trees together, ensuring that we dont
+  // connect trees that would go beyond the depth limit
+  return stemmedPaths.reduce(function(prev, current, i, arr) {
+    return doMerge(prev, current, true).tree;
+  }, [stemmedPaths.shift()]);
+}
+
+var PouchMerge = {};
+
+PouchMerge.merge = function(tree, path, depth) {
+  // Ugh, nicer way to not modify arguments in place?
+  tree = extend(true, [], tree);
+  path = extend(true, {}, path);
+  var newTree = doMerge(tree, path);
+  return {
+    tree: stem(newTree.tree, depth),
+    conflicts: newTree.conflicts
+  };
+};
+
+// We fetch all leafs of the revision tree, and sort them based on tree length
+// and whether they were deleted, undeleted documents with the longest revision
+// tree (most edits) win
+// The final sort algorithm is slightly documented in a sidebar here:
+// http://guide.couchdb.org/draft/conflicts.html
+PouchMerge.winningRev = function(metadata) {
+  var leafs = [];
+  PouchMerge.traverseRevTree(metadata.rev_tree,
+                              function(isLeaf, pos, id, something, opts) {
+    if (isLeaf) {
+      leafs.push({pos: pos, id: id, deleted: !!opts.deleted});
+    }
+  });
+  leafs.sort(function(a, b) {
+    if (a.deleted !== b.deleted) {
+      return a.deleted > b.deleted ? 1 : -1;
+    }
+    if (a.pos !== b.pos) {
+      return b.pos - a.pos;
+    }
+    return a.id < b.id ? 1 : -1;
+  });
+
+  return leafs[0].pos + '-' + leafs[0].id;
+};
+
+// Pretty much all below can be combined into a higher order function to
+// traverse revisions
+// The return value from the callback will be passed as context to all
+// children of that node
+PouchMerge.traverseRevTree = function(revs, callback) {
+  var toVisit = [];
+
+  revs.forEach(function(tree) {
+    toVisit.push({pos: tree.pos, ids: tree.ids});
+  });
+  while (toVisit.length > 0) {
+    var node = toVisit.pop();
+    var pos = node.pos;
+    var tree = node.ids;
+    var newCtx = callback(tree[2].length === 0, pos, tree[0], node.ctx, tree[1]);
+    /*jshint loopfunc: true */
+    tree[2].forEach(function(branch) {
+      toVisit.push({pos: pos+1, ids: branch, ctx: newCtx});
+    });
+  }
+};
+
+PouchMerge.collectLeaves = function(revs) {
+  var leaves = [];
+  PouchMerge.traverseRevTree(revs, function(isLeaf, pos, id, acc, opts) {
+    if (isLeaf) {
+      leaves.unshift({rev: pos + "-" + id, pos: pos, opts: opts});
+    }
+  });
+  leaves.sort(function(a, b) {
+    return b.pos - a.pos;
+  });
+  leaves.map(function(leaf) { delete leaf.pos; });
+  return leaves;
+};
+
+// returns revs of all conflicts that is leaves such that
+// 1. are not deleted and
+// 2. are different than winning revision
+PouchMerge.collectConflicts = function(metadata) {
+  var win = PouchMerge.winningRev(metadata);
+  var leaves = PouchMerge.collectLeaves(metadata.rev_tree);
+  var conflicts = [];
+  leaves.forEach(function(leaf) {
+    if (leaf.rev !== win && !leaf.opts.deleted) {
+      conflicts.push(leaf.rev);
+    }
+  });
+  return conflicts;
+};
+
+PouchMerge.rootToLeaf = function(tree) {
+  var paths = [];
+  PouchMerge.traverseRevTree(tree, function(isLeaf, pos, id, history, opts) {
+    history = history ? history.slice(0) : [];
+    history.push({id: id, opts: opts});
+    if (isLeaf) {
+      var rootPos = pos + 1 - history.length;
+      paths.unshift({pos: rootPos, ids: history});
+    }
+    return history;
+  });
+  return paths;
+};
+
+// a few hacks to get things in the right place for node.js
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = PouchMerge;
+}
+/*globals PouchUtils: true */
+
+'use strict';
+
+var PouchUtils;
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = Pouch;
+  PouchUtils = require('./pouch.utils.js');
+}
+
+// We create a basic promise so the caller can cancel the replication possibly
+// before we have actually started listening to changes etc
+var Promise = function() {
+  this.cancelled = false;
+  this.cancel = function() {
+    this.cancelled = true;
+  };
+};
+
+// The RequestManager ensures that only one database request is active at
+// at time, it ensures we dont max out simultaneous HTTP requests and makes
+// the replication process easier to reason about
+var RequestManager = function() {
+
+  var queue = [];
+  var api = {};
+  var processing = false;
+
+  // Add a new request to the queue, if we arent currently processing anything
+  // then process it immediately
+  api.enqueue = function(fun, args) {
+    queue.push({fun: fun, args: args});
+    if (!processing) {
+      api.process();
+    }
+  };
+
+  // Process the next request
+  api.process = function() {
+    if (processing || !queue.length) {
+      return;
+    }
+    processing = true;
+    var task = queue.shift();
+    task.fun.apply(null, task.args);
+  };
+
+  // We need to be notified whenever a request is complete to process
+  // the next request
+  api.notifyRequestComplete = function() {
+    processing = false;
+    api.process();
+  };
+
+  return api;
+};
+
+// TODO: check CouchDB's replication id generation, generate a unique id particular
+// to this replication
+var genReplicationId = function(src, target, opts) {
+  var filterFun = opts.filter ? opts.filter.toString() : '';
+  return '_local/' + PouchUtils.Crypto.MD5(src.id() + target.id() + filterFun);
+};
+
+// A checkpoint lets us restart replications from when they were last cancelled
+var fetchCheckpoint = function(src, target, id, callback) {
+  target.get(id, function(err, targetDoc) {
+    if (err && err.status === 404) {
+      callback(null, 0);
+    } else {
+      src.get(id, function(err, sourceDoc) {
+        if (err && err.status === 404 || targetDoc.last_seq !== sourceDoc.last_seq) {
+          callback(null, 0);
+        } else {
+          callback(null, sourceDoc.last_seq);
+        }
+      });
+    }
+  });
+};
+
+var writeCheckpoint = function(src, target, id, checkpoint, callback) {
+  var check = {
+    _id: id,
+    last_seq: checkpoint
+  };
+  target.put(check, function(err, doc) {
+    src.put(check, function(err, doc) {
+      callback();
+    });
+  });
+};
+
+function replicate(src, target, opts, promise) {
+
+  var requests = new RequestManager();
+  var writeQueue = [];
+  var repId = genReplicationId(src, target, opts);
+  var results = [];
+  var completed = false;
+  var pending = 0;
+  var last_seq = 0;
+  var continuous = opts.continuous || false;
+  var doc_ids = opts.doc_ids;
+  var result = {
+    ok: true,
+    start_time: new Date(),
+    docs_read: 0,
+    docs_written: 0
+  };
+
+  function docsWritten(err, res, len) {
+    if (opts.onChange) {
+      for (var i = 0; i < len; i++) {
+        /*jshint validthis:true */
+        opts.onChange.apply(this, [result]);
+      }
+    }
+    pending -= len;
+    result.docs_written += len;
+
+    writeCheckpoint(src, target, repId, last_seq, function(err, res) {
+      requests.notifyRequestComplete();
+      isCompleted();
+    });
+  }
+
+  function writeDocs() {
+    if (!writeQueue.length) {
+      return requests.notifyRequestComplete();
+    }
+    var len = writeQueue.length;
+    target.bulkDocs({docs: writeQueue}, {new_edits: false}, function(err, res) {
+      docsWritten(err, res, len);
+    });
+    writeQueue = [];
+  }
+
+  function eachRev(id, rev) {
+    src.get(id, {revs: true, rev: rev, attachments: true}, function(err, doc) {
+      requests.notifyRequestComplete();
+      writeQueue.push(doc);
+      requests.enqueue(writeDocs);
+    });
+  }
+
+  function onRevsDiff(err, diffs) {
+    requests.notifyRequestComplete();
+    if (err) {
+      if (continuous) {
+        promise.cancel();
+      }
+      PouchUtils.call(opts.complete, err, null);
+      return;
+    }
+
+    // We already have the full document stored
+    if (Object.keys(diffs).length === 0) {
+      pending--;
+      isCompleted();
+      return;
+    }
+
+    var _enqueuer = function (rev) {
+        requests.enqueue(eachRev, [id, rev]);
+    };
+
+    for (var id in diffs) {
+      diffs[id].missing.forEach(_enqueuer);
+    }
+  }
+
+  function fetchRevsDiff(diff) {
+    target.revsDiff(diff, onRevsDiff);
+  }
+
+  function onChange(change) {
+    last_seq = change.seq;
+    results.push(change);
+    result.docs_read++;
+    pending++;
+    var diff = {};
+    diff[change.id] = change.changes.map(function(x) { return x.rev; });
+    requests.enqueue(fetchRevsDiff, [diff]);
+  }
+
+  function complete() {
+    completed = true;
+    isCompleted();
+  }
+
+  function isCompleted() {
+    if (completed && pending === 0) {
+      result.end_time = new Date();
+      PouchUtils.call(opts.complete, null, result);
+    }
+  }
+
+  fetchCheckpoint(src, target, repId, function(err, checkpoint) {
+
+    if (err) {
+      return PouchUtils.call(opts.complete, err);
+    }
+
+    last_seq = checkpoint;
+
+    // Was the replication cancelled by the caller before it had a chance
+    // to start. Shouldnt we be calling complete?
+    if (promise.cancelled) {
+      return;
+    }
+
+    var repOpts = {
+      continuous: continuous,
+      since: last_seq,
+      style: 'all_docs',
+      onChange: onChange,
+      complete: complete,
+      doc_ids: doc_ids
+    };
+
+    if (opts.filter) {
+      repOpts.filter = opts.filter;
+    }
+
+    if (opts.query_params) {
+      repOpts.query_params = opts.query_params;
+    }
+
+    var changes = src.changes(repOpts);
+
+    if (opts.continuous) {
+      promise.cancel = changes.cancel;
+    }
+  });
+
+}
+
+function toPouch(db, callback) {
+  if (typeof db === 'string') {
+    return new Pouch(db, callback);
+  }
+  callback(null, db);
+}
+
+Pouch.replicate = function(src, target, opts, callback) {
+  if (opts instanceof Function) {
+    callback = opts;
+    opts = {};
+  }
+  if (opts === undefined) {
+    opts = {};
+  }
+  if (!opts.complete) {
+    opts.complete = callback;
+  }
+  var replicateRet = new Promise();
+  toPouch(src, function(err, src) {
+    if (err) {
+      return PouchUtils.call(callback, err);
+    }
+    toPouch(target, function(err, target) {
+      if (err) {
+        return PouchUtils.call(callback, err);
+      }
+      replicate(src, target, opts, replicateRet);
+    });
+  });
+  return replicateRet;
+};
+
+/*jshint strict: false */
+/*global request: true, Buffer: true, escape: true, PouchMerge: true */
+/*global extend: true, Crypto: true, chrome, ajax, btoa, atob, uuid */
+
+var PouchUtils = {};
+
+if (typeof module !== 'undefined' && module.exports) {
+  PouchMerge = require('./pouch.merge.js');
+}
+
+// List of top level reserved words for doc
+var reservedWords = [
+  '_id',
+  '_rev',
+  '_attachments',
+  '_deleted',
+  '_revisions',
+  '_revs_info',
+  '_conflicts',
+  '_deleted_conflicts',
+  '_local_seq',
+  '_rev_tree'
+];
+
+// Determine id an ID is valid
+//   - invalid IDs begin with an underescore that does not begin '_design' or '_local'
+//   - any other string value is a valid id
+var isValidId = function(id) {
+  if (/^_/.test(id)) {
+    return (/^_(design|local)/).test(id);
+  }
+  return true;
+};
+
+var isChromeApp = function(){
+  return (typeof chrome !== "undefined" &&
+          typeof chrome.storage !== "undefined" &&
+          typeof chrome.storage.local !== "undefined");
+};
+
+// Pretty dumb name for a function, just wraps callback calls so we dont
+// to if (callback) callback() everywhere
+PouchUtils.call = function(fun) {
+  if (typeof fun === typeof Function) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    fun.apply(this, args);
+  }
+};
+
+PouchUtils.isLocalId = function(id) {
+  return (/^_local/).test(id);
+};
+
+// check if a specific revision of a doc has been deleted
+//  - metadata: the metadata object from the doc store
+//  - rev: (optional) the revision to check. defaults to winning revision
+PouchUtils.isDeleted = function(metadata, rev) {
+  if (!rev) {
+    rev = PouchMerge.winningRev(metadata);
+  }
+  if (rev.indexOf('-') >= 0) {
+    rev = rev.split('-')[1];
+  }
+  var deleted = false;
+  PouchMerge.traverseRevTree(metadata.rev_tree, function(isLeaf, pos, id, acc, opts) {
+    if (id === rev) {
+      deleted = !!opts.deleted;
+    }
+  });
+
+  return deleted;
+};
+
+PouchUtils.filterChange = function(opts) {
+  return function(change) {
+    var req = {};
+    var hasFilter = opts.filter && typeof opts.filter === 'function';
+
+    req.query = opts.query_params;
+    if (opts.filter && hasFilter && !opts.filter.call(this, change.doc, req)) {
+      return false;
+    }
+    if (opts.doc_ids && opts.doc_ids.indexOf(change.id) === -1) {
+      return false;
+    }
+    if (!opts.include_docs) {
+      delete change.doc;
+    } else {
+      for (var att in change.doc._attachments) {
+        change.doc._attachments[att].stub = true;
+      }
+    }
+    return true;
+  };
+};
+
+PouchUtils.processChanges = function(opts, changes, last_seq) {
+  // TODO: we should try to filter and limit as soon as possible
+  changes = changes.filter(PouchUtils.filterChange(opts));
+  if (opts.limit) {
+    if (opts.limit < changes.length) {
+      changes.length = opts.limit;
+    }
+  }
+  changes.forEach(function(change){
+    PouchUtils.call(opts.onChange, change);
+  });
+  PouchUtils.call(opts.complete, null, {results: changes, last_seq: last_seq});
+};
+
+// Preprocess documents, parse their revisions, assign an id and a
+// revision for new writes that are missing them, etc
+PouchUtils.parseDoc = function(doc, newEdits) {
+  var error = null;
+  var nRevNum;
+  var newRevId;
+  var revInfo;
+  var opts = {status: 'available'};
+  if (doc._deleted) {
+    opts.deleted = true;
+  }
+
+  if (newEdits) {
+    if (!doc._id) {
+      doc._id = Pouch.uuid();
+    }
+    newRevId = Pouch.uuid({length: 32, radix: 16}).toLowerCase();
+    if (doc._rev) {
+      revInfo = /^(\d+)-(.+)$/.exec(doc._rev);
+      if (!revInfo) {
+        throw "invalid value for property '_rev'";
+      }
+      doc._rev_tree = [{
+        pos: parseInt(revInfo[1], 10),
+        ids: [revInfo[2], {status: 'missing'}, [[newRevId, opts, []]]]
+      }];
+      nRevNum = parseInt(revInfo[1], 10) + 1;
+    } else {
+      doc._rev_tree = [{
+        pos: 1,
+        ids : [newRevId, opts, []]
+      }];
+      nRevNum = 1;
+    }
+  } else {
+    if (doc._revisions) {
+      doc._rev_tree = [{
+        pos: doc._revisions.start - doc._revisions.ids.length + 1,
+        ids: doc._revisions.ids.reduce(function(acc, x) {
+          if (acc === null) {
+            return [x, opts, []];
+          } else {
+            return [x, {status: 'missing'}, [acc]];
+          }
+        }, null)
+      }];
+      nRevNum = doc._revisions.start;
+      newRevId = doc._revisions.ids[0];
+    }
+    if (!doc._rev_tree) {
+      revInfo = /^(\d+)-(.+)$/.exec(doc._rev);
+      if (!revInfo) {
+        return Pouch.Errors.BAD_ARG;
+      }
+      nRevNum = parseInt(revInfo[1], 10);
+      newRevId = revInfo[2];
+      doc._rev_tree = [{
+        pos: parseInt(revInfo[1], 10),
+        ids: [revInfo[2], opts, []]
+      }];
+    }
+  }
+
+  if (typeof doc._id !== 'string') {
+    error = Pouch.Errors.INVALID_ID;
+  }
+  else if (!isValidId(doc._id)) {
+    error = Pouch.Errors.RESERVED_ID;
+  }
+
+  for (var key in doc) {
+    if (doc.hasOwnProperty(key) && key[0] === '_' && reservedWords.indexOf(key) === -1) {
+      error = extend({}, Pouch.Errors.DOC_VALIDATION);
+      error.reason += ': ' + key;
+    }
+  }
+
+  doc._id = decodeURIComponent(doc._id);
+  doc._rev = [nRevNum, newRevId].join('-');
+
+  if (error) {
+    return error;
+  }
+
+  return Object.keys(doc).reduce(function(acc, key) {
+    if (/^_/.test(key) && key !== '_attachments') {
+      acc.metadata[key.slice(1)] = doc[key];
+    } else {
+      acc.data[key] = doc[key];
+    }
+    return acc;
+  }, {metadata : {}, data : {}});
+};
+
+PouchUtils.isCordova = function(){
+  return (typeof cordova !== "undefined" ||
+          typeof PhoneGap !== "undefined" ||
+          typeof phonegap !== "undefined");
+};
+
+PouchUtils.Changes = function() {
+
+  var api = {};
+  var listeners = {};
+
+  if (isChromeApp()){
+    console.log("This is a ChromeApp");
+    chrome.storage.onChanged.addListener(function(e){
+      api.notify(e.db_name.newValue);//object only has oldValue, newValue members
+    });
+  }
+  else {
+    window.addEventListener("storage", function(e) {
+      api.notify(e.key);
+    });
+  }
+
+  api.addListener = function(db_name, id, db, opts) {
+    if (!listeners[db_name]) {
+      listeners[db_name] = {};
+    }
+    listeners[db_name][id] = {
+      db: db,
+      opts: opts
+    };
+  };
+
+  api.removeListener = function(db_name, id) {
+    delete listeners[db_name][id];
+  };
+
+  api.clearListeners = function(db_name) {
+    delete listeners[db_name];
+  };
+
+  api.notifyLocalWindows = function(db_name){
+    //do a useless change on a storage thing
+    //in order to get other windows's listeners to activate
+    if (!isChromeApp()){
+      localStorage[db_name] = (localStorage[db_name] === "a") ? "b" : "a";
+    } else {
+      chrome.storage.local.set({db_name: db_name});
+    }
+  };
+
+  api.notify = function(db_name) {
+    if (!listeners[db_name]) { return; }
+
+    Object.keys(listeners[db_name]).forEach(function (i) {
+      var opts = listeners[db_name][i].opts;
+      listeners[db_name][i].db.changes({
+        include_docs: opts.include_docs,
+        conflicts: opts.conflicts,
+        continuous: false,
+        descending: false,
+        filter: opts.filter,
+        since: opts.since,
+        query_params: opts.query_params,
+        onChange: function(c) {
+          if (c.seq > opts.since && !opts.cancelled) {
+            opts.since = c.seq;
+            PouchUtils.call(opts.onChange, c);
+          }
+        }
+      });
+    });
+  };
+
+  return api;
+};
+
+if (typeof module !== 'undefined' && module.exports) {
+
+  var crypto = require('crypto');
+
+  PouchUtils.Crypto = {
+    MD5: function(str) {
+      return crypto.createHash('md5').update(str).digest('hex');
+    }
+  };
+
+  PouchUtils.atob = function(str) {
+    var base64 = new Buffer(str, 'base64');
+    // Node.js will just skip the characters it can't encode instead of
+    // throwing and exception
+    if (base64.toString('base64') !== str) {
+      throw("Cannot base64 encode full string");
+    }
+    return base64.toString('binary');
+  };
+
+  PouchUtils.btoa = function(str) {
+    return new Buffer(str, 'binary').toString('base64');
+  };
+
+  PouchUtils.extend = require('./deps/extend');
+  PouchUtils.ajax = require('./deps/ajax');
+  PouchUtils.uuid = require('./deps/uuid');
+
+  module.exports = PouchUtils;
+
+} else {
+  PouchUtils.Crypto = Crypto;
+  PouchUtils.extend = extend;
+  PouchUtils.ajax = ajax;
+  PouchUtils.uuid = uuid;
+
+  PouchUtils.atob = atob.bind(null);
+  PouchUtils.btoa = btoa.bind(null);
+}
+
+/*globals Pouch: true, cordova, PouchUtils: true, PouchMerge */
+
+"use strict";
+
+var PouchAdapter;
+var PouchUtils;
+
+if (typeof module !== 'undefined' && module.exports) {
+  PouchUtils = require('./pouch.utils.js');
+}
+
+var call = PouchUtils.call;
+
+/*
+ * A generic pouch adapter
+ */
+
+// returns first element of arr satisfying callback predicate
+function arrayFirst(arr, callback) {
+  for (var i = 0; i < arr.length; i++) {
+    if (callback(arr[i], i) === true) {
+      return arr[i];
+    }
+  }
+  return false;
+}
+
+// Wrapper for functions that call the bulkdocs api with a single doc,
+// if the first result is an error, return an error
+function yankError(callback) {
+  return function(err, results) {
+    if (err || results[0].error) {
+      call(callback, err || results[0]);
+    } else {
+      call(callback, null, results[0]);
+    }
+  };
+}
+
+// for every node in a revision tree computes its distance from the closest
+// leaf
+function computeHeight(revs) {
+  var height = {};
+  var edges = [];
+  PouchMerge.traverseRevTree(revs, function(isLeaf, pos, id, prnt) {
+    var rev = pos + "-" + id;
+    if (isLeaf) {
+      height[rev] = 0;
+    }
+    if (prnt !== undefined) {
+      edges.push({from: prnt, to: rev});
+    }
+    return rev;
+  });
+
+  edges.reverse();
+  edges.forEach(function(edge) {
+    if (height[edge.from] === undefined) {
+      height[edge.from] = 1 + height[edge.to];
+    } else {
+      height[edge.from] = Math.min(height[edge.from], 1 + height[edge.to]);
+    }
+  });
+  return height;
+}
+
+PouchAdapter = function(opts, callback) {
+
+  var api = {};
+
+  var customApi = Pouch.adapters[opts.adapter](opts, function(err, db) {
+    if (err) {
+      if (callback) {
+        callback(err);
+      }
+      return;
+    }
+
+    for (var j in api) {
+      if (!db.hasOwnProperty(j)) {
+        db[j] = api[j];
+      }
+    }
+
+    // Don't call Pouch.open for ALL_DBS
+    // Pouch.open saves the db's name into ALL_DBS
+    if (opts.name === Pouch.prefix + Pouch.ALL_DBS) {
+      callback(err, db);
+    } else {
+      Pouch.open(opts, function(err) {
+        callback(err, db);
+      });
+    }
+  });
+
+  var auto_compaction = (opts.auto_compaction === true);
+
+  // wraps a callback with a function that runs compaction after each edit
+  var autoCompact = function(callback) {
+    if (!auto_compaction) {
+      return callback;
+    }
+    return function(err, res) {
+      if (err) {
+        call(callback, err);
+      } else {
+        var count = res.length;
+        var decCount = function() {
+          count--;
+          if (!count) {
+            call(callback, null, res);
+          }
+        };
+        res.forEach(function(doc) {
+          if (doc.ok) {
+            // TODO: we need better error handling
+            compactDocument(doc.id, 1, decCount);
+          } else {
+            decCount();
+          }
+        });
+      }
+    };
+  };
+
+  api.post = function (doc, opts, callback) {
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    if (typeof doc !== 'object' || Array.isArray(doc)) {
+      return call(callback, Pouch.Errors.NOT_AN_OBJECT);
+    }
+    return customApi.bulkDocs({docs: [doc]}, opts,
+        autoCompact(yankError(callback)));
+  };
+
+  api.put = function(doc, opts, callback) {
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    if (typeof doc !== 'object') {
+      return call(callback, Pouch.Errors.NOT_AN_OBJECT);
+    }
+    if (!('_id' in doc)) {
+      return call(callback, Pouch.Errors.MISSING_ID);
+    }
+    return customApi.bulkDocs({docs: [doc]}, opts,
+        autoCompact(yankError(callback)));
+  };
+
+  api.putAttachment = function (docId, attachmentId, rev, blob, type, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('putAttachment', arguments);
+      return;
+    }
+    if (typeof type === 'function') {
+      callback = type;
+      type = blob;
+      blob = rev;
+      rev = null;
+    }
+    if (typeof type === 'undefined') {
+      type = blob;
+      blob = rev;
+      rev = null;
+    }
+
+    function createAttachment(doc) {
+      doc._attachments = doc._attachments || {};
+      doc._attachments[attachmentId] = {
+        content_type: type,
+        data: blob
+      };
+      api.put(doc, callback);
+    }
+
+    api.get(docId, function(err, doc) {
+      // create new doc
+      if (err && err.error === Pouch.Errors.MISSING_DOC.error) {
+        createAttachment({_id: docId});
+        return;
+      }
+      if (err) {
+        call(callback, err);
+        return;
+      }
+
+      if (doc._rev !== rev) {
+        call(callback, Pouch.Errors.REV_CONFLICT);
+        return;
+      }
+
+      createAttachment(doc);
+    });
+  };
+
+  api.removeAttachment = function (docId, attachmentId, rev, callback) {
+    api.get(docId, function(err, obj) {
+      if (err) {
+        call(callback, err);
+        return;
+      }
+      if (obj._rev !== rev) {
+        call(callback, Pouch.Errors.REV_CONFLICT);
+        return;
+      }
+      if (!obj._attachments) {
+        return call(callback, null);
+      }
+      delete obj._attachments[attachmentId];
+      if (Object.keys(obj._attachments).length === 0){
+        delete obj._attachments;
+      }
+      api.put(obj, callback);
+    });
+  };
+
+  api.remove = function (doc, opts, callback) {
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    if (opts === undefined) {
+      opts = {};
+    }
+    opts.was_delete = true;
+    var newDoc = {_id: doc._id, _rev: doc._rev};
+    newDoc._deleted = true;
+    return customApi.bulkDocs({docs: [newDoc]}, opts, yankError(callback));
+  };
+
+  api.revsDiff = function (req, opts, callback) {
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    var ids = Object.keys(req);
+    var count = 0;
+    var missing = {};
+
+    function readDoc(err, doc, id) {
+      req[id].map(function(revId) {
+        var matches = function(x) { return x.rev !== revId; };
+        if (!doc || doc._revs_info.every(matches)) {
+          if (!missing[id]) {
+            missing[id] = {missing: []};
+          }
+          missing[id].missing.push(revId);
+        }
+      });
+
+      if (++count === ids.length) {
+        return call(callback, null, missing);
+      }
+    }
+
+    ids.map(function(id) {
+      api.get(id, {revs_info: true}, function(err, doc) {
+        readDoc(err, doc, id);
+      });
+    });
+  };
+
+  // compact one document and fire callback
+  // by compacting we mean removing all revisions which
+  // are further from the leaf in revision tree than max_height
+  var compactDocument = function(docId, max_height, callback) {
+    customApi._getRevisionTree(docId, function(err, rev_tree){
+      if (err) {
+        return call(callback);
+      }
+      var height = computeHeight(rev_tree);
+      var candidates = [];
+      var revs = [];
+      Object.keys(height).forEach(function(rev) {
+        if (height[rev] > max_height) {
+          candidates.push(rev);
+        }
+      });
+
+      PouchMerge.traverseRevTree(rev_tree, function(isLeaf, pos, revHash, ctx, opts) {
+        var rev = pos + '-' + revHash;
+        if (opts.status === 'available' && candidates.indexOf(rev) !== -1) {
+          opts.status = 'missing';
+          revs.push(rev);
+        }
+      });
+      customApi._doCompaction(docId, rev_tree, revs, callback);
+    });
+  };
+
+  // compact the whole database using single document
+  // compaction
+  api.compact = function(opts, callback) {
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    api.changes({complete: function(err, res) {
+      if (err) {
+        call(callback); // TODO: silently fail
+        return;
+      }
+      var count = res.results.length;
+      if (!count) {
+        call(callback);
+        return;
+      }
+      res.results.forEach(function(row) {
+        compactDocument(row.id, 0, function() {
+          count--;
+          if (!count) {
+            call(callback);
+          }
+        });
+      });
+    }});
+  };
+
+  /* Begin api wrappers. Specific functionality to storage belongs in the _[method] */
+  api.get = function (id, opts, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('get', arguments);
+      return;
+    }
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+
+    var leaves = [];
+    function finishOpenRevs() {
+      var result = [];
+      var count = leaves.length;
+      if (!count) {
+        return call(callback, null, result);
+      }
+      // order with open_revs is unspecified
+      leaves.forEach(function(leaf){
+        api.get(id, {rev: leaf, revs: opts.revs}, function(err, doc){
+          if (!err) {
+            result.push({ok: doc});
+          } else {
+            result.push({missing: leaf});
+          }
+          count--;
+          if(!count) {
+            call(callback, null, result);
+          }
+        });
+      });
+    }
+
+    if (opts.open_revs) {
+      if (opts.open_revs === "all") {
+        customApi._getRevisionTree(id, function(err, rev_tree){
+          if (err) {
+            // if there's no such document we should treat this
+            // situation the same way as if revision tree was empty
+            rev_tree = [];
+          }
+          leaves = PouchMerge.collectLeaves(rev_tree).map(function(leaf){
+            return leaf.rev;
+          });
+          finishOpenRevs();
+        });
+      } else {
+        if (Array.isArray(opts.open_revs)) {
+          leaves = opts.open_revs;
+          for (var i = 0; i < leaves.length; i++) {
+            var l = leaves[i];
+            // looks like it's the only thing couchdb checks
+            if (!(typeof(l) === "string" && /^\d+-/.test(l))) {
+              return call(callback, Pouch.error(Pouch.Errors.BAD_REQUEST,
+                "Invalid rev format" ));
+            }
+          }
+          finishOpenRevs();
+        } else {
+          return call(callback, Pouch.error(Pouch.Errors.UNKNOWN_ERROR,
+            'function_clause'));
+        }
+      }
+      return; // open_revs does not like other options
+    }
+
+    return customApi._get(id, opts, function(err, result) {
+      if (err) {
+        return call(callback, err);
+      }
+
+      var doc = result.doc;
+      var metadata = result.metadata;
+      var ctx = result.ctx;
+
+      if (opts.conflicts) {
+        var conflicts = PouchMerge.collectConflicts(metadata);
+        if (conflicts.length) {
+          doc._conflicts = conflicts;
+        }
+      }
+
+      if (opts.revs || opts.revs_info) {
+        var paths = PouchMerge.rootToLeaf(metadata.rev_tree);
+        var path = arrayFirst(paths, function(arr) {
+          return arr.ids.map(function(x) { return x.id; })
+            .indexOf(doc._rev.split('-')[1]) !== -1;
+        });
+
+        path.ids.splice(path.ids.map(function(x) {return x.id;})
+                        .indexOf(doc._rev.split('-')[1]) + 1);
+        path.ids.reverse();
+
+        if (opts.revs) {
+          doc._revisions = {
+            start: (path.pos + path.ids.length) - 1,
+            ids: path.ids.map(function(rev) {
+              return rev.id;
+            })
+          };
+        }
+        if (opts.revs_info) {
+          var pos =  path.pos + path.ids.length;
+          doc._revs_info = path.ids.map(function(rev) {
+            pos--;
+            return {
+              rev: pos + '-' + rev.id,
+              status: rev.opts.status
+            };
+          });
+        }
+      }
+
+      if (opts.local_seq) {
+        doc._local_seq = result.metadata.seq;
+      }
+
+      if (opts.attachments && doc._attachments) {
+        var attachments = doc._attachments;
+        var count = Object.keys(attachments).length;
+        if (count === 0) {
+          return call(callback, null, doc);
+        }
+        Object.keys(attachments).forEach(function(key) {
+          customApi._getAttachment(attachments[key], {encode: true, ctx: ctx}, function(err, data) {
+            doc._attachments[key].data = data;
+            if (!--count){
+              call(callback, null, doc);
+            }
+          });
+        });
+      } else {
+        if (doc._attachments){
+          for (var key in doc._attachments) {
+            doc._attachments[key].stub = true;
+          }
+        }
+        call(callback, null, doc);
+      }
+    });
+  };
+
+  api.getAttachment = function(docId, attachmentId, opts, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('getAttachment', arguments);
+      return;
+    }
+    if (opts instanceof Function) {
+      callback = opts;
+      opts = {};
+    }
+    customApi._get(docId, opts, function(err, res) {
+      if (err) {
+        return call(callback, err);
+      }
+      if (res.doc._attachments && res.doc._attachments[attachmentId]) {
+        opts.ctx = res.ctx;
+        customApi._getAttachment(res.doc._attachments[attachmentId], opts, callback);
+      } else {
+        return call(callback, Pouch.Errors.MISSING_DOC);
+      }
+    });
+  };
+
+  api.allDocs = function(opts, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('allDocs', arguments);
+      return;
+    }
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    if ('keys' in opts) {
+      if ('startkey' in opts) {
+        call(callback, Pouch.error(Pouch.Errors.QUERY_PARSE_ERROR,
+          'Query parameter `start_key` is not compatible with multi-get'
+        ));
+        return;
+      }
+      if ('endkey' in opts) {
+        call(callback, Pouch.error(Pouch.Errors.QUERY_PARSE_ERROR,
+          'Query parameter `end_key` is not compatible with multi-get'
+        ));
+        return;
+      }
+    }
+
+    return customApi._allDocs(opts, callback);
+  };
+
+  api.changes = function(opts) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('changes', arguments);
+      return;
+    }
+    opts = PouchUtils.extend(true, {}, opts);
+
+    if (!opts.since) {
+      opts.since = 0;
+    }
+    if (opts.since === 'latest') {
+      api.info(function (err, info) {
+        opts.since = info.update_seq  - 1;
+        api.changes(opts);
+      });
+      return;
+    }
+
+    if (!('descending' in opts)) {
+      opts.descending = false;
+    }
+
+    // 0 and 1 should return 1 document
+    opts.limit = opts.limit === 0 ? 1 : opts.limit;
+    return customApi._changes(opts);
+  };
+
+  api.close = function(callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('close', arguments);
+      return;
+    }
+    return customApi._close(callback);
+  };
+
+  api.info = function(callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('info', arguments);
+      return;
+    }
+    return customApi._info(callback);
+  };
+
+  api.id = function() {
+    return customApi._id();
+  };
+
+  api.type = function() {
+    return (typeof customApi._type === 'function') ? customApi._type() : opts.adapter;
+  };
+
+  api.bulkDocs = function(req, opts, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('bulkDocs', arguments);
+      return;
+    }
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    if (!opts) {
+      opts = {};
+    } else {
+      opts = PouchUtils.extend(true, {}, opts);
+    }
+
+    if (!req || !req.docs || req.docs.length < 1) {
+      return call(callback, Pouch.Errors.MISSING_BULK_DOCS);
+    }
+
+    if (!Array.isArray(req.docs)) {
+      return call(callback, Pouch.Errors.QUERY_PARSE_ERROR);
+    }
+
+    for (var i = 0; i < req.docs.length; ++i) {
+      if (typeof req.docs[i] !== 'object' || Array.isArray(req.docs[i])) {
+        return call(callback, Pouch.Errors.NOT_AN_OBJECT);
+      }
+    }
+
+    req = PouchUtils.extend(true, {}, req);
+    if (!('new_edits' in opts)) {
+      opts.new_edits = true;
+    }
+
+    return customApi._bulkDocs(req, opts, autoCompact(callback));
+  };
+
+  /* End Wrappers */
+  var taskqueue = {};
+
+  taskqueue.ready = false;
+  taskqueue.queue = [];
+
+  api.taskqueue = {};
+
+  api.taskqueue.execute = function (db) {
+    if (taskqueue.ready) {
+      taskqueue.queue.forEach(function(d) {
+        db[d.task].apply(null, d.parameters);
+      });
+    }
+  };
+
+  api.taskqueue.ready = function() {
+    if (arguments.length === 0) {
+      return taskqueue.ready;
+    }
+    taskqueue.ready = arguments[0];
+  };
+
+  api.taskqueue.addTask = function(task, parameters) {
+    taskqueue.queue.push({ task: task, parameters: parameters });
+  };
+
+  api.replicate = {};
+
+  api.replicate.from = function (url, opts, callback) {
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    return Pouch.replicate(url, customApi, opts, callback);
+  };
+
+  api.replicate.to = function (dbName, opts, callback) {
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    return Pouch.replicate(customApi, dbName, opts, callback);
+  };
+
+  for (var j in api) {
+    if (!customApi.hasOwnProperty(j)) {
+      customApi[j] = api[j];
+    }
+  }
+
+  // Http adapter can skip setup so we force the db to be ready and execute any jobs
+  if (opts.skipSetup) {
+    api.taskqueue.ready(true);
+    api.taskqueue.execute(api);
+  }
+
+  if (PouchUtils.isCordova()) {
+    //to inform websql adapter that we can use api
+    console.log("This is Cordova.")
+    cordova.fireWindowEvent(opts.name + "_pouch", {});
+  }
+  return customApi;
+};
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = PouchAdapter;
+}
+
+/*globals Pouch: true, PouchUtils: true, require, console */
+
+"use strict";
+
+var PouchUtils;
+
+if (typeof module !== 'undefined' && module.exports) {
+  Pouch = require('../pouch.js');
+  PouchUtils = require('../pouch.utils.js');
+}
+
+var ajax = PouchUtils.ajax;
+
+var HTTP_TIMEOUT = 10000;
+
+// parseUri 1.2.2
+// (c) Steven Levithan <stevenlevithan.com>
+// MIT License
+function parseUri (str) {
+  var o = parseUri.options;
+  var m = o.parser[o.strictMode ? "strict" : "loose"].exec(str);
+  var uri = {};
+  var i = 14;
+
+  while (i--) {
+    uri[o.key[i]] = m[i] || "";
+  }
+
+  uri[o.q.name] = {};
+  uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+    if ($1) {
+      uri[o.q.name][$1] = $2;
+    }
+  });
+
+  return uri;
+}
+
+function encodeDocId(id) {
+  if (/^_design/.test(id)) {
+    return id;
+  }
+  return encodeURIComponent(id);
+}
+
+parseUri.options = {
+  strictMode: false,
+  key: ["source","protocol","authority","userInfo","user","password","host",
+        "port","relative","path","directory","file","query","anchor"],
+  q:   {
+    name:   "queryKey",
+    parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+  },
+  parser: {
+    strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+    loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+  }
+};
+
+// Get all the information you possibly can about the URI given by name and
+// return it as a suitable object.
+function getHost(name) {
+  // If the given name contains "http:"
+  if (/http(s?):/.test(name)) {
+    // Prase the URI into all its little bits
+    var uri = parseUri(name);
+
+    // Store the fact that it is a remote URI
+    uri.remote = true;
+
+    // Store the user and password as a separate auth object
+    if (uri.user || uri.password) {
+      uri.auth = {username: uri.user, password: uri.password};
+    }
+
+    // Split the path part of the URI into parts using '/' as the delimiter
+    // after removing any leading '/' and any trailing '/'
+    var parts = uri.path.replace(/(^\/|\/$)/g, '').split('/');
+
+    // Store the first part as the database name and remove it from the parts
+    // array
+    uri.db = parts.pop();
+
+    // Restore the path by joining all the remaining parts (all the parts
+    // except for the database name) with '/'s
+    uri.path = parts.join('/');
+
+    return uri;
+  }
+
+  // If the given name does not contain 'http:' then return a very basic object
+  // with no host, the current path, the given name as the database name and no
+  // username/password
+  return {host: '', path: '/', db: name, auth: false};
+}
+
+// Generate a URL with the host data given by opts and the given path
+function genDBUrl(opts, path) {
+  // If the host is remote
+  if (opts.remote) {
+    // If the host already has a path, then we need to have a path delimiter
+    // Otherwise, the path delimiter is the empty string
+    var pathDel = !opts.path ? '' : '/';
+
+    // Return the URL made up of all the host's information and the given path
+    return opts.protocol + '://' + opts.host + ':' + opts.port + '/' +
+      opts.path + pathDel + opts.db + '/' + path;
+  }
+
+  // If the host is not remote, then return the URL made up of just the
+  // database name and the given path
+  return '/' + opts.db + '/' + path;
+}
+
+// Generate a URL with the host data given by opts and the given path
+function genUrl(opts, path) {
+  if (opts.remote) {
+    // If the host already has a path, then we need to have a path delimiter
+    // Otherwise, the path delimiter is the empty string
+    var pathDel = !opts.path ? '' : '/';
+
+    // If the host already has a path, then we need to have a path delimiter
+    // Otherwise, the path delimiter is the empty string
+    return opts.protocol + '://' + opts.host + ':' + opts.port + '/' + opts.path + pathDel + path;
+  }
+
+  return '/' + path;
+}
+
+// Implements the PouchDB API for dealing with CouchDB instances over HTTP
+var HttpPouch = function(opts, callback) {
+
+  // Parse the URI given by opts.name into an easy-to-use object
+  var host = getHost(opts.name);
+
+  host.headers = opts.headers || {};
+  if (host.auth) {
+    var token = PouchUtils.btoa(host.auth.username + ':' + host.auth.password);
+    host.headers.Authorization = 'Basic ' + token;
+  }
+
+  if (opts.headers) {
+    host.headers = opts.headers;
+  }
+
+  // Generate the database URL based on the host
+  var db_url = genDBUrl(host, '');
+
+  // The functions that will be publically available for HttpPouch
+  var api = {};
+
+  var uuids = {
+    list: [],
+    get: function(opts, callback) {
+      if (typeof opts === 'function') {
+        callback = opts;
+        opts = {count: 10};
+      }
+      var cb = function(err, body) {
+        if (err || !('uuids' in body)) {
+          PouchUtils.call(callback, err || Pouch.Errors.UNKNOWN_ERROR);
+        } else {
+          uuids.list = uuids.list.concat(body.uuids);
+          PouchUtils.call(callback, null, "OK");
+        }
+      };
+      var params = '?count=' + opts.count;
+      ajax({
+        headers: host.headers,
+        method: 'GET',
+        url: genUrl(host, '_uuids') + params
+      }, cb);
+    }
+  };
+
+  // Create a new CouchDB database based on the given opts
+  var createDB = function(){
+    ajax({headers: host.headers, method: 'PUT', url: db_url}, function(err, ret) {
+      // If we get an "Unauthorized" error
+      if (err && err.status === 401) {
+        // Test if the database already exists
+        ajax({headers: host.headers, method: 'HEAD', url: db_url}, function (err, ret) {
+          // If there is still an error
+          if (err) {
+            // Give the error to the callback to deal with
+            PouchUtils.call(callback, err);
+          } else {
+            // Continue as if there had been no errors
+            PouchUtils.call(callback, null, api);
+          }
+        });
+        // If there were no errros or if the only error is "Precondition Failed"
+        // (note: "Precondition Failed" occurs when we try to create a database
+        // that already exists)
+      } else if (!err || err.status === 412) {
+        // Continue as if there had been no errors
+        PouchUtils.call(callback, null, api);
+      } else {
+        PouchUtils.call(callback, Pouch.Errors.UNKNOWN_ERROR);
+      }
+    });
+  };
+  if (!opts.skipSetup) {
+    ajax({headers: host.headers, method: 'GET', url: db_url}, function(err, ret) {
+      //check if the db exists
+      if (err) {
+        if (err.status === 404) {
+          //if it doesn't, create it
+          createDB();
+        } else {
+          PouchUtils.call(callback, err);
+        }
+      } else {
+        //go do stuff with the db
+        PouchUtils.call(callback, null, api);
+      }
+    });
+  }
+
+  api.type = function() {
+    return 'http';
+  };
+
+  // The HttpPouch's ID is its URL
+  api.id = function() {
+    return genDBUrl(host, '');
+  };
+
+  api.request = function(options, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('request', arguments);
+      return;
+    }
+    options.headers = host.headers;
+    options.url = genDBUrl(host, options.url);
+    ajax(options, callback);
+  };
+
+  // Sends a POST request to the host calling the couchdb _compact function
+  //    version: The version of CouchDB it is running
+  api.compact = function(opts, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('compact', arguments);
+      return;
+    }
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    ajax({
+      headers: host.headers,
+      url: genDBUrl(host, '_compact'),
+      method: 'POST'
+    }, function() {
+      function ping() {
+        api.info(function(err, res) {
+          if (!res.compact_running) {
+            PouchUtils.call(callback, null);
+          } else {
+            setTimeout(ping, opts.interval || 200);
+          }
+        });
+      }
+      // Ping the http if it's finished compaction
+      if (typeof callback === "function") {
+        ping();
+      }
+    });
+  };
+
+  // Calls GET on the host, which gets back a JSON string containing
+  //    couchdb: A welcome string
+  //    version: The version of CouchDB it is running
+  api.info = function(callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('info', arguments);
+      return;
+    }
+    ajax({
+      headers: host.headers,
+      method:'GET',
+      url: genDBUrl(host, '')
+    }, callback);
+  };
+
+  // Get the document with the given id from the database given by host.
+  // The id could be solely the _id in the database, or it may be a
+  // _design/ID or _local/ID path
+  api.get = function(id, opts, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('get', arguments);
+      return;
+    }
+    // If no options were given, set the callback to the second parameter
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+
+    if (opts.auto_encode === undefined) {
+      opts.auto_encode = true;
+    }
+
+    // List of parameters to add to the GET request
+    var params = [];
+
+    // If it exists, add the opts.revs value to the list of parameters.
+    // If revs=true then the resulting JSON will include a field
+    // _revisions containing an array of the revision IDs.
+    if (opts.revs) {
+      params.push('revs=true');
+    }
+
+    // If it exists, add the opts.revs_info value to the list of parameters.
+    // If revs_info=true then the resulting JSON will include the field
+    // _revs_info containing an array of objects in which each object
+    // representing an available revision.
+    if (opts.revs_info) {
+      params.push('revs_info=true');
+    }
+
+    if (opts.local_seq) {
+      params.push('local_seq=true');
+    }
+    // If it exists, add the opts.open_revs value to the list of parameters.
+    // If open_revs=all then the resulting JSON will include all the leaf
+    // revisions. If open_revs=["rev1", "rev2",...] then the resulting JSON
+    // will contain an array of objects containing data of all revisions
+    if (opts.open_revs) {
+      if (opts.open_revs !== "all") {
+        opts.open_revs = JSON.stringify(opts.open_revs);
+      }
+      params.push('open_revs=' + opts.open_revs);
+    }
+
+    // If it exists, add the opts.attachments value to the list of parameters.
+    // If attachments=true the resulting JSON will include the base64-encoded
+    // contents in the "data" property of each attachment.
+    if (opts.attachments) {
+      params.push('attachments=true');
+    }
+
+    // If it exists, add the opts.rev value to the list of parameters.
+    // If rev is given a revision number then get the specified revision.
+    if (opts.rev) {
+      params.push('rev=' + opts.rev);
+    }
+
+    // If it exists, add the opts.conflicts value to the list of parameters.
+    // If conflicts=true then the resulting JSON will include the field
+    // _conflicts containing all the conflicting revisions.
+    if (opts.conflicts) {
+      params.push('conflicts=' + opts.conflicts);
+    }
+
+    // Format the list of parameters into a valid URI query string
+    params = params.join('&');
+    params = params === '' ? '' : '?' + params;
+
+    if (opts.auto_encode) {
+      id = encodeDocId(id);
+    }
+
+    // Set the options for the ajax call
+    var options = {
+      headers: host.headers,
+      method: 'GET',
+      url: genDBUrl(host, id + params)
+    };
+
+    // If the given id contains at least one '/' and the part before the '/'
+    // is NOT "_design" and is NOT "_local"
+    // OR
+    // If the given id contains at least two '/' and the part before the first
+    // '/' is "_design".
+    // TODO This second condition seems strange since if parts[0] === '_design'
+    // then we already know that parts[0] !== '_local'.
+    var parts = id.split('/');
+    if ((parts.length > 1 && parts[0] !== '_design' && parts[0] !== '_local') ||
+        (parts.length > 2 && parts[0] === '_design' && parts[0] !== '_local')) {
+      // Binary is expected back from the server
+      options.binary = true;
+    }
+
+    // Get the document
+    ajax(options, function(err, doc, xhr) {
+      // If the document does not exist, send an error to the callback
+      if (err) {
+        return PouchUtils.call(callback, err);
+      }
+
+      // Send the document to the callback
+      PouchUtils.call(callback, null, doc, xhr);
+    });
+  };
+
+  // Delete the document given by doc from the database given by host.
+  api.remove = function(doc, opts, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('remove', arguments);
+      return;
+    }
+    // If no options were given, set the callback to be the second parameter
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+
+    // Delete the document
+    ajax({
+      headers: host.headers,
+      method:'DELETE',
+      url: genDBUrl(host, encodeDocId(doc._id)) + '?rev=' + doc._rev
+    }, callback);
+  };
+
+  // Get the attachment
+  api.getAttachment = function(docId, attachmentId, opts, callback) {
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    if (opts.auto_encode === undefined) {
+      opts.auto_encode = true;
+    }
+    if (opts.auto_encode) {
+      docId = encodeDocId(docId);
+    }
+    opts.auto_encode = false;
+    api.get(docId + '/' + attachmentId, opts, callback);
+  };
+
+  // Remove the attachment given by the id and rev
+  api.removeAttachment = function(docId, attachmentId, rev, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('removeAttachment', arguments);
+      return;
+    }
+    ajax({
+      headers: host.headers,
+      method: 'DELETE',
+      url: genDBUrl(host, encodeDocId(docId) + '/' + attachmentId) + '?rev=' + rev
+    }, callback);
+  };
+
+  // Add the attachment given by blob and its contentType property
+  // to the document with the given id, the revision given by rev, and
+  // add it to the database given by host.
+  api.putAttachment = function(docId, attachmentId, rev, blob, type, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('putAttachment', arguments);
+      return;
+    }
+    if (typeof type === 'function') {
+      callback = type;
+      type = blob;
+      blob = rev;
+      rev = null;
+    }
+    if (typeof type === 'undefined') {
+      type = blob;
+      blob = rev;
+      rev = null;
+    }
+    var id = encodeDocId(docId) + '/' + attachmentId;
+    var url = genDBUrl(host, id);
+    if (rev) {
+      url += '?rev=' + rev;
+    }
+
+    var opts = {
+      headers: host.headers,
+      method:'PUT',
+      url: url,
+      processData: false,
+      body: blob,
+      timeout: 60000
+    };
+    opts.headers['Content-Type'] = type;
+    // Add the attachment
+    ajax(opts, callback);
+  };
+
+  // Add the document given by doc (in JSON string format) to the database
+  // given by host. This fails if the doc has no _id field.
+  api.put = function(doc, opts, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('put', arguments);
+      return;
+    }
+    // If no options were given, set the callback to be the second parameter
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    if (typeof doc !== 'object') {
+      return PouchUtils.call(callback, Pouch.Errors.NOT_AN_OBJECT);
+    }
+    if (!('_id' in doc)) {
+      return PouchUtils.call(callback, Pouch.Errors.MISSING_ID);
+    }
+
+    // List of parameter to add to the PUT request
+    var params = [];
+
+    // If it exists, add the opts.new_edits value to the list of parameters.
+    // If new_edits = false then the database will NOT assign this document a
+    // new revision number
+    if (opts && typeof opts.new_edits !== 'undefined') {
+      params.push('new_edits=' + opts.new_edits);
+    }
+
+    // Format the list of parameters into a valid URI query string
+    params = params.join('&');
+    if (params !== '') {
+      params = '?' + params;
+    }
+
+    // Add the document
+    ajax({
+      headers: host.headers,
+      method: 'PUT',
+      url: genDBUrl(host, encodeDocId(doc._id)) + params,
+      body: doc
+    }, callback);
+  };
+
+  // Add the document given by doc (in JSON string format) to the database
+  // given by host. This does not assume that doc is a new document (i.e. does not
+  // have a _id or a _rev field.
+  api.post = function(doc, opts, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('post', arguments);
+      return;
+    }
+    // If no options were given, set the callback to be the second parameter
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    if (typeof doc !== 'object') {
+      return PouchUtils.call(callback, Pouch.Errors.NOT_AN_OBJECT);
+    }
+    if (! ("_id" in doc)) {
+      if (uuids.list.length > 0) {
+        doc._id = uuids.list.pop();
+        api.put(doc, opts, callback);
+      }else {
+        uuids.get(function(err, resp) {
+          if (err) {
+            return PouchUtils.call(callback, Pouch.Errors.UNKNOWN_ERROR);
+          }
+          doc._id = uuids.list.pop();
+          api.put(doc, opts, callback);
+        });
+      }
+    } else {
+      api.put(doc, opts, callback);
+    }
+  };
+
+  // Update/create multiple documents given by req in the database
+  // given by host.
+  api.bulkDocs = function(req, opts, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('bulkDocs', arguments);
+      return;
+    }
+    // If no options were given, set the callback to be the second parameter
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    if (!opts) {
+      opts = {};
+    }
+
+    // If opts.new_edits exists add it to the document data to be
+    // send to the database.
+    // If new_edits=false then it prevents the database from creating
+    // new revision numbers for the documents. Instead it just uses
+    // the old ones. This is used in database replication.
+    if (typeof opts.new_edits !== 'undefined') {
+      req.new_edits = opts.new_edits;
+    }
+
+    // Update/create the documents
+    ajax({
+      headers: host.headers,
+      method:'POST',
+      url: genDBUrl(host, '_bulk_docs'),
+      body: req
+    }, callback);
+  };
+
+  // Get a listing of the documents in the database given
+  // by host and ordered by increasing id.
+  api.allDocs = function(opts, callback) {
+    // If no options were given, set the callback to be the second parameter
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('allDocs', arguments);
+      return;
+    }
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+
+    // List of parameters to add to the GET request
+    var params = [];
+    var body;
+    var method = 'GET';
+
+    // TODO I don't see conflicts as a valid parameter for a
+    // _all_docs request (see http://wiki.apache.org/couchdb/HTTP_Document_API#all_docs)
+    if (opts.conflicts) {
+      params.push('conflicts=true');
+    }
+
+    // If opts.descending is truthy add it to params
+    if (opts.descending) {
+      params.push('descending=true');
+    }
+
+    // If opts.include_docs exists, add the include_docs value to the
+    // list of parameters.
+    // If include_docs=true then include the associated document with each
+    // result.
+    if (opts.include_docs) {
+      params.push('include_docs=true');
+    }
+
+    // If opts.startkey exists, add the startkey value to the list of
+    // parameters.
+    // If startkey is given then the returned list of documents will
+    // start with the document whose id is startkey.
+    if (opts.startkey) {
+      params.push('startkey=' +
+                  encodeURIComponent(JSON.stringify(opts.startkey)));
+    }
+
+    // If opts.endkey exists, add the endkey value to the list of parameters.
+    // If endkey is given then the returned list of docuemnts will
+    // end with the document whose id is endkey.
+    if (opts.endkey) {
+      params.push('endkey=' + encodeURIComponent(JSON.stringify(opts.endkey)));
+    }
+
+    // If opts.limit exists, add the limit value to the parameter list.
+    if (opts.limit) {
+      params.push('limit=' + opts.limit);
+    }
+
+    // Format the list of parameters into a valid URI query string
+    params = params.join('&');
+    if (params !== '') {
+      params = '?' + params;
+    }
+
+    // If keys are supplied, issue a POST request to circumvent GET query string limits
+    // see http://wiki.apache.org/couchdb/HTTP_view_API#Querying_Options
+    if (typeof opts.keys !== 'undefined') {
+      method = 'POST';
+      body = JSON.stringify({keys:opts.keys});
+    }
+
+    // Get the document listing
+    ajax({
+      headers: host.headers,
+      method: method,
+      url: genDBUrl(host, '_all_docs' + params),
+      body: body
+    }, callback);
+  };
+
+  // Get a list of changes made to documents in the database given by host.
+  // TODO According to the README, there should be two other methods here,
+  // api.changes.addListener and api.changes.removeListener.
+  api.changes = function(opts) {
+
+    // We internally page the results of a changes request, this means
+    // if there is a large set of changes to be returned we can start
+    // processing them quicker instead of waiting on the entire
+    // set of changes to return and attempting to process them at once
+    var CHANGES_LIMIT = 25;
+
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('changes', arguments);
+      return;
+    }
+    
+    if (opts.since === 'latest') {
+      api.info(function (err, info) {
+        opts.since = info.update_seq - 1;
+        api.changes(opts);
+      });
+      return;
+    }
+
+    if (Pouch.DEBUG) {
+      console.log(db_url + ': Start Changes Feed: continuous=' + opts.continuous);
+    }
+
+    var params = {};
+    var limit = (typeof opts.limit !== 'undefined') ? opts.limit : false;
+    if (limit === 0) {
+      limit = 1;
+    }
+    //
+    var leftToFetch = limit;
+
+    if (opts.style) {
+      params.style = opts.style;
+    }
+
+    if (opts.include_docs || opts.filter && typeof opts.filter === 'function') {
+      params.include_docs = true;
+    }
+
+    if (opts.continuous) {
+      params.feed = 'longpoll';
+    }
+
+    if (opts.conflicts) {
+      params.conflicts = true;
+    }
+
+    if (opts.descending) {
+      params.descending = true;
+    }
+
+    if (opts.filter && typeof opts.filter === 'string') {
+      params.filter = opts.filter;
+    }
+
+    // If opts.query_params exists, pass it through to the changes request.
+    // These parameters may be used by the filter on the source database.
+    if (opts.query_params && typeof opts.query_params === 'object') {
+      for (var param_name in opts.query_params) {
+        if (opts.query_params.hasOwnProperty(param_name)) {
+          params[param_name] = opts.query_params[param_name];
+        }
+      }
+    }
+
+    var xhr;
+    var lastFetchedSeq;
+    var remoteLastSeq;
+
+    // Get all the changes starting wtih the one immediately after the
+    // sequence number given by since.
+    var fetch = function(since, callback) {
+      params.since = since;
+      params.limit = (!limit || leftToFetch > CHANGES_LIMIT) ?
+        CHANGES_LIMIT : leftToFetch;
+
+      var paramStr = '?' + Object.keys(params).map(function(k) {
+        return k + '=' + params[k];
+      }).join('&');
+
+      // Set the options for the ajax call
+      var xhrOpts = {
+        headers: host.headers, method:'GET',
+        url: genDBUrl(host, '_changes' + paramStr),
+        // _changes can take a long time to generate, especially when filtered
+        timeout: null
+      };
+      lastFetchedSeq = since;
+
+      if (opts.aborted) {
+        return;
+      }
+
+      // Get the changes
+      xhr = ajax(xhrOpts, callback);
+    };
+
+    // If opts.since exists, get all the changes from the sequence
+    // number given by opts.since. Otherwise, get all the changes
+    // from the sequence number 0.
+    var fetchTimeout = 10;
+    var fetchRetryCount = 0;
+
+    var results = {results: []};
+
+    var fetched = function(err, res) {
+      // If the result of the ajax call (res) contains changes (res.results)
+      if (res && res.results) {
+        results.last_seq = res.last_seq;
+        // For each change
+        var req = {};
+        req.query = opts.query_params;
+        res.results = res.results.filter(function(c) {
+          leftToFetch--;
+          var ret = PouchUtils.filterChange(opts)(c);
+          if (ret) {
+            results.results.push(c);
+            PouchUtils.call(opts.onChange, c);
+          }
+          return ret;
+        });
+      }
+
+      // The changes feed may have timed out with no results
+      // if so reuse last update sequence
+      if (res && res.last_seq) {
+        lastFetchedSeq = res.last_seq;
+      }
+
+      var resultsLength = res && res.results.length || 0;
+      var finished = (limit && leftToFetch <= 0) ||
+        (res && !resultsLength) ||
+        (resultsLength && res.last_seq === remoteLastSeq) ||
+        (opts.descending && lastFetchedSeq !== 0);
+
+      if (opts.continuous || !finished) {
+        // Increase retry delay exponentially as long as errors persist
+        if (err) {
+          fetchRetryCount += 1;
+        } else {
+          fetchRetryCount = 0;
+        }
+        var timeoutMultiplier = 1 << fetchRetryCount;
+        var retryWait = fetchTimeout * timeoutMultiplier;
+        var maximumWait = opts.maximumWait || 30000;
+
+        if (retryWait > maximumWait) {
+          PouchUtils.call(opts.complete, err || Pouch.Errors.UNKNOWN_ERROR, null);
+        }
+
+        // Queue a call to fetch again with the newest sequence number
+        setTimeout(function() { fetch(lastFetchedSeq, fetched); }, retryWait);
+      } else {
+        // We're done, call the callback
+        PouchUtils.call(opts.complete, null, results);
+      }
+    };
+
+    // If we arent doing a continuous changes request we need to know
+    // the current update_seq so we know when to stop processing the
+    // changes
+    if (opts.continuous) {
+      fetch(opts.since || 0, fetched);
+    } else {
+      api.info(function(err, res) {
+        if (err) {
+          return PouchUtils.call(opts.complete, err);
+        }
+        remoteLastSeq = res.update_seq;
+        fetch(opts.since || 0, fetched);
+      });
+    }
+
+    // Return a method to cancel this method from processing any more
+    return {
+      cancel: function() {
+        if (Pouch.DEBUG) {
+          console.log(db_url + ': Cancel Changes Feed');
+        }
+        opts.aborted = true;
+        xhr.abort();
+      }
+    };
+  };
+
+  // Given a set of document/revision IDs (given by req), tets the subset of
+  // those that do NOT correspond to revisions stored in the database.
+  // See http://wiki.apache.org/couchdb/HttpPostRevsDiff
+  api.revsDiff = function(req, opts, callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('revsDiff', arguments);
+      return;
+    }
+    // If no options were given, set the callback to be the second parameter
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+
+    // Get the missing document/revision IDs
+    ajax({
+      headers: host.headers,
+      method:'POST',
+      url: genDBUrl(host, '_revs_diff'),
+      body: req
+    }, function(err, res) {
+      PouchUtils.call(callback, err, res);
+    });
+  };
+
+  api.close = function(callback) {
+    if (!api.taskqueue.ready()) {
+      api.taskqueue.addTask('close', arguments);
+      return;
+    }
+    PouchUtils.call(callback, null);
+  };
+
+  return api;
+};
+
+// Delete the HttpPouch specified by the given name.
+HttpPouch.destroy = function(name, callback) {
+  var host = getHost(name);
+  ajax({headers: host.headers, method: 'DELETE', url: genDBUrl(host, '')}, callback);
+};
+
+// HttpPouch is a valid adapter.
+HttpPouch.valid = function() {
+  return true;
+};
+
+// Set HttpPouch to be the adapter used with the http scheme.
+Pouch.adapter('http', HttpPouch);
+Pouch.adapter('https', HttpPouch);
+
+/*globals PouchUtils, PouchMerge */
+
+'use strict';
+
+var idbError = function(callback) {
+  return function(event) {
+    PouchUtils.call(callback, {
+      status: 500,
+      error: event.type,
+      reason: event.target
+    });
+  };
+};
+
+var IdbPouch = function(opts, callback) {
+
+  // IndexedDB requires a versioned database structure, this is going to make
+  // it hard to dynamically create object stores if we needed to for things
+  // like views
+  var POUCH_VERSION = 1;
+
+  // The object stores created for each database
+  // DOC_STORE stores the document meta data, its revision history and state
+  var DOC_STORE = 'document-store';
+  // BY_SEQ_STORE stores a particular version of a document, keyed by its
+  // sequence id
+  var BY_SEQ_STORE = 'by-sequence';
+  // Where we store attachments
+  var ATTACH_STORE = 'attach-store';
+  // Where we store meta data
+  var META_STORE = 'meta-store';
+  // Where we detect blob support
+  var DETECT_BLOB_SUPPORT_STORE = 'detect-blob-support';
+
+
+  var name = opts.name;
+  var req = window.indexedDB.open(name, POUCH_VERSION);
+
+  if (Pouch.openReqList) {
+    Pouch.openReqList[name] = req;
+  }
+
+  var blobSupport = null;
+
+  var instanceId = null;
+  var api = {};
+  var idb = null;
+
+  if (Pouch.DEBUG) {
+    console.log(name + ': Open Database');
+  }
+
+  req.onupgradeneeded = function(e) {
+    var db = e.target.result;
+    var currentVersion = e.oldVersion;
+    while (currentVersion !== e.newVersion) {
+      if (currentVersion === 0) {
+        createSchema(db);
+      }
+      currentVersion++;
+    }
+  };
+
+  function createSchema(db) {
+    db.createObjectStore(DOC_STORE, {keyPath : 'id'})
+      .createIndex('seq', 'seq', {unique: true});
+    db.createObjectStore(BY_SEQ_STORE, {autoIncrement : true})
+      .createIndex('_doc_id_rev', '_doc_id_rev', {unique: true});
+    db.createObjectStore(ATTACH_STORE, {keyPath: 'digest'});
+    db.createObjectStore(META_STORE, {keyPath: 'id', autoIncrement: false});
+    db.createObjectStore(DETECT_BLOB_SUPPORT_STORE);
+  }
+
+  // From http://stackoverflow.com/questions/14967647/encode-decode-image-with-base64-breaks-image (2013-04-21)
+  function fixBinary(bin) {
+    var length = bin.length;
+    var buf = new ArrayBuffer(length);
+    var arr = new Uint8Array(buf);
+    for (var i = 0; i < length; i++) {
+      arr[i] = bin.charCodeAt(i);
+    }
+    return buf;
+  }
+
+  req.onsuccess = function(e) {
+
+    idb = e.target.result;
+
+    var txn = idb.transaction([META_STORE, DETECT_BLOB_SUPPORT_STORE],
+                              'readwrite');
+
+    idb.onversionchange = function() {
+      idb.close();
+    };
+
+    // polyfill the new onupgradeneeded api for chrome. can get rid of when
+    // saucelabs moves to chrome 23
+    if (idb.setVersion && Number(idb.version) !== POUCH_VERSION) {
+      console.log("Number(idb.version): " + Number(idb.version) + " POUCH_VERSION: " + POUCH_VERSION);
+      var versionReq = idb.setVersion(POUCH_VERSION);
+      versionReq.onsuccess = function(evt) {
+        function setVersionComplete() {
+          req.onsuccess(e);
+        }
+        evt.target.result.oncomplete = setVersionComplete;
+        req.onupgradeneeded(e);
+      };
+      return;
+    }
+
+    var req = txn.objectStore(META_STORE).get(META_STORE);
+
+    req.onsuccess = function(e) {
+      var meta = e.target.result || {id: META_STORE};
+      if (name + '_id' in meta) {
+        instanceId = meta[name + '_id'];
+      } else {
+        instanceId = Pouch.uuid();
+        meta[name + '_id'] = instanceId;
+        txn.objectStore(META_STORE).put(meta);
+      }
+
+      // detect blob support
+      try {
+        txn.objectStore(DETECT_BLOB_SUPPORT_STORE).put(new Blob(), "key");
+        blobSupport = true;
+      } catch (err) {
+        blobSupport = false;
+      } finally {
+        PouchUtils.call(callback, null, api);
+      }
+    };
+  };
+
+  req.onerror = idbError(callback);
+
+  api.type = function() {
+    return 'idb';
+  };
+
+  // Each database needs a unique id so that we can store the sequence
+  // checkpoint without having other databases confuse itself.
+  api.id = function idb_id() {
+    return instanceId;
+  };
+
+  api._bulkDocs = function idb_bulkDocs(req, opts, callback) {
+    var newEdits = opts.new_edits;
+    var userDocs = req.docs;
+    // Parse the docs, give them a sequence number for the result
+    var docInfos = userDocs.map(function(doc, i) {
+      var newDoc = PouchUtils.parseDoc(doc, newEdits);
+      newDoc._bulk_seq = i;
+      return newDoc;
+    });
+
+    var docInfoErrors = docInfos.filter(function(docInfo) {
+      return docInfo.error;
+    });
+    if (docInfoErrors.length) {
+      return PouchUtils.call(callback, docInfoErrors[0]);
+    }
+
+    var results = [];
+    var docsWritten = 0;
+
+    function writeMetaData(e) {
+      var meta = e.target.result;
+      meta.updateSeq = (meta.updateSeq || 0) + docsWritten;
+      txn.objectStore(META_STORE).put(meta);
+    }
+
+    function processDocs() {
+      if (!docInfos.length) {
+        txn.objectStore(META_STORE).get(META_STORE).onsuccess = writeMetaData;
+        return;
+      }
+      var currentDoc = docInfos.shift();
+      var req = txn.objectStore(DOC_STORE).get(currentDoc.metadata.id);
+      req.onsuccess = function process_docRead(event) {
+        var oldDoc = event.target.result;
+        if (!oldDoc) {
+          insertDoc(currentDoc);
+        } else {
+          updateDoc(oldDoc, currentDoc);
+        }
+      };
+    }
+
+    function complete(event) {
+      var aresults = [];
+      results.sort(sortByBulkSeq);
+      results.forEach(function(result) {
+        delete result._bulk_seq;
+        if (result.error) {
+          aresults.push(result);
+          return;
+        }
+        var metadata = result.metadata;
+        var rev = PouchMerge.winningRev(metadata);
+
+        aresults.push({
+          ok: true,
+          id: metadata.id,
+          rev: rev
+        });
+
+        if (PouchUtils.isLocalId(metadata.id)) {
+          return;
+        }
+
+        IdbPouch.Changes.notify(name);
+        IdbPouch.Changes.notifyLocalWindows(name);
+      });
+      PouchUtils.call(callback, null, aresults);
+    }
+
+    function preprocessAttachment(att, finish) {
+      if (att.stub) {
+        return finish();
+      }
+      if (typeof att.data === 'string') {
+        var data;
+        try {
+          data = atob(att.data);
+        } catch (e) {
+          var err = Pouch.error(Pouch.Errors.BAD_ARG,
+                                "Attachments need to be base64 encoded");
+          return PouchUtils.call(callback, err);
+        }
+        att.digest = 'md5-' + PouchUtils.Crypto.MD5(data);
+        if (blobSupport) {
+          var type = att.content_type;
+          data = fixBinary(data);
+          att.data = new Blob([data], {type: type});
+        }
+        return finish();
+      }
+      var reader = new FileReader();
+      reader.onloadend = function(e) {
+        att.digest = 'md5-' + PouchUtils.Crypto.MD5(this.result);
+        if (!blobSupport) {
+          att.data = btoa(this.result);
+        }
+        finish();
+      };
+      reader.readAsBinaryString(att.data);
+    }
+
+    function preprocessAttachments(callback) {
+      if (!docInfos.length) {
+        return callback();
+      }
+
+      var docv = 0;
+      docInfos.forEach(function(docInfo) {
+        var attachments = docInfo.data && docInfo.data._attachments ?
+          Object.keys(docInfo.data._attachments) : [];
+
+        if (!attachments.length) {
+          return done();
+        }
+
+        var recv = 0;
+        function attachmentProcessed() {
+          recv++;
+          if (recv === attachments.length) {
+            done();
+          }
+        }
+
+        for (var key in docInfo.data._attachments) {
+          preprocessAttachment(docInfo.data._attachments[key], attachmentProcessed);
+        }
+      });
+
+      function done() {
+        docv++;
+        if (docInfos.length === docv) {
+          callback();
+        }
+      }
+    }
+
+    function writeDoc(docInfo, callback) {
+      var err = null;
+      var recv = 0;
+      docInfo.data._id = docInfo.metadata.id;
+      docInfo.data._rev = docInfo.metadata.rev;
+
+      docsWritten++;
+
+      if (PouchUtils.isDeleted(docInfo.metadata, docInfo.metadata.rev)) {
+        docInfo.data._deleted = true;
+      }
+
+      var attachments = docInfo.data._attachments ?
+        Object.keys(docInfo.data._attachments) : [];
+
+      function collectResults(attachmentErr) {
+        if (!err) {
+          if (attachmentErr) {
+            err = attachmentErr;
+            PouchUtils.call(callback, err);
+          } else if (recv === attachments.length) {
+            finish();
+          }
+        }
+      }
+
+      function attachmentSaved(err) {
+        recv++;
+        collectResults(err);
+      }
+
+      for (var key in docInfo.data._attachments) {
+        if (!docInfo.data._attachments[key].stub) {
+          var data = docInfo.data._attachments[key].data;
+          delete docInfo.data._attachments[key].data;
+          var digest = docInfo.data._attachments[key].digest;
+          saveAttachment(docInfo, digest, data, attachmentSaved);
+        } else {
+          recv++;
+          collectResults();
+        }
+      }
+
+      function finish() {
+        docInfo.data._doc_id_rev = docInfo.data._id + "::" + docInfo.data._rev;
+        var dataReq = txn.objectStore(BY_SEQ_STORE).put(docInfo.data);
+        dataReq.onsuccess = function(e) {
+          if (Pouch.DEBUG) {
+            console.log(name + ': Wrote Document ', docInfo.metadata.id);
+          }
+          docInfo.metadata.seq = e.target.result;
+          // Current _rev is calculated from _rev_tree on read
+          delete docInfo.metadata.rev;
+          var metaDataReq = txn.objectStore(DOC_STORE).put(docInfo.metadata);
+          metaDataReq.onsuccess = function() {
+            results.push(docInfo);
+            PouchUtils.call(callback);
+          };
+        };
+      }
+
+      if (!attachments.length) {
+        finish();
+      }
+    }
+
+    function updateDoc(oldDoc, docInfo) {
+      var merged = PouchMerge.merge(oldDoc.rev_tree, docInfo.metadata.rev_tree[0], 1000);
+      var wasPreviouslyDeleted = PouchUtils.isDeleted(oldDoc);
+      var inConflict = (wasPreviouslyDeleted &&
+                        PouchUtils.isDeleted(docInfo.metadata)) ||
+        (!wasPreviouslyDeleted && newEdits && merged.conflicts !== 'new_leaf');
+
+      if (inConflict) {
+        results.push(makeErr(Pouch.Errors.REV_CONFLICT, docInfo._bulk_seq));
+        return processDocs();
+      }
+
+      docInfo.metadata.rev_tree = merged.tree;
+      writeDoc(docInfo, processDocs);
+    }
+
+    function insertDoc(docInfo) {
+      // Cant insert new deleted documents
+      if ('was_delete' in opts && PouchUtils.isDeleted(docInfo.metadata)) {
+        results.push(Pouch.Errors.MISSING_DOC);
+        return processDocs();
+      }
+      writeDoc(docInfo, processDocs);
+    }
+
+    // Insert sequence number into the error so we can sort later
+    function makeErr(err, seq) {
+      err._bulk_seq = seq;
+      return err;
+    }
+
+    function saveAttachment(docInfo, digest, data, callback) {
+      var objectStore = txn.objectStore(ATTACH_STORE);
+      var getReq = objectStore.get(digest).onsuccess = function(e) {
+        var originalRefs = e.target.result && e.target.result.refs || {};
+        var ref = [docInfo.metadata.id, docInfo.metadata.rev].join('@');
+        var newAtt = {
+          digest: digest,
+          body: data,
+          refs: originalRefs
+        };
+        newAtt.refs[ref] = true;
+        var putReq = objectStore.put(newAtt).onsuccess = function(e) {
+          PouchUtils.call(callback);
+        };
+      };
+    }
+
+    var txn;
+    preprocessAttachments(function() {
+      txn = idb.transaction([DOC_STORE, BY_SEQ_STORE, ATTACH_STORE, META_STORE],
+                            'readwrite');
+      txn.onerror = idbError(callback);
+      txn.ontimeout = idbError(callback);
+      txn.oncomplete = complete;
+
+      processDocs();
+    });
+  };
+
+  function sortByBulkSeq(a, b) {
+    return a._bulk_seq - b._bulk_seq;
+  }
+
+  // First we look up the metadata in the ids database, then we fetch the
+  // current revision(s) from the by sequence store
+  api._get = function idb_get(id, opts, callback) {
+    var doc;
+    var metadata;
+    var err;
+    var txn;
+    if (opts.ctx) {
+      txn = opts.ctx;
+    } else {
+      txn = idb.transaction([DOC_STORE, BY_SEQ_STORE, ATTACH_STORE], 'readonly');
+    }
+
+    function finish(){
+      PouchUtils.call(callback, err, {doc: doc, metadata: metadata, ctx: txn});
+    }
+
+    txn.objectStore(DOC_STORE).get(id).onsuccess = function(e) {
+      metadata = e.target.result;
+      // we can determine the result here if:
+      // 1. there is no such document
+      // 2. the document is deleted and we don't ask about specific rev
+      // When we ask with opts.rev we expect the answer to be either
+      // doc (possibly with _deleted=true) or missing error
+      if (!metadata) {
+        err = Pouch.Errors.MISSING_DOC;
+        return finish();
+      }
+      if (PouchUtils.isDeleted(metadata) && !opts.rev) {
+        err = Pouch.error(Pouch.Errors.MISSING_DOC, "deleted");
+        return finish();
+      }
+
+      var rev = PouchMerge.winningRev(metadata);
+      var key = metadata.id + '::' + (opts.rev ? opts.rev : rev);
+      var index = txn.objectStore(BY_SEQ_STORE).index('_doc_id_rev');
+
+      index.get(key).onsuccess = function(e) {
+        doc = e.target.result;
+        if(doc && doc._doc_id_rev) {
+          delete(doc._doc_id_rev);
+        }
+        if (!doc) {
+          err = Pouch.Errors.MISSING_DOC;
+          return finish();
+        }
+        finish();
+      };
+    };
+  };
+
+  api._getAttachment = function(attachment, opts, callback) {
+    var result;
+    var txn;
+    if (opts.ctx) {
+      txn = opts.ctx;
+    } else {
+      txn = idb.transaction([DOC_STORE, BY_SEQ_STORE, ATTACH_STORE], 'readonly');
+    }
+    var digest = attachment.digest;
+    var type = attachment.content_type;
+
+    txn.objectStore(ATTACH_STORE).get(digest).onsuccess = function(e) {
+      var data = e.target.result.body;
+      if (opts.encode) {
+        if (blobSupport) {
+          var reader = new FileReader();
+          reader.onloadend = function(e) {
+            result = btoa(this.result);
+            PouchUtils.call(callback, null, result);
+          };
+          reader.readAsBinaryString(data);
+        } else {
+          result = data;
+          PouchUtils.call(callback, null, result);
+        }
+      } else {
+        if (blobSupport) {
+          result = data;
+        } else {
+          data = fixBinary(atob(data));
+          result = new Blob([data], {type: type});
+        }
+        PouchUtils.call(callback, null, result);
+      }
+    };
+  };
+
+  api._allDocs = function idb_allDocs(opts, callback) {
+    var start = 'startkey' in opts ? opts.startkey : false;
+    var end = 'endkey' in opts ? opts.endkey : false;
+
+    var descending = 'descending' in opts ? opts.descending : false;
+    descending = descending ? 'prev' : null;
+
+    var keyRange = start && end ? window.IDBKeyRange.bound(start, end)
+      : start ? window.IDBKeyRange.lowerBound(start)
+      : end ? window.IDBKeyRange.upperBound(end) : null;
+
+    var transaction = idb.transaction([DOC_STORE, BY_SEQ_STORE], 'readonly');
+    transaction.oncomplete = function() {
+      if ('keys' in opts) {
+        opts.keys.forEach(function(key) {
+          if (key in resultsMap) {
+            results.push(resultsMap[key]);
+          } else {
+            results.push({"key": key, "error": "not_found"});
+          }
+        });
+        if (opts.descending) {
+          results.reverse();
+        }
+      }
+      PouchUtils.call(callback, null, {
+        total_rows: results.length,
+        rows: ('limit' in opts) ? results.slice(0, opts.limit) : results
+      });
+    };
+
+    var oStore = transaction.objectStore(DOC_STORE);
+    var oCursor = descending ? oStore.openCursor(keyRange, descending)
+      : oStore.openCursor(keyRange);
+    var results = [];
+    var resultsMap = {};
+    oCursor.onsuccess = function(e) {
+      if (!e.target.result) {
+        return;
+      }
+      var cursor = e.target.result;
+      var metadata = cursor.value;
+      // If opts.keys is set we want to filter here only those docs with
+      // key in opts.keys. With no performance tests it is difficult to
+      // guess if iteration with filter is faster than many single requests
+      function allDocsInner(metadata, data) {
+        if (PouchUtils.isLocalId(metadata.id)) {
+          return cursor['continue']();
+        }
+        var doc = {
+          id: metadata.id,
+          key: metadata.id,
+          value: {
+            rev: PouchMerge.winningRev(metadata)
+          }
+        };
+        if (opts.include_docs) {
+          doc.doc = data;
+          doc.doc._rev = PouchMerge.winningRev(metadata);
+          if (doc.doc._doc_id_rev) {
+              delete(doc.doc._doc_id_rev);
+          }
+          if (opts.conflicts) {
+            doc.doc._conflicts = PouchMerge.collectConflicts(metadata);
+          }
+          for (var att in doc.doc._attachments) {
+            doc.doc._attachments[att].stub = true;
+          }
+        }
+        if ('keys' in opts) {
+          if (opts.keys.indexOf(metadata.id) > -1) {
+            if (PouchUtils.isDeleted(metadata)) {
+              doc.value.deleted = true;
+              doc.doc = null;
+            }
+            resultsMap[doc.id] = doc;
+          }
+        } else {
+          if (!PouchUtils.isDeleted(metadata)) {
+            results.push(doc);
+          }
+        }
+        cursor['continue']();
+      }
+
+      if (!opts.include_docs) {
+        allDocsInner(metadata);
+      } else {
+        var index = transaction.objectStore(BY_SEQ_STORE).index('_doc_id_rev');
+        var mainRev = PouchMerge.winningRev(metadata);
+        var key = metadata.id + "::" + mainRev;
+        index.get(key).onsuccess = function(event) {
+          allDocsInner(cursor.value, event.target.result);
+        };
+      }
+    };
+  };
+
+  api._info = function idb_info(callback) {
+    var count = 0;
+    var update_seq = 0;
+    var txn = idb.transaction([DOC_STORE, META_STORE], 'readonly');
+
+    function fetchUpdateSeq(e) {
+      update_seq = e.target.result && e.target.result.updateSeq || 0;
+    }
+
+    function countDocs(e) {
+      var cursor = e.target.result;
+      if (!cursor) {
+        txn.objectStore(META_STORE).get(META_STORE).onsuccess = fetchUpdateSeq;
+        return;
+      }
+      if (cursor.value.deleted !== true) {
+        count++;
+      }
+      cursor['continue']();
+    }
+
+    txn.oncomplete = function() {
+      callback(null, {
+        db_name: name,
+        doc_count: count,
+        update_seq: update_seq
+      });
+    };
+
+    txn.objectStore(DOC_STORE).openCursor().onsuccess = countDocs;
+  };
+
+  api._changes = function idb_changes(opts) {
+    if (Pouch.DEBUG) {
+      console.log(name + ': Start Changes Feed: continuous=' + opts.continuous);
+    }
+
+    if (opts.continuous) {
+      var id = name + ':' + Pouch.uuid();
+      opts.cancelled = false;
+      IdbPouch.Changes.addListener(name, id, api, opts);
+      IdbPouch.Changes.notify(name);
+      return {
+        cancel: function() {
+          if (Pouch.DEBUG) {
+            console.log(name + ': Cancel Changes Feed');
+          }
+          opts.cancelled = true;
+          IdbPouch.Changes.removeListener(name, id);
+        }
+      };
+    }
+
+    var descending = opts.descending ? 'prev' : null;
+    var last_seq = 0;
+
+    // Ignore the `since` parameter when `descending` is true
+    opts.since = opts.since && !descending ? opts.since : 0;
+
+    var results = [], resultIndices = {}, dedupResults = [];
+    var txn;
+
+    function fetchChanges() {
+      txn = idb.transaction([DOC_STORE, BY_SEQ_STORE]);
+      txn.oncomplete = onTxnComplete;
+
+      var req;
+
+      if (descending) {
+        req = txn.objectStore(BY_SEQ_STORE)
+            .openCursor(window.IDBKeyRange.lowerBound(opts.since, true), descending);
+      } else {
+        req = txn.objectStore(BY_SEQ_STORE)
+            .openCursor(window.IDBKeyRange.lowerBound(opts.since, true));
+      }
+
+      req.onsuccess = onsuccess;
+      req.onerror = onerror;
+    }
+
+    if (opts.filter && typeof opts.filter === 'string') {
+      var filterName = opts.filter.split('/');
+      api.get('_design/' + filterName[0], function(err, ddoc) {
+        /*jshint evil: true */
+        var filter = eval('(function() { return ' +
+                          ddoc.filters[filterName[1]] + ' })()');
+        opts.filter = filter;
+        fetchChanges();
+      });
+    } else {
+      fetchChanges();
+    }
+
+    function onsuccess(event) {
+      if (!event.target.result) {
+        // Filter out null results casued by deduping
+        for (var i = 0, l = results.length; i < l; i++ ) {
+          var result = results[i];
+          if (result) {
+            dedupResults.push(result);
+          }
+        }
+        return false;
+      }
+
+      var cursor = event.target.result;
+
+      // Try to pre-emptively dedup to save us a bunch of idb calls
+      var changeId = cursor.value._id;
+      var changeIdIndex = resultIndices[changeId];
+      if (changeIdIndex !== undefined) {
+        results[changeIdIndex].seq = cursor.key;
+        // update so it has the later sequence number
+        results.push(results[changeIdIndex]);
+        results[changeIdIndex] = null;
+        resultIndices[changeId] = results.length - 1;
+        return cursor['continue']();
+      }
+
+      var index = txn.objectStore(DOC_STORE);
+      index.get(cursor.value._id).onsuccess = function(event) {
+        var metadata = event.target.result;
+        if (PouchUtils.isLocalId(metadata.id)) {
+          return cursor['continue']();
+        }
+
+        if(last_seq < metadata.seq){
+          last_seq = metadata.seq;
+        }
+
+        var mainRev = PouchMerge.winningRev(metadata);
+        var key = metadata.id + "::" + mainRev;
+        var index = txn.objectStore(BY_SEQ_STORE).index('_doc_id_rev');
+        index.get(key).onsuccess = function(docevent) {
+          var doc = docevent.target.result;
+          delete doc['_doc_id_rev'];
+          var changeList = [{rev: mainRev}];
+          if (opts.style === 'all_docs') {
+            changeList = PouchMerge.collectLeaves(metadata.rev_tree)
+              .map(function(x) { return {rev: x.rev}; });
+          }
+          var change = {
+            id: metadata.id,
+            seq: cursor.key,
+            changes: changeList,
+            doc: doc
+          };
+
+          if (PouchUtils.isDeleted(metadata, mainRev)) {
+            change.deleted = true;
+          }
+          if (opts.conflicts) {
+            change.doc._conflicts = PouchMerge.collectConflicts(metadata);
+          }
+
+          // Dedupe the changes feed
+          var changeId = change.id, changeIdIndex = resultIndices[changeId];
+          if (changeIdIndex !== undefined) {
+            results[changeIdIndex] = null;
+          }
+          results.push(change);
+          resultIndices[changeId] = results.length - 1;
+          cursor['continue']();
+        };
+      };
+    }
+
+    function onTxnComplete() {
+      PouchUtils.processChanges(opts, dedupResults, last_seq);
+    }
+
+    function onerror(error) {
+      // TODO: shouldn't we pass some params here?
+      PouchUtils.call(opts.complete);
+    }
+  };
+
+  api._close = function(callback) {
+    if (idb === null) {
+      return PouchUtils.call(callback, Pouch.Errors.NOT_OPEN);
+    }
+
+    // https://developer.mozilla.org/en-US/docs/IndexedDB/IDBDatabase#close
+    // "Returns immediately and closes the connection in a separate thread..."
+    idb.close();
+    PouchUtils.call(callback, null);
+  };
+
+  api._getRevisionTree = function(docId, callback) {
+    var txn = idb.transaction([DOC_STORE], 'readonly');
+    var req = txn.objectStore(DOC_STORE).get(docId);
+    req.onsuccess = function (event) {
+      var doc = event.target.result;
+      if (!doc) {
+        PouchUtils.call(callback, Pouch.Errors.MISSING_DOC);
+      } else {
+        PouchUtils.call(callback, null, doc.rev_tree);
+      }
+    };
+  };
+
+  // This function removes revisions of document docId
+  // which are listed in revs and sets this document
+  // revision to to rev_tree
+  api._doCompaction = function(docId, rev_tree, revs, callback) {
+    var txn = idb.transaction([DOC_STORE, BY_SEQ_STORE], 'readwrite');
+
+    var index = txn.objectStore(DOC_STORE);
+    index.get(docId).onsuccess = function(event) {
+      var metadata = event.target.result;
+      metadata.rev_tree = rev_tree;
+
+      var count = revs.length;
+      revs.forEach(function(rev) {
+        var index = txn.objectStore(BY_SEQ_STORE).index('_doc_id_rev');
+        var key = docId + "::" + rev;
+        index.getKey(key).onsuccess = function(e) {
+          var seq = e.target.result;
+          if (!seq) {
+            return;
+          }
+          var req = txn.objectStore(BY_SEQ_STORE)['delete'](seq);
+
+          count--;
+          if (!count) {
+            txn.objectStore(DOC_STORE).put(metadata);
+          }
+        };
+      });
+    };
+    txn.oncomplete = function() {
+      PouchUtils.call(callback);
+    };
+  };
+
+  return api;
+};
+
+IdbPouch.valid = function idb_valid() {
+  console.log("Supports window.indexedDB? " + !!window.indexedDB);
+  return !!window.indexedDB;
+};
+
+IdbPouch.destroy = function idb_destroy(name, callback) {
+  if (Pouch.DEBUG) {
+    console.log(name + ': Delete Database');
+  }
+  IdbPouch.Changes.clearListeners(name);
+
+  //Close open request for "name" database to fix ie delay.
+  if (Pouch.openReqList[name] && Pouch.openReqList[name].result) {
+    Pouch.openReqList[name].result.close();
+  }
+  var req = window.indexedDB.deleteDatabase(name);
+
+  req.onsuccess = function() {
+    //Remove open request from the list.
+    if (Pouch.openReqList[name]) {
+      Pouch.openReqList[name] = null;
+    }
+    PouchUtils.call(callback, null);
+  };
+
+  req.onerror = idbError(callback);
+};
+
+IdbPouch.Changes = new PouchUtils.Changes();
+
+Pouch.adapter('idb', IdbPouch);
+
+/*globals PouchUtils, PouchMerge */
+
+'use strict';
+
+function quote(str) {
+  return "'" + str + "'";
+}
+
+var POUCH_VERSION = 1;
+var POUCH_SIZE = 3 * 1024 * 1024;
+
+// The object stores created for each database
+// DOC_STORE stores the document meta data, its revision history and state
+var DOC_STORE = quote('document-store');
+// BY_SEQ_STORE stores a particular version of a document, keyed by its
+// sequence id
+var BY_SEQ_STORE = quote('by-sequence');
+// Where we store attachments
+var ATTACH_STORE = quote('attach-store');
+var META_STORE = quote('metadata-store');
+
+var unknownError = function(callback) {
+  return function(event) {
+    PouchUtils.call(callback, {
+      status: 500,
+      error: event.type,
+      reason: event.target
+    });
+  };
+};
+
+var webSqlPouch = function(opts, callback) {
+
+  var api = {};
+  var instanceId = null;
+  var name = opts.name;
+
+  var db = openDatabase(name, POUCH_VERSION, name, POUCH_SIZE);
+  if (!db) {
+    return PouchUtils.call(callback, Pouch.Errors.UNKNOWN_ERROR);
+  }
+
+  function dbCreated() {
+    callback(null, api);
+  }
+
+  function setup(){
+    db.transaction(function (tx) {
+      var meta = 'CREATE TABLE IF NOT EXISTS ' + META_STORE +
+        ' (update_seq, dbid)';
+      var attach = 'CREATE TABLE IF NOT EXISTS ' + ATTACH_STORE +
+        ' (digest, json, body BLOB)';
+      var doc = 'CREATE TABLE IF NOT EXISTS ' + DOC_STORE +
+        ' (id unique, seq, json, winningseq)';
+      var seq = 'CREATE TABLE IF NOT EXISTS ' + BY_SEQ_STORE +
+        ' (seq INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, doc_id_rev UNIQUE, json)';
+
+      tx.executeSql(attach);
+      tx.executeSql(doc);
+      tx.executeSql(seq);
+      tx.executeSql(meta);
+
+      var updateseq = 'SELECT update_seq FROM ' + META_STORE;
+      tx.executeSql(updateseq, [], function(tx, result) {
+        if (!result.rows.length) {
+          var initSeq = 'INSERT INTO ' + META_STORE + ' (update_seq) VALUES (?)';
+          tx.executeSql(initSeq, [0]);
+          return;
+        }
+      });
+
+      var dbid = 'SELECT dbid FROM ' + META_STORE + ' WHERE dbid IS NOT NULL';
+      tx.executeSql(dbid, [], function(tx, result) {
+        if (!result.rows.length) {
+          var initDb = 'UPDATE ' + META_STORE + ' SET dbid=?';
+          instanceId = Pouch.uuid();
+          tx.executeSql(initDb, [instanceId]);
+          return;
+        }
+        instanceId = result.rows.item(0).dbid;
+      });
+    }, unknownError(callback), dbCreated);
+  }
+  if (PouchUtils.isCordova()) {
+    console.log("This is a Cordova app. Waiting for until custom api is made in pouch.adapters before doing setup.")
+    //to wait until custom api is made in pouch.adapters before doing setup
+    window.addEventListener(name + '_pouch', function cordova_init() {
+      window.removeEventListener(name + '_pouch', cordova_init, false);
+      setup();
+    }, false);
+  } else {
+    console.log("This is NOT a Cordova app.")
+    setup();
+  }
+
+
+  api.type = function() {
+    return 'websql';
+  };
+
+  api.id = function() {
+    return instanceId;
+  };
+
+  api._info = function(callback) {
+    db.transaction(function(tx) {
+      var sql = 'SELECT COUNT(id) AS count FROM ' + DOC_STORE;
+      tx.executeSql(sql, [], function(tx, result) {
+        var doc_count = result.rows.item(0).count;
+        var updateseq = 'SELECT update_seq FROM ' + META_STORE;
+        tx.executeSql(updateseq, [], function(tx, result) {
+          var update_seq = result.rows.item(0).update_seq;
+          callback(null, {
+            db_name: name,
+            doc_count: doc_count,
+            update_seq: update_seq
+          });
+        });
+      });
+    });
+  };
+
+  api._bulkDocs = function idb_bulkDocs(req, opts, callback) {
+
+    var newEdits = opts.new_edits;
+    var userDocs = req.docs;
+    var docsWritten = 0;
+
+    // Parse the docs, give them a sequence number for the result
+    var docInfos = userDocs.map(function(doc, i) {
+      var newDoc = PouchUtils.parseDoc(doc, newEdits);
+      newDoc._bulk_seq = i;
+      return newDoc;
+    });
+
+    var docInfoErrors = docInfos.filter(function(docInfo) {
+      return docInfo.error;
+    });
+    if (docInfoErrors.length) {
+      return PouchUtils.call(callback, docInfoErrors[0]);
+    }
+
+    var tx;
+    var results = [];
+    var fetchedDocs = {};
+
+    function sortByBulkSeq(a, b) {
+      return a._bulk_seq - b._bulk_seq;
+    }
+
+    function complete(event) {
+      var aresults = [];
+      results.sort(sortByBulkSeq);
+      results.forEach(function(result) {
+        delete result._bulk_seq;
+        if (result.error) {
+          aresults.push(result);
+          return;
+        }
+        var metadata = result.metadata;
+        var rev = PouchMerge.winningRev(metadata);
+
+        aresults.push({
+          ok: true,
+          id: metadata.id,
+          rev: rev
+        });
+
+        if (PouchUtils.isLocalId(metadata.id)) {
+          return;
+        }
+
+        docsWritten++;
+
+        webSqlPouch.Changes.notify(name);
+        webSqlPouch.Changes.notifyLocalWindows(name);
+      });
+
+      var updateseq = 'SELECT update_seq FROM ' + META_STORE;
+      tx.executeSql(updateseq, [], function(tx, result) {
+        var update_seq = result.rows.item(0).update_seq + docsWritten;
+        var sql = 'UPDATE ' + META_STORE + ' SET update_seq=?';
+        tx.executeSql(sql, [update_seq], function() {
+          PouchUtils.call(callback, null, aresults);
+        });
+      });
+    }
+
+    function preprocessAttachment(att, finish) {
+      if (att.stub) {
+        return finish();
+      }
+      if (typeof att.data === 'string') {
+        try {
+          att.data = atob(att.data);
+        } catch (e) {
+          var err = Pouch.error(Pouch.Errors.BAD_ARG,
+                                "Attachments need to be base64 encoded");
+          return PouchUtils.call(callback, err);
+        }
+        att.digest = 'md5-' + PouchUtils.Crypto.MD5(att.data);
+        return finish();
+      }
+      var reader = new FileReader();
+      reader.onloadend = function(e) {
+        att.data = this.result;
+        att.digest = 'md5-' + PouchUtils.Crypto.MD5(this.result);
+        finish();
+      };
+      reader.readAsBinaryString(att.data);
+    }
+
+    function preprocessAttachments(callback) {
+      if (!docInfos.length) {
+        return callback();
+      }
+
+      var docv = 0;
+      var recv = 0;
+
+      docInfos.forEach(function(docInfo) {
+        var attachments = docInfo.data && docInfo.data._attachments ?
+          Object.keys(docInfo.data._attachments) : [];
+
+        if (!attachments.length) {
+          return done();
+        }
+
+        function processedAttachment() {
+          recv++;
+          if (recv === attachments.length) {
+            done();
+          }
+        }
+
+        for (var key in docInfo.data._attachments) {
+          preprocessAttachment(docInfo.data._attachments[key], processedAttachment);
+        }
+      });
+
+      function done() {
+        docv++;
+        if (docInfos.length === docv) {
+          callback();
+        }
+      }
+    }
+
+    function writeDoc(docInfo, callback, isUpdate) {
+
+      function finish() {
+        var data = docInfo.data;
+        var sql = 'INSERT INTO ' + BY_SEQ_STORE + ' (doc_id_rev, json) VALUES (?, ?);';
+        tx.executeSql(sql, [data._id + "::" + data._rev,
+                            JSON.stringify(data)], dataWritten);
+      }
+
+      function collectResults(attachmentErr) {
+        if (!err) {
+          if (attachmentErr) {
+            err = attachmentErr;
+            PouchUtils.call(callback, err);
+          } else if (recv === attachments.length) {
+            finish();
+          }
+        }
+      }
+
+      var err = null;
+      var recv = 0;
+
+      docInfo.data._id = docInfo.metadata.id;
+      docInfo.data._rev = docInfo.metadata.rev;
+
+      if (PouchUtils.isDeleted(docInfo.metadata, docInfo.metadata.rev)) {
+        docInfo.data._deleted = true;
+      }
+
+      var attachments = docInfo.data._attachments ?
+        Object.keys(docInfo.data._attachments) : [];
+
+      function attachmentSaved(err) {
+        recv++;
+        collectResults(err);
+      }
+
+      for (var key in docInfo.data._attachments) {
+        if (!docInfo.data._attachments[key].stub) {
+          var data = docInfo.data._attachments[key].data;
+          delete docInfo.data._attachments[key].data;
+          var digest = docInfo.data._attachments[key].digest;
+          saveAttachment(docInfo, digest, data, attachmentSaved);
+        } else {
+          recv++;
+          collectResults();
+        }
+      }
+
+      if (!attachments.length) {
+        finish();
+      }
+
+      function dataWritten(tx, result) {
+        var seq = docInfo.metadata.seq = result.insertId;
+        delete docInfo.metadata.rev;
+
+        var mainRev = PouchMerge.winningRev(docInfo.metadata);
+
+        var sql = isUpdate ?
+          'UPDATE ' + DOC_STORE + ' SET seq=?, json=?, winningseq=(SELECT seq FROM ' +
+          BY_SEQ_STORE + ' WHERE doc_id_rev=?) WHERE id=?' :
+          'INSERT INTO ' + DOC_STORE + ' (id, seq, winningseq, json) VALUES (?, ?, ?, ?);';
+        var metadataStr = JSON.stringify(docInfo.metadata);
+        var key = docInfo.metadata.id + "::" + mainRev;
+        var params = isUpdate ?
+          [seq, metadataStr, key, docInfo.metadata.id] :
+          [docInfo.metadata.id, seq, seq, metadataStr];
+        tx.executeSql(sql, params, function(tx, result) {
+          results.push(docInfo);
+          PouchUtils.call(callback, null);
+        });
+      }
+    }
+
+    function updateDoc(oldDoc, docInfo) {
+      var merged = PouchMerge.merge(oldDoc.rev_tree, docInfo.metadata.rev_tree[0], 1000);
+      var inConflict = (PouchUtils.isDeleted(oldDoc) &&
+                        PouchUtils.isDeleted(docInfo.metadata)) ||
+        (!PouchUtils.isDeleted(oldDoc) &&
+         newEdits && merged.conflicts !== 'new_leaf');
+
+      if (inConflict) {
+        results.push(makeErr(Pouch.Errors.REV_CONFLICT, docInfo._bulk_seq));
+        return processDocs();
+      }
+
+      docInfo.metadata.rev_tree = merged.tree;
+      writeDoc(docInfo, processDocs, true);
+    }
+
+    function insertDoc(docInfo) {
+      // Cant insert new deleted documents
+      if ('was_delete' in opts && PouchUtils.isDeleted(docInfo.metadata)) {
+        results.push(Pouch.Errors.MISSING_DOC);
+        return processDocs();
+      }
+      writeDoc(docInfo, processDocs, false);
+    }
+
+    function processDocs() {
+      if (!docInfos.length) {
+        return complete();
+      }
+      var currentDoc = docInfos.shift();
+      var id = currentDoc.metadata.id;
+      if (id in fetchedDocs) {
+        updateDoc(fetchedDocs[id], currentDoc);
+      } else {
+        // if we have newEdits=false then we can update the same
+        // document twice in a single bulk docs call
+        fetchedDocs[id] = currentDoc.metadata;
+        insertDoc(currentDoc);
+      }
+    }
+
+    // Insert sequence number into the error so we can sort later
+    function makeErr(err, seq) {
+      err._bulk_seq = seq;
+      return err;
+    }
+
+    function saveAttachment(docInfo, digest, data, callback) {
+      var ref = [docInfo.metadata.id, docInfo.metadata.rev].join('@');
+      var newAtt = {digest: digest};
+      var sql = 'SELECT digest, json FROM ' + ATTACH_STORE + ' WHERE digest=?';
+      tx.executeSql(sql, [digest], function(tx, result) {
+        if (!result.rows.length) {
+          newAtt.refs = {};
+          newAtt.refs[ref] = true;
+          sql = 'INSERT INTO ' + ATTACH_STORE + '(digest, json, body) VALUES (?, ?, ?)';
+          tx.executeSql(sql, [digest, JSON.stringify(newAtt), data], function() {
+            PouchUtils.call(callback, null);
+          });
+        } else {
+          newAtt.refs = JSON.parse(result.rows.item(0).json).refs;
+          sql = 'UPDATE ' + ATTACH_STORE + ' SET json=?, body=? WHERE digest=?';
+          tx.executeSql(sql, [JSON.stringify(newAtt), data, digest], function() {
+            PouchUtils.call(callback, null);
+          });
+        }
+      });
+    }
+
+    function metadataFetched(tx, results) {
+      for (var j=0; j<results.rows.length; j++) {
+        var row = results.rows.item(j);
+        fetchedDocs[row.id] = JSON.parse(row.json);
+      }
+      processDocs();
+    }
+
+    preprocessAttachments(function() {
+      db.transaction(function(txn) {
+        tx = txn;
+        var ids = '(' + docInfos.map(function(d) {
+          return quote(d.metadata.id);
+        }).join(',') + ')';
+        var sql = 'SELECT * FROM ' + DOC_STORE + ' WHERE id IN ' + ids;
+        tx.executeSql(sql, [], metadataFetched);
+      }, unknownError(callback));
+    });
+  };
+
+  api._get = function(id, opts, callback) {
+    var doc;
+    var metadata;
+    var err;
+    if (!opts.ctx) {
+      db.transaction(function(txn) {
+        opts.ctx = txn;
+        api._get(id, opts, callback);
+      });
+      return;
+    }
+    var tx = opts.ctx;
+
+    function finish() {
+      PouchUtils.call(callback, err, {doc: doc, metadata: metadata, ctx: tx});
+    }
+
+    var sql = 'SELECT * FROM ' + DOC_STORE + ' WHERE id=?';
+    tx.executeSql(sql, [id], function(a, results) {
+      if (!results.rows.length) {
+        err = Pouch.Errors.MISSING_DOC;
+        return finish();
+      }
+      metadata = JSON.parse(results.rows.item(0).json);
+      if (PouchUtils.isDeleted(metadata) && !opts.rev) {
+        err = Pouch.error(Pouch.Errors.MISSING_DOC, "deleted");
+        return finish();
+      }
+
+      var rev = PouchMerge.winningRev(metadata);
+      var key = opts.rev ? opts.rev : rev;
+      key = metadata.id + '::' + key;
+      var sql = 'SELECT * FROM ' + BY_SEQ_STORE + ' WHERE doc_id_rev=?';
+      tx.executeSql(sql, [key], function(tx, results) {
+        if (!results.rows.length) {
+          err = Pouch.Errors.MISSING_DOC;
+          return finish();
+        }
+        doc = JSON.parse(results.rows.item(0).json);
+
+        finish();
+      });
+    });
+  };
+
+  function makeRevs(arr) {
+    return arr.map(function(x) { return {rev: x.rev}; });
+  }
+
+  api._allDocs = function(opts, callback) {
+    var results = [];
+    var resultsMap = {};
+    var start = 'startkey' in opts ? opts.startkey : false;
+    var end = 'endkey' in opts ? opts.endkey : false;
+    var descending = 'descending' in opts ? opts.descending : false;
+    var sql = 'SELECT ' + DOC_STORE + '.id, ' + BY_SEQ_STORE + '.seq, ' +
+      BY_SEQ_STORE + '.json AS data, ' + DOC_STORE + '.json AS metadata FROM ' +
+      BY_SEQ_STORE + ' JOIN ' + DOC_STORE + ' ON ' + BY_SEQ_STORE + '.seq = ' +
+      DOC_STORE + '.winningseq';
+
+    if ('keys' in opts) {
+      sql += ' WHERE ' + DOC_STORE + '.id IN (' + opts.keys.map(function(key){
+        return quote(key);
+      }).join(',') + ')';
+    } else {
+      if (start) {
+        sql += ' WHERE ' + DOC_STORE + '.id >= "' + start + '"';
+      }
+      if (end) {
+        sql += (start ? ' AND ' : ' WHERE ') + DOC_STORE + '.id <= "' + end + '"';
+      }
+      sql += ' ORDER BY ' + DOC_STORE + '.id ' + (descending ? 'DESC' : 'ASC');
+    }
+
+    db.transaction(function(tx) {
+      tx.executeSql(sql, [], function(tx, result) {
+        for (var i = 0, l = result.rows.length; i < l; i++ ) {
+          var doc = result.rows.item(i);
+          var metadata = JSON.parse(doc.metadata);
+          var data = JSON.parse(doc.data);
+          if (!(PouchUtils.isLocalId(metadata.id))) {
+            doc = {
+              id: metadata.id,
+              key: metadata.id,
+              value: {rev: PouchMerge.winningRev(metadata)}
+            };
+            if (opts.include_docs) {
+              doc.doc = data;
+              doc.doc._rev = PouchMerge.winningRev(metadata);
+              if (opts.conflicts) {
+                doc.doc._conflicts = PouchMerge.collectConflicts(metadata);
+              }
+              for (var att in doc.doc._attachments) {
+                doc.doc._attachments[att].stub = true;
+              }
+            }
+            if ('keys' in opts) {
+              if (opts.keys.indexOf(metadata.id) > -1) {
+                if (PouchUtils.isDeleted(metadata)) {
+                  doc.value.deleted = true;
+                  doc.doc = null;
+                }
+                resultsMap[doc.id] = doc;
+              }
+            } else {
+              if(!PouchUtils.isDeleted(metadata)) {
+                results.push(doc);
+              }
+            }
+          }
+        }
+      });
+    }, unknownError(callback), function() {
+      if ('keys' in opts) {
+        opts.keys.forEach(function(key) {
+          if (key in resultsMap) {
+            results.push(resultsMap[key]);
+          } else {
+            results.push({"key": key, "error": "not_found"});
+          }
+        });
+        if (opts.descending) {
+          results.reverse();
+        }
+      }
+      PouchUtils.call(callback, null, {
+        total_rows: results.length,
+        rows: ('limit' in opts) ? results.slice(0, opts.limit) : results
+      });
+    });
+  };
+
+  api._changes = function idb_changes(opts) {
+
+    if (Pouch.DEBUG) {
+      console.log(name + ': Start Changes Feed: continuous=' + opts.continuous);
+    }
+
+    if (opts.continuous) {
+      console.log('The replication is continuous.');
+      var id = name + ':' + Pouch.uuid();
+      opts.cancelled = false;
+      webSqlPouch.Changes.addListener(name, id, api, opts);
+      webSqlPouch.Changes.notify(name);
+      return {
+        cancel: function() {
+          if (Pouch.DEBUG) {
+            console.log(name + ': Cancel Changes Feed');
+          }
+          opts.cancelled = true;
+          webSqlPouch.Changes.removeListener(name, id);
+        }
+      };
+    }
+
+    var descending = opts.descending;
+
+    // Ignore the `since` parameter when `descending` is true
+    opts.since = opts.since && !descending ? opts.since : 0;
+
+    var results = [];
+    var txn;
+
+    function fetchChanges() {
+      var sql = 'SELECT ' + DOC_STORE + '.id, ' + BY_SEQ_STORE + '.seq, ' +
+        BY_SEQ_STORE + '.json AS data, ' + DOC_STORE + '.json AS metadata FROM ' +
+        BY_SEQ_STORE + ' JOIN ' + DOC_STORE + ' ON ' + BY_SEQ_STORE + '.seq = ' +
+        DOC_STORE + '.winningseq WHERE ' + DOC_STORE + '.seq > ' + opts.since +
+        ' ORDER BY ' + DOC_STORE + '.seq ' + (descending ? 'DESC' : 'ASC');
+
+      db.transaction(function(tx) {
+        tx.executeSql(sql, [], function(tx, result) {
+          var last_seq = 0;
+          for (var i = 0, l = result.rows.length; i < l; i++ ) {
+            var res = result.rows.item(i);
+            var metadata = JSON.parse(res.metadata);
+            if (!PouchUtils.isLocalId(metadata.id)) {
+              if (last_seq < res.seq) {
+                last_seq = res.seq;
+              }
+              var doc = JSON.parse(res.data);
+              var mainRev = doc._rev;
+              var changeList = [{rev: mainRev}];
+              if (opts.style === 'all_docs') {
+                changeList = makeRevs(PouchMerge.collectLeaves(metadata.rev_tree));
+              }
+              var change = {
+                id: metadata.id,
+                seq: res.seq,
+                changes: changeList,
+                doc: doc
+              };
+              if (PouchUtils.isDeleted(metadata, mainRev)) {
+                change.deleted = true;
+              }
+              if (opts.conflicts) {
+                change.doc._conflicts = PouchMerge.collectConflicts(metadata);
+              }
+              results.push(change);
+            }
+          }
+          PouchUtils.processChanges(opts, results, last_seq);
+        });
+      });
+    }
+
+    if (opts.filter && typeof opts.filter === 'string') {
+      var filterName = opts.filter.split('/');
+      api.get('_design/' + filterName[0], function(err, ddoc) {
+        /*jshint evil: true */
+        var filter = eval('(function() { return ' +
+                          ddoc.filters[filterName[1]] + ' })()');
+        opts.filter = filter;
+        fetchChanges();
+      });
+    } else {
+      fetchChanges();
+    }
+  };
+
+  api._close = function(callback) {
+    //WebSQL databases do not need to be closed
+    PouchUtils.call(callback, null);
+  };
+
+  api._getAttachment = function(attachment, opts, callback) {
+    var res;
+    var tx = opts.ctx;
+    var digest = attachment.digest;
+    var type = attachment.content_type;
+    var sql = 'SELECT body FROM ' + ATTACH_STORE + ' WHERE digest=?';
+    tx.executeSql(sql, [digest], function(tx, result) {
+      var data = result.rows.item(0).body;
+      if (opts.encode) {
+        res = btoa(data);
+      } else {
+        res = new Blob([data], {type: type});
+      }
+      PouchUtils.call(callback, null, res);
+    });
+  };
+
+  api._getRevisionTree = function(docId, callback) {
+    db.transaction(function (tx) {
+      var sql = 'SELECT json AS metadata FROM ' + DOC_STORE + ' WHERE id = ?';
+      tx.executeSql(sql, [docId], function(tx, result) {
+        if (!result.rows.length) {
+          PouchUtils.call(callback, Pouch.Errors.MISSING_DOC);
+        } else {
+          var data = JSON.parse(result.rows.item(0).metadata);
+          PouchUtils.call(callback, null, data.rev_tree);
+        }
+      });
+    });
+  };
+
+  api._doCompaction = function(docId, rev_tree, revs, callback) {
+    db.transaction(function (tx) {
+      var sql = 'SELECT json AS metadata FROM ' + DOC_STORE + ' WHERE id = ?';
+      tx.executeSql(sql, [docId], function(tx, result) {
+        if (!result.rows.length) {
+          return PouchUtils.call(callback);
+        }
+        var metadata = JSON.parse(result.rows.item(0).metadata);
+        metadata.rev_tree = rev_tree;
+
+        var sql = 'DELETE FROM ' + BY_SEQ_STORE + ' WHERE doc_id_rev IN (' +
+          revs.map(function(rev){return quote(docId + '::' + rev);}).join(',') + ')';
+
+        tx.executeSql(sql, [], function(tx, result) {
+          var sql = 'UPDATE ' + DOC_STORE + ' SET json = ? WHERE id = ?';
+
+          tx.executeSql(sql, [JSON.stringify(metadata), docId], function(tx, result) {
+            callback();
+          });
+        });
+      });
+    });
+  };
+
+  return api;
+};
+
+webSqlPouch.valid = function() {
+  console.log("Supports webSqlPouch (window.openDatabase)? " + !!window.openDatabase);
+  return !!window.openDatabase;
+};
+
+webSqlPouch.destroy = function(name, callback) {
+  var db = openDatabase(name, POUCH_VERSION, name, POUCH_SIZE);
+  db.transaction(function (tx) {
+    tx.executeSql('DROP TABLE IF EXISTS ' + DOC_STORE, []);
+    tx.executeSql('DROP TABLE IF EXISTS ' + BY_SEQ_STORE, []);
+    tx.executeSql('DROP TABLE IF EXISTS ' + ATTACH_STORE, []);
+    tx.executeSql('DROP TABLE IF EXISTS ' + META_STORE, []);
+  }, unknownError(callback), function() {
+    PouchUtils.call(callback, null);
+  });
+};
+
+webSqlPouch.Changes = new PouchUtils.Changes();
+
+Pouch.adapter('websql', webSqlPouch);
+
+/*global Pouch: true, pouchCollate: true */
+
+"use strict";
+
+var pouchCollate;
+if (typeof module !== 'undefined' && module.exports) {
+  pouchCollate = require('../pouch.collate.js');
+}
+
+// This is the first implementation of a basic plugin, we register the
+// plugin object with pouch and it is mixin'd to each database created
+// (regardless of adapter), adapters can override plugins by providing
+// their own implementation. functions on the plugin object that start
+// with _ are reserved function that are called by pouchdb for special
+// notifications.
+
+// If we wanted to store incremental views we can do it here by listening
+// to the changes feed (keeping track of our last update_seq between page loads)
+// and storing the result of the map function (possibly using the upcoming
+// extracted adapter functions)
+
+var MapReduce = function(db) {
+
+  function viewQuery(fun, options) {
+    if (!options.complete) {
+      return;
+    }
+
+    if (!fun.reduce) {
+      options.reduce = false;
+    }
+
+    function sum(values) {
+      return values.reduce(function(a, b) { return a + b; }, 0);
+    }
+
+    var builtInReduce = {
+      "_sum": function(keys, values){
+        return sum(values);
+      },
+
+      "_count": function(keys, values, rereduce){
+        if (rereduce){
+          return sum(values);
+        } else {
+          return values.length;
+        }
+      },
+
+      "_stats": function(keys, values, rereduce) {
+        return {
+          'sum': sum(values),
+          'min': Math.min.apply(null, values),
+          'max': Math.max.apply(null, values),
+          'count': values.length,
+          'sumsqr': (function(){
+            var _sumsqr = 0;
+            for(var idx in values) {
+              if (typeof values[idx] === 'number') {
+              _sumsqr += values[idx] * values[idx];
+              }
+            }
+            return _sumsqr;
+          })()
+        };
+      }
+    };
+
+    var results = [];
+    var current = null;
+    var num_started= 0;
+    var completed= false;
+
+    var emit = function(key, val) {
+      var viewRow = {
+        id: current.doc._id,
+        key: key,
+        value: val
+      };
+
+      if (options.startkey && pouchCollate(key, options.startkey) < 0) return;
+      if (options.endkey && pouchCollate(key, options.endkey) > 0) return;
+      if (options.key && pouchCollate(key, options.key) !== 0) return;
+
+      num_started++;
+      if (options.include_docs) {
+        //in this special case, join on _id (issue #106)
+        if (val && typeof val === 'object' && val._id){
+          db.get(val._id,
+              function(_, joined_doc){
+                if (joined_doc) {
+                  viewRow.doc = joined_doc;
+                }
+                results.push(viewRow);
+                checkComplete();
+              });
+          return;
+        } else {
+          viewRow.doc = current.doc;
+        }
+      }
+      results.push(viewRow);
+    };
+
+    // ugly way to make sure references to 'emit' in map/reduce bind to the
+    // above emit
+    eval('fun.map = ' + fun.map.toString() + ';');
+    if (fun.reduce) {
+      if (builtInReduce[fun.reduce]) {
+        fun.reduce = builtInReduce[fun.reduce];
+      }
+
+      eval('fun.reduce = ' + fun.reduce.toString() + ';');
+    }
+
+    //only proceed once all documents are mapped and joined
+    var checkComplete= function(){
+      if (completed && results.length == num_started){
+        results.sort(function(a, b) {
+          return pouchCollate(a.key, b.key);
+        });
+        if (options.descending) {
+          results.reverse();
+        }
+        if (options.reduce === false) {
+          return options.complete(null, {
+            rows: ('limit' in options)
+              ? results.slice(0, options.limit)
+              : results,
+            total_rows: results.length
+          });
+        }
+
+        var groups = [];
+        results.forEach(function(e) {
+          var last = groups[groups.length-1] || null;
+          if (last && pouchCollate(last.key[0][0], e.key) === 0) {
+            last.key.push([e.key, e.id]);
+            last.value.push(e.value);
+            return;
+          }
+          groups.push({key: [[e.key, e.id]], value: [e.value]});
+        });
+        groups.forEach(function(e) {
+          e.value = fun.reduce(e.key, e.value);
+          e.value = (typeof e.value === 'undefined') ? null : e.value;
+          e.key = e.key[0][0];
+        });
+
+        options.complete(null, {
+          rows: ('limit' in options)
+            ? groups.slice(0, options.limit)
+            : groups,
+          total_rows: groups.length
+        });
+      }
+    };
+
+    db.changes({
+      conflicts: true,
+      include_docs: true,
+      onChange: function(doc) {
+        if (!('deleted' in doc)) {
+          current = {doc: doc.doc};
+          fun.map.call(this, doc.doc);
+        }
+      },
+      complete: function() {
+        completed= true;
+        checkComplete();
+      }
+    });
+  }
+
+  function httpQuery(fun, opts, callback) {
+
+    // List of parameters to add to the PUT request
+    var params = [];
+    var body = undefined;
+    var method = 'GET';
+
+    // If opts.reduce exists and is defined, then add it to the list
+    // of parameters.
+    // If reduce=false then the results are that of only the map function
+    // not the final result of map and reduce.
+    if (typeof opts.reduce !== 'undefined') {
+      params.push('reduce=' + opts.reduce);
+    }
+    if (typeof opts.include_docs !== 'undefined') {
+      params.push('include_docs=' + opts.include_docs);
+    }
+    if (typeof opts.limit !== 'undefined') {
+      params.push('limit=' + opts.limit);
+    }
+    if (typeof opts.descending !== 'undefined') {
+      params.push('descending=' + opts.descending);
+    }
+    if (typeof opts.startkey !== 'undefined') {
+      params.push('startkey=' + encodeURIComponent(JSON.stringify(opts.startkey)));
+    }
+    if (typeof opts.endkey !== 'undefined') {
+      params.push('endkey=' + encodeURIComponent(JSON.stringify(opts.endkey)));
+    }
+    if (typeof opts.key !== 'undefined') {
+      params.push('key=' + encodeURIComponent(JSON.stringify(opts.key)));
+    }
+    if (typeof opts.group !== 'undefined') {
+      params.push('group=' + opts.group);
+    }
+    if (typeof opts.group_level !== 'undefined') {
+      params.push('group_level=' + opts.group_level);
+    }
+
+    // If keys are supplied, issue a POST request to circumvent GET query string limits
+    // see http://wiki.apache.org/couchdb/HTTP_view_API#Querying_Options
+    if (typeof opts.keys !== 'undefined') {
+      method = 'POST';
+      body = JSON.stringify({keys:opts.keys});
+    }
+
+    // Format the list of parameters into a valid URI query string
+    params = params.join('&');
+    params = params === '' ? '' : '?' + params;
+
+    // We are referencing a query defined in the design doc
+    if (typeof fun === 'string') {
+      var parts = fun.split('/');
+      db.request({
+        method: method,
+        url: '_design/' + parts[0] + '/_view/' + parts[1] + params,
+        body: body
+      }, callback);
+      return;
+    }
+
+    // We are using a temporary view, terrible for performance but good for testing
+    var queryObject = JSON.parse(JSON.stringify(fun, function(key, val) {
+      if (typeof val === 'function') {
+        return val + ''; // implicitly `toString` it
+      }
+      return val;
+    }));
+
+    db.request({
+      method:'POST',
+      url: '_temp_view' + params,
+      body: queryObject
+    }, callback);
+  }
+
+  function query(fun, opts, callback) {
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+
+    if (callback) {
+      opts.complete = callback;
+    }
+
+    if (db.type() === 'http') {
+	  if (typeof fun === 'function'){
+	    return httpQuery({map: fun}, opts, callback);
+	  }
+	  return httpQuery(fun, opts, callback);
+    }
+
+    if (typeof fun === 'object') {
+      return viewQuery(fun, opts);
+    }
+
+    if (typeof fun === 'function') {
+      return viewQuery({map: fun}, opts);
+    }
+
+    var parts = fun.split('/');
+    db.get('_design/' + parts[0], function(err, doc) {
+      if (err) {
+        if (callback) callback(err);
+        return;
+      }
+
+      if (!doc.views[parts[1]]) {
+        if (callback) callback({ error: 'not_found', reason: 'missing_named_view' });
+        return;
+      }
+
+      viewQuery({
+        map: doc.views[parts[1]].map,
+        reduce: doc.views[parts[1]].reduce
+      }, opts);
+    });
+  }
+
+  return {'query': query};
+};
+
+// Deletion is a noop since we dont store the results of the view
+MapReduce._delete = function() { };
+
+Pouch.plugin('mapreduce', MapReduce);
+
+ })(this);// $.couch is used to communicate with a CouchDB server, the server methods can
 // be called directly without creating an instance. Typically all methods are
 // passed an <code>options</code> object which defines a success callback which
 // is called with the data returned from the http request to CouchDB, you can
@@ -303,31 +5894,36 @@ function binb2b64(binarray)
 
     // Returns the session information for the currently logged in user.
     session: function(options) {
+
+      if (options.success) options.success();
+
+      return;
+
       options = options || {};
       // Ugly hack to use  Lets session authentication work on kindle and nook
       // Note: $.ajax handles objects and strings, this only handles objects.
       // Dependencies jQuery, jQuery.cookie
       var data = "";
       isNookOrKindle = /nook|kindle/.test(navigator.userAgent.toLowerCase()); // see jQuery.browser.mobile
-      if ( isNookOrKindle ) 
-      { 
+      if ( isNookOrKindle )
+      {
         AuthSession = { 'AuthSession' : $.cookie( "AuthSession" ) };
         if ( options && options.data ) // we like objective data
         {
-          if (typeof(options.data) == "object") 
+          if (typeof(options.data) == "object")
           {
             data = $.extend( options.data, AuthSession );
           } else
           {
             console.log("fet broke your code. Make your get request data an object.")
-          } 
-        } else 
+          }
+        } else
         {
           data = AuthSession;
         }
-      } 
+      }
       return $.ajax({
-        type: "GET", 
+        type: "GET",
         url: this.urlPrefix + "/_session",
         async: false,
         data: data,
@@ -349,8 +5945,8 @@ function binb2b64(binarray)
 
     userDb : function(callback) {
       return $.couch.session({
-        success : function(resp) {
-          var userDb = $.couch.db(resp.info.authentication_db);
+        success : function() {
+          var userDb = new PouchDB("_users");
           callback(userDb);
         }
       });
@@ -393,6 +5989,12 @@ function binb2b64(binarray)
      // expected to have <code>name</code> and <code>password</code> fields.
     login: function(options) {
       options = options || {};
+
+      // Set the cookie
+      $.cookie( "AuthSession", "admin", { expires: 600 });
+      if (options.success) options.success();
+      return;
+
       return $.ajax({
         type: "POST", url: this.urlPrefix + "/_session", dataType: "json",
         data: {name: options.name, password: options.password},
@@ -416,6 +6018,13 @@ function binb2b64(binarray)
     // Delete your current CouchDB user session
     logout: function(options) {
       options = options || {};
+
+      // Set the cookie
+      $.cookie("AuthSession", "");
+      if (options.success) options.success();
+      return;
+
+
       return $.ajax({
         type: "DELETE", url: this.urlPrefix + "/_session", dataType: "json",
         username : "_", password : "_",
@@ -1081,7 +6690,8 @@ function binb2b64(binarray)
     return obj !== null ? JSON.stringify(obj) : null;
   }
 
-})(jQuery);/*!
+})(jQuery);
+/*!
 * jQuery Cookie Plugin
 * https://github.com/carhartl/jquery-cookie
 *
@@ -3104,6 +8714,271 @@ Backbone.Collection = (function(_super) {
   return Collection;
 
 })(Backbone.Collection);
+/*! backbone-pouch - v1.1.0 - 2013-07-16
+* http://jo.github.io/backbone-pouch/
+* Copyright (c) 2013 Johannes J. Schmidt; Licensed MIT */
+(function(root) {
+  'use strict';
+  
+  var BackbonePouch;
+  if (typeof exports === 'object') {
+    BackbonePouch = exports;
+  } else {
+    BackbonePouch = root.BackbonePouch = {};
+  }
+
+  // Require Underscore, if we're on the server, and it's not already present.
+  var _ = root._;
+  if (!_ && (typeof require === 'function')) {
+    _ = require('underscore');
+  }
+
+  var methodMap = {
+    'create': 'post',
+    'update': 'put',
+    'patch':  'put',
+    'delete': 'remove'
+  };
+
+  BackbonePouch.defaults = {
+    fetch: 'allDocs',
+    listen: true,
+    options: {
+      post: {},
+      put: {},
+      get: {},
+      remove: {},
+      allDocs: {
+        include_docs: true
+      },
+      query: {
+        include_docs: true
+      },
+      spatial: {
+        include_docs: true
+      },
+      changes: {
+        continuous: true,
+        include_docs: true
+      }
+    }
+  };
+
+  function applyDefaults(options, defaults) {
+    options.options = options.options || {};
+    defaults.options = defaults.options || {};
+
+    // merge toplevel options
+    if (typeof options.fetch === 'undefined') {
+      options.fetch = defaults.fetch;
+    }
+    if (typeof options.listen === 'undefined') {
+      options.listen = defaults.listen;
+    }
+    if (typeof options.db === 'undefined') {
+      options.db = defaults.db;
+    }
+
+    // merge PouchDB options
+    _.each(defaults.options, function(value, key) {
+      options.options[key] = options.options[key] || {};
+      _.extend(options.options[key], value);
+    });
+  }
+
+  // backbone-pouch sync adapter
+  BackbonePouch.sync = function(defaults) {
+    defaults = defaults || {};
+    applyDefaults(defaults, BackbonePouch.defaults);
+
+    var adapter = function(method, model, options) {
+      options = options || {};
+      applyDefaults(options, model && model.pouch || {});
+      applyDefaults(options, defaults);
+
+      // This is to get the options (especially options.db)
+      // by calling model.sync() without arguments.
+      if (typeof method !== 'string') {
+        return options;
+      }
+
+      // ensure we have a pouch db adapter
+      if (!options.db) {
+        throw new Error('A "db" property must be specified');
+      }
+
+      function callback(err, response) {
+        if (err) {
+          return options.error && options.error(err);
+        }
+        if (method === 'create' || method === 'update' || method === 'patch') {
+          response = {
+            _id: response.id,
+            _rev: response.rev
+          };
+        }
+        if (method === 'delete') {
+          response = {};
+        }
+        if (method === 'read') {
+          if (response.rows) {
+            response = _.map(response.rows, function(row) {
+              // use `doc` value if present
+              return row.doc ||
+                // or use `value` property otherwise
+                // and inject id
+                _.extend({
+                  _id: row.id
+                }, row.value);
+            });
+          }
+          if (options.listen) {
+            // TODO:
+            // * implement for model
+            // * allow overwriding of since.
+            options.db.info(function(err, info) {
+              // get changes since info.update_seq
+              options.db.changes(_.extend({}, options.options.changes, {
+                since: info.update_seq,
+                onChange: function(change) {
+                  var todo = model.get(change.id);
+
+                  if (change.deleted) {
+                    if (todo) {
+                      todo.destroy();
+                    }
+                  } else {
+                    if (todo) {
+                      todo.set(change.doc);
+                    } else {
+                      model.add(change.doc);
+                    }
+                  }
+
+                  // call original onChange if present
+                  if (typeof options.options.changes.onChange === 'function') {
+                    options.options.changes.onChange(change);
+                  }
+                }
+              }));
+            });
+          }
+        }
+        return options.success && options.success(response);
+      }
+
+      model.trigger('request', model, options.db, options);
+
+      if (method === 'read') {
+        // get single model
+        if (model.id) {
+          return options.db.get(model.id, options.options.get, callback);
+        }
+        // query view or spatial index
+        if (options.fetch === 'query' || options.fetch === 'spatial') {
+          if (!options.options[options.fetch].fun) {
+            throw new Error('A "' + options.fetch + '.fun" object must be specified');
+          }
+          return options.db[options.fetch](options.options[options.fetch].fun, options.options[options.fetch], callback);
+        }
+        // allDocs or spatial query
+        options.db[options.fetch](options.options[options.fetch], callback);
+      } else {
+        options.db[methodMap[method]](model.toJSON(), options.options[methodMap[method]], callback);
+      }
+
+      return options;
+    };
+
+    adapter.defaults = defaults;
+
+    return adapter;
+  };
+
+  BackbonePouch.attachments = function(defaults) {
+    defaults = defaults || {};
+
+    function attachmentId(id, name) {
+      return encodeURIComponent(id) + '/' + encodeURIComponent(name);
+    }
+
+    function getPouch(model) {
+      if (model.pouch && model.pouch.db) {
+        return model.pouch.db;
+      }
+      if (model.collection && model.collection.pouch && model.collection.pouch.db) {
+        return model.collection.pouch.db;
+      }
+      
+      if (defaults.db) {
+        return defaults.db;
+      }
+      
+      var options = model.sync();
+      if (options.db) {
+        return options.db;
+      }
+
+      // TODO: ask sync adapter
+        
+      throw new Error('A "db" property must be specified');
+    }
+
+    return {
+      attachments: function(filter) {
+        var atts = this.get('_attachments') || {};
+        if (filter) {
+          return _.filter(_.keys(atts), function(key) {
+            if (typeof filter === 'function') {
+              return filter(key, atts[key]);
+            }
+            
+            return atts[key].content_type.match(filter);
+          });
+        }
+        return _.keys(atts);
+      },
+      attachment: function(name, done) {
+        // TODO: first look at the _attachments stub,
+        // maybe there the data is already there
+        var db = getPouch(this);
+        return db.getAttachment(attachmentId(this.id, name), done);
+      },
+      attach: function(blob, name, type, done) {
+        if (typeof name === 'function') {
+          done = name;
+          name = undefined;
+          type = undefined;
+        }
+        if (typeof type === 'function') {
+          done = type;
+          type = undefined;
+        }
+        name = name || blob.filename;
+        type = type || blob.type;
+
+        // If I do not already have an id, give me one
+        if (!this.id) {
+          this.set({ _id: Math.uuid() }, { silent: true });
+        }
+        
+        var db = getPouch(this);
+        var that = this;
+        return db.putAttachment(attachmentId(this.id, name), this.get('_rev'), blob, type, function(err, response) {
+          if (!err && response.rev) {
+            var atts = that.get('_attachments') || {};
+            atts[name] = {
+              content_type: type,
+              stub: true
+            };
+            that.set({ _rev: response.rev, _attachments: atts }, { silent: true });
+          }
+          done(err, response);
+        });
+      }
+    };
+  };
+}(this));
 // Generated by CoffeeScript 1.6.3
 var CheckDigit;
 

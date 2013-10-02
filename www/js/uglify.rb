@@ -1,5 +1,5 @@
 #! /usr/bin/env ruby
-
+require 'rubygems'
 require 'uglifier'
 require 'pathname'
 
@@ -19,9 +19,9 @@ ARGV.each { |arg|
 
 
 # TODO test to see if we can use a glob for modules/* to make this automatic
-# I don't think we have any code that needs to be run in order, but don't do 
+# I don't think we have any code that needs to be run in order, but don't do
 # make this change until we can do regression tests
-jsFiles = [ 
+jsFiles = [
   'helpers.js',
 
   'modules/button/ButtonView.js',
@@ -161,16 +161,20 @@ jsFiles = [
 
   'router.js',
 
+  'configuration.js',
+
+  'templates.js',
+
   'boot.js',
 
   'version.js'
 ]
 
 libFiles = [
-# 'lib/phonegap.js',
   'lib/jquery.js',
   'lib/underscore.js',
   'lib/sha1.js',
+  'lib/pouchdb-nightly.js',
   'lib/jquery.couch.js',
   'lib/jquery.cookie.js',
   'lib/jquery.tablesorter.js',
@@ -190,15 +194,13 @@ libFiles = [
   'lib/inflection.js',
   'lib/backbone.js',
   'lib/moment.js',
+  'lib/backbone-couchdb.js',
   'lib/backbone-pouch.js',
   'lib/transcriptionCheckdigit.js',
   'lib/table2CSV.js',
   'lib/base64.js',
   'lib/jstz.js',
   'lib/ckeditor.js',
-  '../_docs/configuration.js',
-  '../_docs/templates.js',
-  'lib/pouchdb-nightly.js',
   'lib/coffee-script.js' # This file tends to like to be last
 ]
 
@@ -208,6 +210,9 @@ def replace(file_path, contents)
   regExp = Regexp.new("#{startString}(.*)#{endString}", Regexp::MULTILINE)
   replacedResult = IO.read(file_path).gsub(regExp, "#{startString}\n#{contents}\n#{endString}")
   File.open(file_path, 'w') { |f| f.write(replacedResult) }
+  puts "*"*80
+  puts "*"*80
+  puts "*"*80
 end
 
 if $options[:make_index_dev]
@@ -221,11 +226,11 @@ if $options[:make_app]
   for path in jsFiles
     puts "reading #{path}"
     path = File.join(Dir.pwd, "min", Pathname.new(path).basename.to_s.gsub(".js",".min.js"))
-    app += File.read path 
+    app += File.read path
 
   end
 
-  File.open( "app.js", 'w' ) { |f| 
+  File.open( "app.js", 'w' ) { |f|
     puts "writing app.js"
     f.write( app )
   }
@@ -248,8 +253,8 @@ if $options[:make_lib]
     lib += File.read(path)
   end
 
-  File.open( "lib.js", 'w' ) { |f| 
+  File.open( "lib.js", 'w' ) { |f|
     puts "writing lib.js"
-    f.write lib 
+    f.write lib
   }
 end

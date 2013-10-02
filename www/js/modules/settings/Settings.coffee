@@ -56,8 +56,8 @@ class Settings extends Backbone.Model
     subnetBase = @config.get("subnet").base
 
 
-    if Tangerine.settings.get("context") != "server"
-      if groupHost?
+    if groupHost
+      if Tangerine.settings.get("context") != "server"
         splitGroup = groupHost.split("://")
         groupHost = "#{splitGroup[0]}://#{@upUser}:#{@upPass}@#{splitGroup[1]}"
 
@@ -75,20 +75,20 @@ class Settings extends Backbone.Model
         url : "http://#{update.host}/"
         db  : "http://#{update.host}/#{update.dbName}/"
         target : update.target
-      subnet : 
+      subnet :
         url : ("http://#{subnetBase}#{@ipRange[x]}:#{port}/"                 for x in [0..255])
         db  : ("http://#{subnetBase}#{@ipRange[x]}:#{port}/#{local.dbName}/" for x in [0..255])
-      satellite : 
+      satellite :
         url : ("#{subnetBase}#{x}:#{port}/"                       for x in [0..255])
         db  : ("#{subnetBase}#{x}:#{port}/#{prefix}#{groupName}/" for x in [0..255])
 
-    @couch = 
+    @couch =
       view  : "_design/#{designDoc}/_view/"
       show  : "_design/#{designDoc}/_show/"
       list  : "_design/#{designDoc}/_list/"
       index : "_design/#{designDoc}/index.html"
 
-    @groupCouch = 
+    @groupCouch =
       view  : "_design/#{groupDDoc}/_view/"
       show  : "_design/#{groupDDoc}/_show/"
       list  : "_design/#{groupDDoc}/_list/"
@@ -107,14 +107,14 @@ class Settings extends Backbone.Model
 
     if groupName == "trunk"
       groupName = "tangerine"
-    else 
+    else
       groupName = @config.get("groupDBPrefix") + groupName
 
     return "#{groupHost}#{port}/#{groupName}/#{@couch.index}#{hash}"
 
   urlHost  : ( location ) -> "#{@location[location].url}"
-  
-  urlDB    : ( location, pass = null ) -> 
+
+  urlDB    : ( location, pass = null ) ->
     if location == "local"
       result = "#{@location[location].db}".slice(1,-1)
     else
@@ -148,7 +148,7 @@ class Settings extends Backbone.Model
       "#{@location[location].db}#{@groupCouch.show}#{show}"
     else
       "#{@location[location].db}#{@couch.show}#{show}"
-  
+
   # these two are a little weird. I feel like subnetAddress should be a class with properties IP, URL and index
   urlSubnet: ( ip ) ->
     port   = @config.get "port"

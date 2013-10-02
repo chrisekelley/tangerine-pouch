@@ -1,5 +1,3 @@
-
-
 // $.couch is used to communicate with a CouchDB server, the server methods can
 // be called directly without creating an instance. Typically all methods are
 // passed an <code>options</code> object which defines a success callback which
@@ -90,31 +88,36 @@
 
     // Returns the session information for the currently logged in user.
     session: function(options) {
+
+      if (options.success) options.success();
+
+      return;
+
       options = options || {};
       // Ugly hack to use  Lets session authentication work on kindle and nook
       // Note: $.ajax handles objects and strings, this only handles objects.
       // Dependencies jQuery, jQuery.cookie
       var data = "";
       isNookOrKindle = /nook|kindle/.test(navigator.userAgent.toLowerCase()); // see jQuery.browser.mobile
-      if ( isNookOrKindle ) 
-      { 
+      if ( isNookOrKindle )
+      {
         AuthSession = { 'AuthSession' : $.cookie( "AuthSession" ) };
         if ( options && options.data ) // we like objective data
         {
-          if (typeof(options.data) == "object") 
+          if (typeof(options.data) == "object")
           {
             data = $.extend( options.data, AuthSession );
           } else
           {
             console.log("fet broke your code. Make your get request data an object.")
-          } 
-        } else 
+          }
+        } else
         {
           data = AuthSession;
         }
-      } 
+      }
       return $.ajax({
-        type: "GET", 
+        type: "GET",
         url: this.urlPrefix + "/_session",
         async: false,
         data: data,
@@ -136,8 +139,8 @@
 
     userDb : function(callback) {
       return $.couch.session({
-        success : function(resp) {
-          var userDb = $.couch.db(resp.info.authentication_db);
+        success : function() {
+          var userDb = new PouchDB("_users");
           callback(userDb);
         }
       });
@@ -180,6 +183,12 @@
      // expected to have <code>name</code> and <code>password</code> fields.
     login: function(options) {
       options = options || {};
+
+      // Set the cookie
+      $.cookie( "AuthSession", "admin", { expires: 600 });
+      if (options.success) options.success();
+      return;
+
       return $.ajax({
         type: "POST", url: this.urlPrefix + "/_session", dataType: "json",
         data: {name: options.name, password: options.password},
@@ -203,6 +212,13 @@
     // Delete your current CouchDB user session
     logout: function(options) {
       options = options || {};
+
+      // Set the cookie
+      $.cookie("AuthSession", "");
+      if (options.success) options.success();
+      return;
+
+
       return $.ajax({
         type: "DELETE", url: this.urlPrefix + "/_session", dataType: "json",
         username : "_", password : "_",
