@@ -767,11 +767,15 @@ class Router extends Backbone.Router
           showView()
         else
           users = new TabletUsers
-          users.fetch
+          fetchOptions =
+            fetch: 'query'
+            options:
+              query:
+                fun:
+                  map: (doc) -> emit(doc.collection, doc) if doc.collection
             success: ->
               showView(users)
-
-
+          users.fetch fetchOptions
 
   logout: ->
     Tangerine.user.logout()

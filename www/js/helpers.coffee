@@ -49,6 +49,7 @@ Backbone.Model.prototype.beforeSave = ->
     "updated" : (new Date()).toString()
     "hash" : @toHash()
     "fromInstanceId" : Tangerine.settings.getString("instanceId")
+
 #
 # This series of functions returns properties with default values if no property is found
 # @gotcha be mindful of the default "blank" values set here

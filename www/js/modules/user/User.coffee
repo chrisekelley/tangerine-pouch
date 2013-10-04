@@ -160,9 +160,9 @@ class User extends Backbone.Model
   ###
   fetch: ( callbacks={} ) =>
     $.couch.userDb (db) =>
-      db.openDoc "org.couchdb.user:#{@myName}",
+        db.get "org.couchdb.user:#{@myName}",
         success: ( userDoc ) =>
-          Tangerine.$db.openDoc "_security",
+          Tangerine.$db.get "_security",
             success: (securityDoc) =>
               @dbAdmins  = securityDoc?.admins?.names  || []
               @dbReaders = securityDoc?.members?.names || []
@@ -173,7 +173,6 @@ class User extends Backbone.Model
 
         error: =>
           callbacks.error?.apply(@, arguments)
-
 
 
   ###

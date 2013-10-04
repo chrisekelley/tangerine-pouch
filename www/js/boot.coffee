@@ -20,6 +20,7 @@ Tangerine.$db = $.couch.db(Tangerine.db_name)
 # Backbone.couch_connector.config.global_changes = false
 Backbone.sync = BackbonePouch.sync({
   db: PouchDB('tangerine')
+#  fetch: 'query'
 });
 Backbone.Model.prototype.idAttribute = '_id';
 
