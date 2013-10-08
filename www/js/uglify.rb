@@ -165,6 +165,8 @@ jsFiles = [
 
   'templates.js',
 
+  'views.js',
+
   'boot.js',
 
   'version.js'

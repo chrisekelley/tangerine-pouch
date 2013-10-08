@@ -47,6 +47,7 @@ class Settings extends Backbone.Model
     port       = @config.get "port"
 
     designDoc  = Tangerine.design_doc
+    designDoc  = groupDDoc
 
     prefix     = @config.get "groupDBPrefix"
 

@@ -41,7 +41,7 @@ class Subtest extends Backbone.Model
           newQuestion = question.clone()
           newQuestion.save
             "assessmentId" : assessmentId
-            "_id"          : Utils.guid() 
+            "_id"          : Utils.guid()
             "subtestId"    : newId
         # send user to edit page for reordering subtests
         Tangerine.router.navigate "edit/#{assessmentId}", true

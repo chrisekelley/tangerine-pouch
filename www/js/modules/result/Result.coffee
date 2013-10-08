@@ -1,12 +1,15 @@
 class Result extends Backbone.Model
-
   url: "result"
 
   initialize: ( options ) ->
 
     # could use defaults but it messes things up
     if options.blank == true
-      device = device || Device || {}
+      # Checking for phonegap Device... could do it this way:
+      # navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry|IEMobile)/)
+      if !device && typeof(Device) != "undefined"
+        device = Device
+      device = device || {}
       deviceInfo =
         'name'      : device.name
         'platform'  : device.platform
@@ -15,6 +18,7 @@ class Result extends Backbone.Model
         'userAgent' : navigator.userAgent
 
       @set
+        'collection'        : "result"
         'subtestData'       : []
         'start_time'        : (new Date()).getTime()
         'enumerator'        : Tangerine.user.name()
@@ -26,7 +30,7 @@ class Result extends Backbone.Model
 
   add: ( subtestDataElement, callbacks = {}) ->
     @setSubtestData subtestDataElement, callbacks
-    @save null, 
+    @save null,
       success: callbacks.success || $.noop
       error:   callbacks.error   || $.noop
 

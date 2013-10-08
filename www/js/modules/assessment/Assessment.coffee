@@ -43,6 +43,15 @@ class Assessment extends Backbone.Model
         allSubtests = new Subtests
         allSubtests.fetch
           key: @id
+          fetch: 'query'
+          options:
+            query:
+              fun:
+                map: ( doc ) ->
+                  return unless doc.collection is "subtest"
+                  id = doc.assessmentId or doc.curriculumId
+                  return unless id != null
+                  emit id, doc
           success: (collection) =>
             @subtests = collection
             @subtests.maintainOrder()
@@ -54,7 +63,8 @@ class Assessment extends Backbone.Model
     @lastDKey = dKey
     
     # split to handle multiple dkeys
-    dKeys = dKey.replace(/[^a-f0-9]/g," ").split(/\s+/)
+#    dKeys = dKey.replace(/[^a-f0-9]/g," ").split(/\s+/)
+    dKeys = dKey.split(/\s+/)
 
     @trigger "status", "import lookup"
 
@@ -77,40 +87,62 @@ class Assessment extends Backbone.Model
       else
         "/"+sourceDB+"/"+Tangerine.settings.couch.view + "byDKey"
 
+    replicationErrorLog = (err, result) =>
+      if result?
+        console.log("Replication is fine. ")
+      else
+        console.log("Replication error: " + JSON.stringify(err));
+        if err && (err.status is 401)
+          alert("Error: Name or password is incorrect. Unable to connect to the server.");
+
     $.ajax 
       url: sourceDKey,
       type: "GET"
       dataType: "jsonp"
       data: keys: JSON.stringify(dKeys)
+#      data: keys: dKeys
+#        ["testtest"]
       error: (a, b) => @trigger "status", "import error", "#{a} #{b}"
       success: (data) =>
         docList = []
         for datum in data.rows
           docList.push datum.id
 
-        $.ajax 
-          url: localDKey,
-          type: "POST"
-          contentType: "application/json"
-          dataType: "json"
-          data: JSON.stringify(keys:dKeys)
-          error: (a, b) => @trigger "status", "import error", "#{a} #{b}"
-          success: (data) =>
-            for datum in data.rows
-              docList.push datum.id
+        docList = _.uniq(docList)
+        opts =
+          continuous: false,
+#          doc_ids:docList
+#          withCredentials:true,
+          cookieAuth: {username:"uploader-sweetgroup", password:"pass"},
+          auth: {username:"uploader-sweetgroup", password:"pass"},
+#          complete: onComplete,
+          timeout: 60000,
+          doc_ids: docList;
+        Backbone.sync.defaults.db.replicate.from(sourceDB, opts, replicationErrorLog);
 
-            docList = _.uniq(docList)
+#        $.ajax
+#          url: localDKey,
+#          type: "POST"
+#          contentType: "application/json"
+#          dataType: "json"
+#          data: JSON.stringify(keys:dKeys)
+#          error: (a, b) => @trigger "status", "import error", "#{a} #{b}"
+#          success: (data) =>
+#            for datum in data.rows
+#              docList.push datum.id
+#
+#            docList = _.uniq(docList)
 
-            $.couch.replicate( 
-              sourceDB,
-              targetDB,
-                success: (response)=> 
-                  @checkConflicts docList 
-                  @trigger "status", "import success", response
-                error: (a, b)      => @trigger "status", "import error", "#{a} #{b}"
-              ,
-                doc_ids: docList
-            )
+#            $.couch.replicate(
+#              sourceDB,
+#              targetDB,
+#                success: (response)=>
+#                  @checkConflicts docList
+#                  @trigger "status", "import success", response
+#                error: (a, b)      => @trigger "status", "import error", "#{a} #{b}"
+#              ,
+#                doc_ids: docList
+#            )
 
     false
 

@@ -13,8 +13,8 @@ class SubtestRunView extends Backbone.View
     @protoViews  = Tangerine.config.get "prototypeViews"
     @model       = options.model
     @parent      = options.parent
-    @fontStyle = "style=\"font-family: #{@model.get('fontFamily')} !important;\"" if @model.get("fontFamily") != "" 
-    
+    @fontStyle = "style=\"font-family: #{@model.get('fontFamily')} !important;\"" if @model.get("fontFamily") != ""
+
     @prototypeRendered = false
 
   render: ->
@@ -31,14 +31,19 @@ class SubtestRunView extends Backbone.View
       #{enumeratorHelp}
       #{studentDialog}
       <div id='prototype_wrapper'></div>
-      
+
       <div class='controlls clearfix'>
         #{transitionComment}
         <button class='next navigation'>#{t('next')}</button>#{if skippable then skipButton else "" }
       </div>
     "
-  
+
     # Use prototype specific views here
+#    if !(protoView = [@protoViews[@model.get 'prototype']])
+#      return
+#    if !(protoView['run'])
+#      return
+
     @prototypeView = new window[@protoViews[@model.get 'prototype']['run']]
       model  : @model
       parent : @
@@ -63,7 +68,7 @@ class SubtestRunView extends Backbone.View
     @prototypeView?.afterRender?()
     @onShow()
 
-  showNext: => @$el.find(".controlls").show() 
+  showNext: => @$el.find(".controlls").show()
   hideNext: => @$el.find(".controlls").hide()
 
   onShow: ->
@@ -92,7 +97,7 @@ class SubtestRunView extends Backbone.View
     link = @model.get("gridLinkId") || ""
     if link == "" then return
     grid = @parent.model.subtests.get @model.get("gridLinkId")
-    gridWasAutostopped = @parent.result.gridWasAutostopped grid.id    
+    gridWasAutostopped = @parent.result.gridWasAutostopped grid.id
 
   onClose: ->
     @prototypeView?.close?()
@@ -121,9 +126,9 @@ class SubtestRunView extends Backbone.View
   getResult: ->
     result = @prototypeView.getResult()
     hash = @model.get("hash") if @model.has("hash")
-    return { 
+    return {
       'body' : result
-      'meta' : 
+      'meta' :
         'hash' : hash
     }
 

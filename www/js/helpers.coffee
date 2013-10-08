@@ -44,7 +44,7 @@ Backbone.Model.prototype.toHash = ->
 
 # by default all models will save a timestamp and hash of significant attributes
 Backbone.Model.prototype.beforeSave = ->
-  @set 
+  @set
     "editedBy" : Tangerine?.user?.name() || "unknown"
     "updated" : (new Date()).toString()
     "hash" : @toHash()
@@ -64,7 +64,7 @@ Backbone.Model.prototype.getBoolean =       (key) -> return if @has(key) then (@
 #
 # handy jquery functions
 #
-( ($) -> 
+( ($) ->
 
   $.fn.scrollTo = (speed = 250, callback) ->
     try
@@ -154,7 +154,7 @@ sks = [ { q : (km["0100ser"[i]] for i in [0..6]), i : 0, c : -> Tangerine.settin
         { q : (km["0900redo"[i]] for i in [0..7]), i : 0, c : -> vm.currentView.index--; vm.currentView.resetNext(); },
         { q : (km["0900back"[i]] for i in [0..7]), i : 0, c : -> vm.currentView.index -= 2; vm.currentView.index = Math.max(0, vm.currentView.index); vm.currentView.resetNext(); },
         { q : (km["0100update"[i]] for i in [0..9]), i : 0, c : -> Utils.updateTangerine( -> Utils.midAlert("Updated, please refresh.") ) } ]
-$(document).keydown (e) -> ( if e.keyCode == sks[j].q[sks[j].i++] then sks[j]['c']() if sks[j].i == sks[j].q.length else sks[j].i = 0 ) for sk, j in sks 
+$(document).keydown (e) -> ( if e.keyCode == sks[j].q[sks[j].i++] then sks[j]['c']() if sks[j].i == sks[j].q.length else sks[j].i = 0 ) for sk, j in sks
 
 
 String.prototype.safetyDance = -> this.replace(/\s/g, "_").replace(/[^a-zA-Z0-9_]/g,"")
@@ -200,7 +200,6 @@ _.indexBy = ( propertyName, objectArray ) ->
 class Utils
 
   @loadCollections : ( loadOptions ) ->
-
     throw "You're gonna want a callback in there, buddy." unless loadOptions.complete?
 
     toLoad = loadOptions.collections || []
@@ -209,6 +208,7 @@ class Utils
       if current = toLoad.pop()
         memberName = current.underscore().camelize(true)
         options[memberName] = new window[current]
+        console.log(current, options[memberName])
         options[memberName].fetch
           success: ->
             getNext options
@@ -218,7 +218,9 @@ class Utils
     getNext {}
 
   @universalUpload: ->
-    $.ajax 
+    # TODO: May need rewrite
+    console.log "May need rewrite: UNIVERSAL UPLOAD"
+    $.ajax
       url: Tangerine.settings.urlView("local", "byCollection")
       type: "POST"
       dataType: "json"
@@ -228,7 +230,7 @@ class Utils
       )
       success: (data) ->
         docList = _.pluck(data.rows,"id")
-        
+
         $.couch.replicate(
           Tangerine.settings.urlDB("local"),
           Tangerine.settings.urlDB("group"),
@@ -257,6 +259,8 @@ class Utils
 
 
   @updateTangerine: (doResolve = true, options = {}) ->
+    # TODO: May need rewrite
+    console.log "May need rewrite: UPDATE TANGERINE"
 
     return unless Tangerine.user.isAdmin()
 
@@ -284,7 +288,7 @@ class Utils
       keys : docIds
       success: (response) ->
         oldDocs = []
-        for row in response.rows  
+        for row in response.rows
           oldDocs.push {
             "_id"  : row.id
             "_rev" : row.value.rev
@@ -352,7 +356,7 @@ class Utils
       if Tangerine.loadingTimer?
         clearTimeout Tangerine.loadingTimer
         Tangerine.loadingTimer = null
-          
+
       $(".loading_bar").remove()
 
   @showLoadingIndicator: ->
@@ -361,7 +365,7 @@ class Utils
   # asks for confirmation in the browser, and uses phonegap for cool confirmation
   @confirm: (message, options) ->
     if navigator.notification?.confirm?
-      navigator.notification.confirm message, 
+      navigator.notification.confirm message,
         (input) ->
           if input == 1
             options.callback true
@@ -383,7 +387,7 @@ class Utils
   # works on textareas, input type text and password
   @getValues: ( selector ) ->
     values = {}
-    $(selector).find("input[type=text], input[type=password], textarea").each ( index, element ) -> 
+    $(selector).find("input[type=text], input[type=password], textarea").each ( index, element ) ->
       values[element.id] = element.value
     return values
 
@@ -413,7 +417,7 @@ class Utils
 
 
     if Utils["#{where}AlertTimer"]?
-      clearTimeout Utils["#{where}AlertTimer"] 
+      clearTimeout Utils["#{where}AlertTimer"]
       $alert = $(selector)
       $alert.html( $alert.html() + "<br>" + alertText )
     else
@@ -423,11 +427,11 @@ class Utils
 
     do ($alert, selector, delay) ->
       computedDelay = ((""+$alert.html()).match(/<br>/g)||[]).length * 1500
-      Utils["#{where}AlertTimer"] = setTimeout -> 
+      Utils["#{where}AlertTimer"] = setTimeout ->
           Utils["#{where}AlertTimer"] = null
           $alert.fadeOut(250, -> $(this).remove() )
       , Math.max(computedDelay, delay)
-      
+
 
 
   @sticky: (html, buttonText = "Close", callback, position = "middle") ->
@@ -468,7 +472,7 @@ class Utils
 
     $pass.on "keyup", (event) ->
       return true unless event.which == 13
-      $button.off "click" 
+      $button.off "click"
       $pass.off "change"
 
       callback $pass.val()
@@ -492,7 +496,7 @@ class Utils
 
   @humanGUID: -> return @randomLetters(4)+"-"+@randomLetters(4)+"-"+@randomLetters(4)
   @safeLetters = "abcdefghijlmnopqrstuvwxyz".split("")
-  @randomLetters: (length) -> 
+  @randomLetters: (length) ->
     result = ""
     while length--
       result += Utils.safeLetters[Math.floor(Math.random()*Utils.safeLetters.length)]
@@ -523,7 +527,7 @@ class Utils
 
   # not currently implemented but working
   @resizeScrollPane: ->
-    $(".scroll_pane").height( $(window).height() - ( $("#navigation").height() + $("#footer").height() + 100) ) 
+    $(".scroll_pane").height( $(window).height() - ( $("#navigation").height() + $("#footer").height() + 100) )
 
   # asks user if they want to logout
   @askToLogout: -> Tangerine.user.logout() if confirm("Would you like to logout now?")
@@ -538,8 +542,10 @@ class Utils
 
 # Robbert interface
 class Robbert
-  
+
   @request: (options) ->
+    # TODO: May need rewrite
+    console.log "May need rewrite: Robbert Request"
 
     success = options.success
     error   = options.error
@@ -562,6 +568,8 @@ class Robbert
 class TangerineTree
 
   @make: (options) ->
+    # TODO: May need rewrite
+    console.log "May need rewrite: TANGERINE TREE MAKE"
 
     Utils.working true
     success = options.success
@@ -601,6 +609,6 @@ $ ->
   $("#content").on "click", ".disposable_alert", ->
     $(this).stop().fadeOut 100, ->
       $(this).remove()
-  
+
   # $(window).resize Utils.resizeScrollPane
   # Utils.resizeScrollPane()

@@ -35,8 +35,8 @@
          "groupDDoc" : "ojai",
          "language" : "en",
          "log" : [""],
-         "groupName" : "",
-         "groupHost" : "http://databases.tangerinecentral.org",
+         "groupName" : "sweetgroup",
+         "groupHost" : "https://ugandagaap.iriscouch.com",
          "upPass" : "pass"
       }
    },

@@ -11,7 +11,7 @@ class AssessmentImportView extends Backbone.View
   groupImport: ->
 
     $.ajax 
-      url: Tangerine.settings.urlView("local", "byDKey"),
+      url: Tangerine.settings.urlView("group", "byDKey"),
       type: "POST"
       contentType: "application/json"
       dataType: "json"

@@ -1,26 +1,30 @@
 var configuration = {
    "_id" : "configuration",
 
-   "local" : {
-      "dbName" : "tangerine",
-      "login"  : "localuser:localpass",
-      "host"   : "http://localhost"
-   },
-
+  "local" : {
+    "dbName" : "group-sweetgroup",
+    "login"  : "admin:password",
+    "host"   : "http://localhost:5984"
+  },
+  "import" : {
+    "couchappUrl": "http://localhost:5984/group-sweetgroup/_design/ojai/index.html"
+  },
    "update" : {
-      "target" : "http://localadmin:localpassword@localhost:5984/tangerine",
+      "target" : "http://admin:password@localhost:5984/tangerine",
       "dbName" : "update",
-      "host"   : "databases.tangerinecentral.org",
+      "host"   : "http://localhost:5984",
       "login"  : ""
    },
-
+  "log" : {
+    "spp" : true
+  },
    "subnet" : {
-      "base" : "192.168.1."
+      "base" : "192.168.0."
    },
 
    "trunk" : {
       "dbName" : "tangerine",
-      "host" : "databases.tangerinecentral.org"
+      "host" : "localhost"
    },
 
    "groupDBPrefix" : "group-",
@@ -35,8 +39,8 @@ var configuration = {
          "groupDDoc" : "ojai",
          "language" : "en",
          "log" : [""],
-         "groupName" : "",
-         "groupHost" : "http://databases.tangerinecentral.org",
+         "groupName" : "sweetgroup",
+         "groupHost" : "http://admin:password@localhost:5984",
          "upPass" : "pass"
       }
    },
