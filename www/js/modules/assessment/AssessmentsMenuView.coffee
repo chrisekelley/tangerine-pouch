@@ -124,8 +124,6 @@ class AssessmentsMenuView extends Backbone.View
       containers.push "<section id='teachers_container' class='TeachersView'></section>"     if @teachers.length isnt 0
       containers.push "<section id='users_menu_container' class='UsersMenuView'></section>"  if @users.length isnt 0
 
-
-
     html = "
       #{Tangerine.settings.contextualize(
         server : "
@@ -133,6 +131,9 @@ class AssessmentsMenuView extends Backbone.View
           #{apkButton}
           #{resultsButton} 
           #{groupHandle}
+          ",
+        mobile : "
+          #{resultsButton}
           "
         ) }
       <section>

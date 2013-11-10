@@ -169,10 +169,10 @@
           return options.db.get(model.id, options.options.get, callback);
         }
         // Backbone couch api support
-        if (this.view) {
-          options.fetch = "query";
-          options.options[options.fetch].fun = window[this.view];
-        }
+//        if (this.view) {
+//          options.fetch = "query";
+//          options.options[options.fetch].fun = window[this.view];
+//        }
         // query view or spatial index
         if (options.fetch === 'query' || options.fetch === 'spatial') {
           if (!options.options[options.fetch].fun) {

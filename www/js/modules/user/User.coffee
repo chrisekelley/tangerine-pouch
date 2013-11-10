@@ -86,7 +86,7 @@ class User extends Backbone.Model
           @intent = ""
           @trigger "pass-error", t("LoginView.message.error_password_incorrect")
           Tangerine.log.app "User-login-fail", name + " password incorrect"
-        else 
+        else
           @intent = "login"
           @signup name, pass
 
@@ -145,30 +145,30 @@ class User extends Backbone.Model
   save: (keyObject, valueOptions, options ) ->
     attrs = {}
     if _.isObject keyObject
-      attrs = $.extend attrs, keyObject 
+      attrs = $.extend attrs, keyObject
       options = valueOptions
-    else 
+    else
       attrs[keyObject] = value
     # get user DB
     $.couch.userDb (db) =>
-      db.saveDoc $.extend(@attributes, attrs),
-        success: =>
-          options.success?.apply(@, arguments)
+      db.put $.extend(@attributes, attrs), (err, response) ->
+        if (response)
+          options.success?.apply(@, response)
 
   ###
     Fetches user's doc from _users, loads into @attributes
   ###
   fetch: ( callbacks={} ) =>
     $.couch.userDb (db) =>
-        db.get "org.couchdb.user:#{@myName}",
-        success: ( userDoc ) =>
-          Tangerine.$db.get "_security",
-            success: (securityDoc) =>
+        db.get "org.couchdb.user:#{@myName}", (err, userDoc) ->
+        if userDoc
+          Tangerine.$db.get "_security", (err, securityDoc) ->
+            if securityDoc
               @dbAdmins  = securityDoc?.admins?.names  || []
               @dbReaders = securityDoc?.members?.names || []
               @dbReaders = _.filter(@dbReaders,(a)=>a.substr(0, 8)!="uploader")
               @set userDoc
-              callbacks.success?.apply(@, arguments)
+              callbacks.success?.apply(@, securityDoc)
               @trigger 'group-refresh'
 
         error: =>
@@ -176,9 +176,9 @@ class User extends Backbone.Model
 
 
   ###
-  
+
   Groups
-  
+
   ###
 
   joinGroup: (group, callback = {}) ->
@@ -197,7 +197,7 @@ class User extends Backbone.Model
             # Robbert does not interact with the session.
             if response.status == "success"
               @login @get("name"), auth_p, success:callback
-              @trigger "group-join" 
+              @trigger "group-join"
 
             Utils.midAlert response.message
           error : (error) =>

@@ -50,12 +50,12 @@ class Router extends Backbone.Router
     'dataEntry/:id' : 'dataEntry'
 
     'resume/:assessmentId/:resultId'    : 'resume'
-    
+
     'restart/:id'   : 'restart'
     'edit/:id'      : 'edit'
     'results/:id'   : 'results'
     'import'        : 'import'
-    
+
     'subtest/:id'       : 'editSubtest'
 
     'question/:id' : 'editQuestion'
@@ -65,17 +65,16 @@ class Router extends Backbone.Router
 
     'sync/:id'      : 'sync'
 
-    
+
   admin: (options) ->
     Tangerine.user.verify
       isAdmin: ->
-        $.couch.allDbs
-          success: (databases) =>
+        Tangerine.$db.allDbs (err, databases) ->
             groups = databases.filter (database) -> database.indexOf("group-") == 0
             view = new AdminView
               groups : groups
             vm.show view
-    
+
   dashboard: (options) ->
     options = options?.split(/\//)
     #default view options
@@ -161,7 +160,7 @@ class Router extends Backbone.Router
               success: ->
                 subtests = allSubtests.where "curriculumId" : curriculumId
                 allParts = (subtest.get("part") for subtest in subtests)
-                partCount = Math.max.apply Math, allParts 
+                partCount = Math.max.apply Math, allParts
                 view = new CurriculumView
                   "curriculum" : curriculum
                   "subtests" : subtests
@@ -261,7 +260,7 @@ class Router extends Backbone.Router
                 Tangerine.$db.view "#{Tangerine.design_doc}/resultsByStudentSubtest",
                   key : [studentId,subtestId]
                   success: (response) =>
-                    allResults = new KlassResults 
+                    allResults = new KlassResults
                     allResults.fetch
                       success: (collection) ->
                         results = collection.where
@@ -357,7 +356,7 @@ class Router extends Backbone.Router
 
   dataEntry: ( assessmentId ) ->
     Tangerine.user.verify
-      isAdmin: ->    
+      isAdmin: ->
         assessment = new Assessment "_id" : assessmentId
         assessment.fetch
           success: ->
@@ -374,7 +373,7 @@ class Router extends Backbone.Router
 
   sync: ( assessmentId ) ->
     Tangerine.user.verify
-      isAdmin: ->    
+      isAdmin: ->
         assessment = new Assessment "_id" : assessmentId
         assessment.fetch
           success: ->
@@ -418,7 +417,7 @@ class Router extends Backbone.Router
 
   edit: (id) ->
     Tangerine.user.verify
-      isAdmin: ->    
+      isAdmin: ->
         assessment = new Assessment
           "_id" : id
         assessment.fetch
@@ -464,7 +463,7 @@ class Router extends Backbone.Router
               "_id" : resultId
             result.fetch
               success: (result) ->
-                view = new AssessmentRunView 
+                view = new AssessmentRunView
                   model: assessment
 
                 if result.has("order_map")
@@ -480,7 +479,7 @@ class Router extends Backbone.Router
                 # replace the view's result with our old one
                 view.result = result
 
-                # Hijack the normal Result and ResultView, use one from the db 
+                # Hijack the normal Result and ResultView, use one from the db
                 view.subtestViews.pop()
                 view.subtestViews.push new ResultView
                   model          : result
@@ -531,7 +530,7 @@ class Router extends Backbone.Router
           success :  ->
             filename = assessment.get("name") + "-" + moment().format("YYYY-MMM-DD HH:mm")
             document.location = "/" + Tangerine.dbName + "/_design/" + Tangerine.designDoc + "/_list/csv/csvRowByResult?key=\"#{id}\"&filename=#{filename}"
-        
+
       isUser: ->
         errView = new ErrorView
           message : "You're not an admin user"
@@ -614,7 +613,7 @@ class Router extends Backbone.Router
               allSubtests = new Subtests
               allSubtests.fetch
                 success: ( allSubtests ) ->
-                  subtests = new Subtests allSubtests.where 
+                  subtests = new Subtests allSubtests.where
                     "curriculumId" : klass.get("curriculumId")
                     "reportType"   : "progress"
                   allResults = new KlassResults
@@ -788,7 +787,7 @@ class Router extends Backbone.Router
       Tangerine.user.verify
         isAuthenticated: ->
           showView = (teacher) ->
-            view = new AccountView 
+            view = new AccountView
               user : Tangerine.user
               teacher: teacher
             vm.show view
@@ -831,7 +830,7 @@ class Router extends Backbone.Router
       isAuthenticated: ->
         users = new TabletUsers
         users.fetch
-          success: -> 
+          success: ->
             teachers = new Teachers
             teachers.fetch
               success: =>
@@ -861,7 +860,7 @@ class Router extends Backbone.Router
             , name,
             success: ->
               user = new User
-              user.save 
+              user.save
                 "name"  : name
                 "id"    : "tangerine.user:"+name
                 "roles" : []

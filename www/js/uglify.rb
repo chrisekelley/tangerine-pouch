@@ -24,6 +24,8 @@ ARGV.each { |arg|
 jsFiles = [
   'helpers.js',
 
+  'views.js',
+
   'modules/button/ButtonView.js',
 
   'modules/assessment/Assessment.js',
@@ -164,8 +166,6 @@ jsFiles = [
   'configuration.js',
 
   'templates.js',
-
-  'views.js',
 
   'boot.js',
 

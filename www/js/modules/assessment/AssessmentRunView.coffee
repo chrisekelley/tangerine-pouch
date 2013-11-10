@@ -136,7 +136,12 @@ class AssessmentRunView extends Backbone.View
       sum         : currentView.getSum()
     ,
       success : =>
+        console.log("saveResult was successful - resetNext.")
         @resetNext()
+      error: (error, msg) =>
+        console.log "save error"
+        console.log arguments
+        callbacks.error?(error, msg)
 
   resetNext: =>
     @rendered.subtest = false

@@ -220,27 +220,50 @@ class Utils
   @universalUpload: ->
     # TODO: May need rewrite
     console.log "May need rewrite: UNIVERSAL UPLOAD"
-    $.ajax
-      url: Tangerine.settings.urlView("local", "byCollection")
-      type: "POST"
-      dataType: "json"
-      contentType: "application/json"
-      data: JSON.stringify(
-        keys : ["result"]
-      )
+#    $.ajax
+#      url: Tangerine.settings.urlView("local", "byCollection")
+#      type: "POST"
+#      dataType: "json"
+#      contentType: "application/json"
+#      data: JSON.stringify(
+#        keys : ["result"]
+#      )
+    dbResults = new Results()
+    dbResults.fetch
+      fetch: 'query'
+      options:
+        query:
+          fun:  byCollection
       success: (data) ->
-        docList = _.pluck(data.rows,"id")
+        docList = _.pluck(data.models,"id")
+#        $.couch.replicate(
+#          Tangerine.settings.urlDB("local"),
+#          Tangerine.settings.urlDB("group"),
+#            success: =>
+#              Utils.sticky "Results synced to cloud successfully."
+#            error: (code, message) =>
+#              Utils.sticky "Upload error<br>#{code} #{message}"
+#          ,
+#            doc_ids: docList
+#        )
+        opts =
+          continuous: false,
+#          doc_ids:docList
+#          withCredentials:true,
+          cookieAuth: {username:"uploader-sweetgroup", password:"pass"},
+          auth: {username:"uploader-sweetgroup", password:"pass"},
+#          complete: onComplete,
+          timeout: 60000,
+          doc_ids: docList;
+        Backbone.sync.defaults.db.replicate.to(Tangerine.settings.urlDB("group"), opts, replicationErrorLog);
 
-        $.couch.replicate(
-          Tangerine.settings.urlDB("local"),
-          Tangerine.settings.urlDB("group"),
-            success: =>
-              Utils.sticky "Results synced to cloud successfully."
-            error: (code, message) =>
-              Utils.sticky "Upload error<br>#{code} #{message}"
-          ,
-            doc_ids: docList
-        )
+  replicationErrorLog = (err, result) =>
+    if result?
+      console.log("Replication is fine. ")
+    else
+      console.log("Replication error: " + JSON.stringify(err));
+      if err && (err.status is 401)
+        alert("Error: Name or password is incorrect. Unable to connect to the server.");
 
   @restartTangerine: (message, callback) ->
     Utils.midAlert "#{message || 'Restarting Tangerine'}"

@@ -161,7 +161,7 @@
       // prepare user doc based on name and password
       user_doc = this.prepareUserDoc(user_doc, password);
       return $.couch.userDb(function(db) {
-        db.saveDoc(user_doc, options);
+        db.put(user_doc, options);
       });
     },
 

@@ -2,7 +2,11 @@ class Results extends Backbone.Collection
 
   url : "result"
   model : Result
-  view: "resultsByAssessmentId"
+  pouch:
+    fetch: 'query'
+    options:
+      query:
+        fun:  resultsByAssessmentId
 
   comparator: (model) ->
     model.get('start_time') || 0

@@ -40,7 +40,7 @@ var configuration = {
          "language" : "en",
          "log" : [""],
          "groupName" : "sweetgroup",
-         "groupHost" : "http://admin:password@localhost:5984",
+         "groupHost" : "http://localhost:5984",
          "upPass" : "pass"
       }
    },

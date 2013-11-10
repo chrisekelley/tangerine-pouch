@@ -33,7 +33,7 @@ class TabletManagerView extends Backbone.View
 
     Utils.working true
     @randomIdDoc = hex_sha1(""+Math.random())
-    Tangerine.$db.saveDoc 
+    Tangerine.$db.put
       "_id" : @randomIdDoc
     ,
       success: (doc) =>
